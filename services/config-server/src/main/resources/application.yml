@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: native # Use 'native' profile to load configurations from local files
+  application:
+      name: config-server # Name of the configuration server application
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/configurations   # This is where the configuration files for each service will be stored
+
+server:
+  port: 8888
