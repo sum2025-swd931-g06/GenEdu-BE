@@ -1,13 +1,14 @@
 services:
   postgresql:
     container_name: ms_pg_sql
-    image: postgres
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       PGDATA: /data/postgres
     volumes:
       - postgres:/data/postgres
+      - ./postgres_init.sql:/docker-entrypoint-initdb.d/postgres_init.sql
     ports:
       - "5432:5432"
     networks:
