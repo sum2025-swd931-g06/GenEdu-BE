@@ -1,4 +1,4 @@
-POST http://localhost:8222/api/v1/customers
+POST http://localhost:8222/api/v1/users
 Content-Type: application/json
 
 {
