@@ -6,32 +6,3 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: "http://localhost:9099/realms/GenEdu"
-  cloud:
-    gateway:
-      discovery:
-        locator:
-          enabled: true
-      routes:
-        - id: user-service
-          uri: lb:http://USER-SERVICE
-          predicates:
-            - Path=/api/v1/users/**
-        - id: user-service-swagger
-          uri: lb:http://USER-SERVICE
-          predicates:
-            - Path=/aggregate/user-service/v3/api-docs
-          filters:
-            - RewritePath=/aggregate/user-service/v3/api-docs, /v3/api-docs
-springdoc:
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-    config-url: /v3/api-docs/swagger-config
-    urls:
-      - url: /v3/api-docs
-      - name: API Gateway Service
-      - url: /aggregate/user-service/v3/api-docs
-        name: User Service
-  api-docs:
-    path: /v3/api-docs
-    enabled: true
