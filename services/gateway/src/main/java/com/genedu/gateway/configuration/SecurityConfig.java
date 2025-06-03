@@ -23,6 +23,7 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityFilterChain (ServerHttpSecurity httpSecurity) {
         return httpSecurity
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(Customizer.withDefaults())
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(freeResources).permitAll()
                         .anyExchange().authenticated())

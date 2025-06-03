@@ -4,6 +4,7 @@ import com.genedu.user.dto.customer.CreateUserValidatorGroup;
 import com.genedu.user.dto.customer.UserCreationRequestDTO;
 import com.genedu.user.model.User;
 import com.genedu.user.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "keycloak")
 public class UserController {
 
     private final UserService userService;

@@ -2,10 +2,12 @@ server:
   port: 8090
 
 spring:
+  # Database configuration
   datasource:
     url: jdbc:postgresql://localhost:5432/userdb
     username: admin
     password: admin
+  # JPA and Hibernate configuration
   jpa:
     hibernate:
       ddl-auto: validate
@@ -15,6 +17,7 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  # Flyway configuration
     flyway:
       enabled: true
       baseline-on-migrate: true
@@ -22,11 +25,3 @@ spring:
       password: admin
       baseline-description: "Baseline init for user service"
       baseline-version: 0
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-  api-docs:
-    path: /v3/api-docs
-  csrf:
-    enabled: false
