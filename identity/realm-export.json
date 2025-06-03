@@ -869,51 +869,7 @@
         "phone",
         "offline_access",
         "microprofile-jwt"
-      ],
-      "authorizationSettings": {
-        "allowRemoteResourceManagement": true,
-        "policyEnforcementMode": "ENFORCING",
-        "resources": [
-          {
-            "name": "Default Resource",
-            "ownerManagedAccess": false,
-            "displayName": "Default Resource",
-            "attributes": {},
-            "_id": "c149a5c3-4118-484a-a78d-f92a616f56b3",
-            "uris": [
-              "/*"
-            ],
-            "icon_uri": ""
-          }
-        ],
-        "policies": [
-          {
-            "id": "01e3fe97-e09e-4304-a905-81f71cc767b9",
-            "name": "Default Policy",
-            "description": "",
-            "type": "role",
-            "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS",
-            "config": {
-              "roles": "[{\"id\":\"default-roles-genedu\",\"required\":false}]"
-            }
-          },
-          {
-            "id": "c598ffb4-b611-4fc4-a006-30886b6e82f8",
-            "name": "Default Permission",
-            "description": "",
-            "type": "resource",
-            "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS",
-            "config": {
-              "resources": "[\"Default Resource\"]",
-              "applyPolicies": "[\"Default Policy\"]"
-            }
-          }
-        ],
-        "scopes": [],
-        "decisionStrategy": "UNANIMOUS"
-      }
+      ]
     },
     {
       "id": "605cc1e9-e4ec-46c3-b29a-df3942a5f6f9",
