@@ -1,6 +1,25 @@
 spring:
   config:
     import: optional:configserver:http://localhost:8888
-
   application:
     name: user-service
+
+  # Security configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9099/realms/GenEdu
+          jwk-set-uri: http://localhost:9099/realms/GenEdu/protocol/openid-connect/certs
+# Spring Doc configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    oauth:
+      client-id: genedu-be
+      client-secret: kniGc5Z7lwdgtOjBuwfrNIIEpYRia9Lb
+    csrf:
+      enabled: false

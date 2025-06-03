@@ -15,13 +15,15 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/aggregate/**",
-            "/actuator/**"
+            "/actuator/**",
+            "/webjars/**",
     };
 
     @Bean
     public SecurityWebFilterChain securityFilterChain (ServerHttpSecurity httpSecurity) {
         return httpSecurity
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(Customizer.withDefaults())
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(freeResources).permitAll()
                         .anyExchange().authenticated())

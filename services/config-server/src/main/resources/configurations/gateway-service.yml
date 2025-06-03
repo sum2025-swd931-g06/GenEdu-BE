@@ -5,33 +5,44 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: "http://localhost:9099/realms/GenEdu"
+          issuer-uri: http://localhost:9099/realms/GenEdu
+          jwk-set-uri: http://localhost:9099/realms/GenEdu/protocol/openid-connect/certs
+  # Gateway configuration
   cloud:
     gateway:
       discovery:
         locator:
           enabled: true
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: '*'
+            allowedMethods: '*'
+            allowedHeaders: '*'
+            allowCredentials: false
+  # Route configuration
       routes:
+        # User Service Routes
         - id: user-service
-          uri: lb:http://USER-SERVICE
+          uri: lb://USER-SERVICE
           predicates:
             - Path=/api/v1/users/**
+        # User Service Swagger Route
         - id: user-service-swagger
-          uri: lb:http://USER-SERVICE
+          uri: lb://USER-SERVICE
           predicates:
-            - Path=/aggregate/user-service/v3/api-docs
+            - Path=/aggregate/user-service/**
           filters:
-            - RewritePath=/aggregate/user-service/v3/api-docs, /v3/api-docs
+            - RewritePath=/aggregate/user-service(?<segment>/?.*), $\{segment}
+
+# Spring Doc configuration
 springdoc:
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-    config-url: /v3/api-docs/swagger-config
-    urls:
-      - url: /v3/api-docs
-      - name: API Gateway Service
-      - url: /aggregate/user-service/v3/api-docs
-        name: User Service
   api-docs:
     path: /v3/api-docs
-    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    use-root-path: true
+    # Configuration for Swagger UI Services
+    urls:
+      - name: User Service
+        url: /aggregate/user-service/v3/api-docs
