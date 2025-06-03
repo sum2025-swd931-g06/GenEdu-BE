@@ -73,8 +73,8 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
     networks:
       - microservices-net
-#    command: 'start-dev --import-realm'
-    command: 'start-dev'
+    command: 'start-dev --import-realm'
+    # command: 'start-dev'
     volumes:
       - ./identity/realm-export.json:/opt/keycloak/data/import/realm-export.json
 
