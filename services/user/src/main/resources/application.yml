@@ -4,13 +4,5 @@ spring:
   application:
     name: user-service
 
-keycloak:
-  server-url: http://localhost:9099
-  realm: GenEdu
-  client-id: admin-cli
-  grant-type: password
-  password: genedu-admin
-  username: genedu-admin
-  client-secret: wEli51b7nULXyzcNAao2jqu1HEAEJgNw
 
 

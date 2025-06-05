@@ -8,7 +8,7 @@ spring:
 springdoc:
   swagger-ui:
     oauth:
-      client-id: genedu-be
-      client-secret: r2zFR2utotgHybjmw1JAXk8TRyYsvvWz
+      client-id: ${KC_GENEDU_GENEDU_BE_CLIENT_ID:genedu-be}
+      client-secret: ${KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY:r2zFR2utotgHybjmw1JAXk8TRyYsvvWz}
     csrf:
       enabled: false
