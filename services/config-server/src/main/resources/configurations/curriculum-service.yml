@@ -1,10 +1,10 @@
 server:
-  port: 8090
+  port: 8091
 
 spring:
   # Database configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/userdb
+    url: jdbc:postgresql://localhost:5432/curriculumdb
     username: admin
     password: admin
   # JPA and Hibernate configuration
@@ -17,7 +17,7 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-  # Flyway configuration
+    # Flyway configuration
     flyway:
       enabled: true
       baseline-on-migrate: true
@@ -25,7 +25,7 @@ spring:
       password: admin
       baseline-description: "Baseline init for user service"
       baseline-version: 0
-# Security configuration
+  # Security configuration
   security:
     oauth2:
       resourceserver:

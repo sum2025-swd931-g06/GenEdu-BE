@@ -9,6 +9,6 @@ springdoc:
   swagger-ui:
     oauth:
       client-id: genedu-be
-      client-secret: kniGc5Z7lwdgtOjBuwfrNIIEpYRia9Lb
+      client-secret: r2zFR2utotgHybjmw1JAXk8TRyYsvvWz
     csrf:
       enabled: false

@@ -1,45 +1,38 @@
 package com.genedu.user.controller;
 
-import com.genedu.user.dto.customer.CreateUserValidatorGroup;
-import com.genedu.user.dto.customer.UserCreationRequestDTO;
-import com.genedu.user.model.User;
+import com.genedu.user.dto.customer.UserListResponseDTO;
+import com.genedu.user.dto.customer.UserResponseDTO;
 import com.genedu.user.service.UserService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.groups.Default;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-@SecurityRequirement(name = "keycloak")
 public class UserController {
-
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<User> createUser(
-        @RequestBody @Validated({Default.class, CreateUserValidatorGroup.class}) UserCreationRequestDTO userCreationRequestDTO
+    @GetMapping("/admin/users")
+    ResponseEntity<UserListResponseDTO> getAllUsers(
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false)
+            int pageNo
     ) {
-        return ResponseEntity.ok(userService.createUser(userCreationRequestDTO));
+        UserListResponseDTO users = userService.getAllUsers(pageNo);
+        return ResponseEntity.ok(users);
     }
 
-    @PutMapping("{userId}")
-    public ResponseEntity<Void> updateUser(
-        @PathVariable UUID userId,
-        @RequestBody @Validated({Default.class}) UserCreationRequestDTO userCreationRequestDTO
-    ) {
-        userService.updateUser(userCreationRequestDTO, userId);
-        return ResponseEntity.accepted().build();
-    }
-
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers () {
-        return ResponseEntity.ok(userService.getAllUsers());
+    @GetMapping("/admin/{userId}")
+    ResponseEntity<UserResponseDTO> getUserProfile(@PathVariable String userId) {
+        UserResponseDTO userResponseDTO = userService.getUserProfile(userId);
+        return ResponseEntity.ok(userResponseDTO);
     }
 }
