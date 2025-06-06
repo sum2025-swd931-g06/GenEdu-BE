@@ -34,6 +34,18 @@ spring:
             - Path=/aggregate/user-service/**
           filters:
             - RewritePath=/aggregate/user-service(?<segment>/?.*), $\{segment}
+        # Content Service Routes
+        - id: content-service
+          uri: lb://CONTENT-SERVICE
+          predicates:
+            - Path=/api/v1/users/**
+        # Content Service Swagger Route
+        - id: content-service-swagger
+          uri: lb://CONTENT-SERVICE
+          predicates:
+            - Path=/aggregate/content-service/**
+          filters:
+            - RewritePath=/aggregate/content-service(?<segment>/?.*), $\{segment}
 
 # Spring Doc configuration
 springdoc:
@@ -46,3 +58,10 @@ springdoc:
     urls:
       - name: User Service
         url: /aggregate/user-service/v3/api-docs
+      - name: Content Service
+        url: /aggregate/content-service/v3/api-docs
+    oauth:
+      client-id: ${KC_GENEDU_GENEDU_BE_CLIENT_ID}
+      client-secret: ${KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY}
+    csrf:
+      enabled: false

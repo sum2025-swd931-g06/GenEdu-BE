@@ -4,7 +4,7 @@ server:
 spring:
   # Database configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/curriculumdb
+    url: jdbc:postgresql://localhost:5432/contentdb
     username: admin
     password: admin
   # JPA and Hibernate configuration
