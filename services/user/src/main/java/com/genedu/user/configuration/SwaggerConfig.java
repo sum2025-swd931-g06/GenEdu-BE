@@ -8,7 +8,8 @@ import io.swagger.v3.oas.annotations.security.*;
 
 @OpenAPIDefinition(
         info = @Info(title = "Gate Way Service API", description = "Gate Way API documentation", version = "1.0"),
-        security = @SecurityRequirement(name = "keycloak")
+        security = @SecurityRequirement(name = "keycloak"
+        )
 )
 @SecurityScheme(
         name = "keycloak",

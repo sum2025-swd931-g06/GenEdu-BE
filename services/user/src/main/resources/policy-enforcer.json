@@ -1,0 +1,46 @@
+{
+  "realm": "GenEdu",
+  "auth-server-url": "http://localhost:9099",
+  "resource": "genedu-be",
+  "credentials": {
+    "secret": "r2zFR2utotgHybjmw1JAXk8TRyYsvvWz"
+  },
+  "paths" : [
+    {
+      "path": "/webjars/swagger-ui/**",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path": "/v3/api-docs/swagger-config",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path": "/v3/api-docs/swagger-resources/**",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path": "/swagger-ui/**",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path": "/swagger-ui/oauth2-redirect.html",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path": "/swagger-ui/index.html",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path": "/swagger-ui/swagger-initializer.js",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path": "/v3/api-docs",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path": "/aggregate/user-service/v3/api-docs",
+      "enforcement-mode": "DISABLED"
+    }
+  ]
+}

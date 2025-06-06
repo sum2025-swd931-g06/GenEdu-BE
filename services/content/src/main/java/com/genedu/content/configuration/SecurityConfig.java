@@ -1,4 +1,4 @@
-package com.genedu.user.configuration;
+package com.genedu.content.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.adapters.authorization.integration.jakarta.ServletPolicyEnforcerFilter;
@@ -37,16 +37,16 @@ public class SecurityConfig {
             "/actuator/**",
             "/webjars/**",
     };
-
+//
     @Bean
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable); // Disable CSRF protection for stateless APIs
         http.cors(Customizer.withDefaults()); // Enable CORS with default settings
-        http.addFilterAfter(createPolicyEnforcerFilter(), BearerTokenAuthenticationFilter.class); // Keycloak Policy Enforcer Filter
-        http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(freeResources).permitAll() // Allow free resources
-                .anyRequest().authenticated() // All other requests require authentication
-        );
+//        http.addFilterAfter(createPolicyEnforcerFilter(), BearerTokenAuthenticationFilter.class); // Keycloak Policy Enforcer Filter
+//        http.authorizeHttpRequests(authorize -> authorize
+//                .requestMatchers(freeResources).permitAll() // Allow free resources
+//                .anyRequest().authenticated() // All other requests require authentication
+//        );
         http.oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(Customizer.withDefaults()) // Use JWT for OAuth2 Resource Server
         );
@@ -72,20 +72,20 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-    private ServletPolicyEnforcerFilter createPolicyEnforcerFilter() {
-        return new ServletPolicyEnforcerFilter(new ConfigurationResolver() {
-            @Override
-            public PolicyEnforcerConfig resolve(HttpRequest request) {
-                try {
-                    // Set the base URL for the policy enforcer
-                    return JsonSerialization.
-                            readValue(getClass().getResourceAsStream("/policy-enforcer.json"),
-                                    PolicyEnforcerConfig.class);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
+//    private ServletPolicyEnforcerFilter createPolicyEnforcerFilter() {
+//        return new ServletPolicyEnforcerFilter(new ConfigurationResolver() {
+//            @Override
+//            public PolicyEnforcerConfig resolve(HttpRequest request) {
+//                try {
+//                    // Set the base URL for the policy enforcer
+//                    return JsonSerialization.
+//                            readValue(getClass().getResourceAsStream("/policy-enforcer.json"),
+//                                    PolicyEnforcerConfig.class);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        });
+//    }
 
 }
