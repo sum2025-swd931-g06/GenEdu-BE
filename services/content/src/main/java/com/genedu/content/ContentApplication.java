@@ -1,13 +1,13 @@
-package com.genedu.curriculum;
+package com.genedu.content;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CurriculumApplication {
+public class ContentApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CurriculumApplication.class, args);
+		SpringApplication.run(ContentApplication.class, args);
 	}
 
 }

@@ -5,10 +5,3 @@ spring:
     name: gateway-service
 
 
-springdoc:
-  swagger-ui:
-    oauth:
-      client-id: genedu-be
-      client-secret: kniGc5Z7lwdgtOjBuwfrNIIEpYRia9Lb
-    csrf:
-      enabled: false

@@ -1,0 +1,24 @@
+package com.genedu.content.model;
+
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "lessons")
+public class Lesson {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "title", columnDefinition = "varchar(255)", nullable = false)
+    private String title;
+
+    @Column(name = "order_number", columnDefinition = "int", nullable = false)
+    private Integer orderNumber;
+
+    @Column(name = "description", columnDefinition = "text")
+    private String description;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Chapter chapter;
+}

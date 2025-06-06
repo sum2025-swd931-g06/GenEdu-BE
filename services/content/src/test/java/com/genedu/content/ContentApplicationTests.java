@@ -1,10 +1,10 @@
-package com.genedu.curriculum;
+package com.genedu.content;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CurriculumApplicationTests {
+class ContentApplicationTests {
 
 	@Test
 	void contextLoads() {

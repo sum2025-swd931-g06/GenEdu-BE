@@ -1,56 +1,79 @@
 package com.genedu.user.service.impl;
 
-import com.genedu.user.dto.customer.UserCreationRequestDTO;
+import com.genedu.user.dto.customer.UserAdminDTO;
+import com.genedu.user.dto.customer.UserListResponseDTO;
+import com.genedu.user.dto.customer.UserResponseDTO;
 import com.genedu.user.exception.UserNotFoundException;
-import com.genedu.user.mapper.UserMapper;
 import com.genedu.user.model.User;
-import com.genedu.user.repository.UserRepository;
 import com.genedu.user.service.UserService;
+import com.genedu.user.configuration.KeycloakPropsConfig;
+import com.sun.tools.xjc.reader.xmlschema.bindinfo.BIConversion;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
+
+    private final Keycloak keycloak;
+    private final KeycloakPropsConfig keycloakPropsConfig;
+
+    private static final int USER_PER_PAGE = 10;
 
     @Override
-    public User createUser(UserCreationRequestDTO userCreationRequestDTO) {
-        return userRepository.save(userMapper.toCustomer(userCreationRequestDTO));
+    public UserResponseDTO getUserProfile(String userId) {
+        UserRepresentation userRepresentation = null;
+        try {
+            userRepresentation = keycloak.realm(keycloakPropsConfig.getRealm())
+                    .users()
+                    .get(userId)
+                    .toRepresentation();
+        } catch (Exception e) {
+            log.error("Error fetching user with ID {}: {}", userId, e.getMessage());
+        }
+
+        if (userRepresentation == null) {
+            log.error("User with ID {} not found", userId);
+            throw new UserNotFoundException("User not found with ID: " + userId);
+        }
+
+        return UserResponseDTO.fromUserRepresentation(userRepresentation);
     }
 
     @Override
-    public void updateUser(UserCreationRequestDTO userCreationRequestDTO, UUID customerId) {
-        if (customerId == null) {
-            throw new IllegalArgumentException("Customer ID must not be null for update");
-        }
-        User user = userMapper.toCustomer(userCreationRequestDTO);
-        User existingCustomer = userRepository.findById(user.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("Customer not found with ID: " + user.getUserId()));
+    public UserListResponseDTO getAllUsers(int pageNo) {
+        try {
+            List<UserAdminDTO> result = keycloak.realm(keycloakPropsConfig.getRealm()).users()
+                    .search(null, pageNo * USER_PER_PAGE, USER_PER_PAGE).stream()
+                    .filter(UserRepresentation::isEnabled)
+                    .map(UserAdminDTO::fromUserRepresentation)
+                    .toList();
+            int totalUser = result.size();
 
-        mergerUser(existingCustomer, user);
-        userRepository.save(existingCustomer);
+            return new UserListResponseDTO(totalUser, result, (totalUser + USER_PER_PAGE - 1) / USER_PER_PAGE);
+        } catch (RuntimeException exception) {
+            log.error("Error fetching users: {}", exception.getMessage());
+            throw new RuntimeException("Failed to fetch users: " + exception.getMessage(), exception);
+        }
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    private void mergerUser(User existingCustomer, User customer) {
-        if(StringUtils.isNotBlank(customer.getFirstName())) {
-            existingCustomer.setFirstName(customer.getFirstName());
-        }
-        if(StringUtils.isNotBlank(customer.getLastName())) {
-            existingCustomer.setLastName(customer.getLastName());
-        }
-        if(StringUtils.isNotBlank(customer.getEmail())) {
-            existingCustomer.setEmail(customer.getEmail());
+    public void clearUserSession(String userId) {
+        try {
+            keycloak.realm(keycloakPropsConfig.getRealm())
+                    .users()
+                    .get(userId)
+                    .logout();
+            log.info("User session cleared for user ID: {}", userId);
+        } catch (Exception e) {
+            log.error("Error clearing session for user ID {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Failed to clear user session: " + e.getMessage(), e);
         }
     }
 }
