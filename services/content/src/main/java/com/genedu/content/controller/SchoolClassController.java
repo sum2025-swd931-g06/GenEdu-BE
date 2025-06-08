@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/school-classes")
-@Tag(name = "School Class", description = "Quản lý danh sách lớp học")
+@Tag(name = "School Class", description = "Manage school classes in the system")
 public class SchoolClassController {
     private final SchoolClassService schoolClassService;
 
@@ -42,12 +42,31 @@ public class SchoolClassController {
         return ResponseEntity.ok(schoolClasses);
     }
 
+    @Operation(summary = "Lấy lớp học theo ID", description = "Trả về thông tin lớp học theo ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lấy lớp học thành công"),
+            @ApiResponse(responseCode = "404", description = "Lớp học không tìm thấy", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<SchoolClassResponseDTO> getSchoolClassById(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "ID của lớp học cần lấy thông tin", required = true
+            )
+            @PathVariable Integer id
+    ) {
+        log.info("Fetching school class with ID: {}", id);
+        SchoolClassResponseDTO schoolClass = schoolClassService.getSchoolClassById(id);
+        return ResponseEntity.ok(schoolClass);
+    }
+
     @Operation(summary = "Tạo mới lớp học", description = "Tạo một lớp học mới với tên và mô tả.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Tạo lớp học thành công"),
             @ApiResponse(responseCode = "400", description = "Dữ liệu không hợp lệ", content = @Content),
             @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
     })
+    @PostMapping()
     public ResponseEntity<SchoolClassResponseDTO> createSchoolClass(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Thông tin lớp học cần tạo", required = true

@@ -11,11 +11,4 @@ public record SchoolClassRequestDTO (String name, String description) {
             throw new IllegalArgumentException("Description cannot be null or blank");
         }
     }
-
-    public SchoolClass toSchoolClass() {
-        return SchoolClass.builder()
-                .name(this.name())
-                .description(this.description())
-                .build();
-    }
 }

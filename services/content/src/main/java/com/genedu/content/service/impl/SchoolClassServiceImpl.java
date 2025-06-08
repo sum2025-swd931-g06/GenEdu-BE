@@ -2,6 +2,7 @@ package com.genedu.content.service.impl;
 
 import com.genedu.content.dto.schoolclass.SchoolClassRequestDTO;
 import com.genedu.content.dto.schoolclass.SchoolClassResponseDTO;
+import com.genedu.content.mapper.SchoolClassMapper;
 import com.genedu.content.model.SchoolClass;
 import com.genedu.content.service.SchoolClassService;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,35 @@ public class SchoolClassServiceImpl implements SchoolClassService {
                 .toList();
     }
 
+    /**
+     * Retrieves a SchoolClass by its ID and converts it to a DTO.
+     * Throws IllegalArgumentException if the ID is null or not found.
+     *
+     * @param id ID of the school class.
+     * @return SchoolClassResponseDTO containing school class details.
+     */
+    public SchoolClassResponseDTO getSchoolClassById(Integer id) {
+        SchoolClass schoolClass = getSchoolClassEntityById(id);
+        return SchoolClassResponseDTO.fromSchoolClass(schoolClass);
+    }
+
+    /**
+     * Retrieves a SchoolClass entity by its ID.
+     * Throws IllegalArgumentException if the ID is null or not found.
+     *
+     * @param id ID of the school class.
+     * @return SchoolClass entity.
+     */
+    @Override
+    public SchoolClass getSchoolClassEntityById(Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("School class ID cannot be null.");
+        }
+
+        return schoolClassRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("School class not found with id: " + id));
+    }
+
     /*
      * Creates a new school class from the provided DTO.
      *
@@ -64,7 +94,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
             );
         }
 
-        SchoolClass schoolClass = schoolClassRequestDTO.toSchoolClass();
+        SchoolClass schoolClass = SchoolClassMapper.toEntity(schoolClassRequestDTO);
         schoolClass = schoolClassRepository.save(schoolClass);
 
         return SchoolClassResponseDTO.fromSchoolClass(schoolClass);
@@ -87,7 +117,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
                     "School class with name " + schoolClassRequestDTO.name() + " already exists.");
         }
 
-        existingSchoolClass = schoolClassRequestDTO.toSchoolClass();
+        existingSchoolClass = SchoolClassMapper.toEntity(schoolClassRequestDTO);
 
         existingSchoolClass = schoolClassRepository.save(existingSchoolClass);
         return SchoolClassResponseDTO.fromSchoolClass(existingSchoolClass);
