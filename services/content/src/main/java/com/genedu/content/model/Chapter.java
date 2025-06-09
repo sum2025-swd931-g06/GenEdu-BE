@@ -1,7 +1,13 @@
 package com.genedu.content.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+@RequiredArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
+@Setter
 @Entity
 @Table(name = "chapters")
 public class Chapter {
