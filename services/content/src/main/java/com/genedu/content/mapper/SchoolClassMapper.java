@@ -16,7 +16,11 @@ public class SchoolClassMapper {
         return new SchoolClassResponseDTO(
                 entity.getId().toString(),
                 entity.getName(),
-                entity.getDescription()
+                entity.getDescription(),
+                entity.getCreatedOn(),
+                entity.getCreatedBy(),
+                entity.getLastModifiedOn(),
+                entity.getLastModifiedBy()
         );
     }
 }

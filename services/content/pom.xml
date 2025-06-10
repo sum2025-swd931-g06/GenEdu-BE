@@ -88,6 +88,19 @@
 			<version>25.0.3</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.genedu</groupId>
+			<artifactId>common-library</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.genedu</groupId>
+			<artifactId>common-library</artifactId>
+			<version>${revision}</version>
+			<classifier>tests</classifier>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
