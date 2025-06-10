@@ -1,5 +1,7 @@
 package com.genedu.user.service.impl;
 
+import com.genedu.commonlibrary.exception.AccessDeniedException;
+import com.genedu.commonlibrary.exception.ForbiddenException;
 import com.genedu.user.dto.customer.UserAdminDTO;
 import com.genedu.user.dto.customer.UserListResponseDTO;
 import com.genedu.user.dto.customer.UserResponseDTO;
@@ -23,27 +25,22 @@ public class UserServiceImpl implements UserService {
 
     private final Keycloak keycloak;
     private final KeycloakPropsConfig keycloakPropsConfig;
+    private static final String ERROR_FORMAT = "%s: Client %s don't have access right for this resource";
 
     private static final int USER_PER_PAGE = 10;
 
     @Override
     public UserResponseDTO getUserProfile(String userId) {
-        UserRepresentation userRepresentation = null;
         try {
-            userRepresentation = keycloak.realm(keycloakPropsConfig.getRealm())
+            return UserResponseDTO.fromUserRepresentation(keycloak.realm(keycloakPropsConfig.getRealm())
                     .users()
                     .get(userId)
-                    .toRepresentation();
-        } catch (Exception e) {
-            log.error("Error fetching user with ID {}: {}", userId, e.getMessage());
+                    .toRepresentation());
+        } catch (ForbiddenException exception) {
+            throw new AccessDeniedException(
+                    String.format(ERROR_FORMAT, exception.getMessage(), keycloakPropsConfig.getClientId())
+            );
         }
-
-        if (userRepresentation == null) {
-            log.error("User with ID {} not found", userId);
-            throw new UserNotFoundException("User not found with ID: " + userId);
-        }
-
-        return UserResponseDTO.fromUserRepresentation(userRepresentation);
     }
 
     @Override
@@ -57,9 +54,10 @@ public class UserServiceImpl implements UserService {
             int totalUser = result.size();
 
             return new UserListResponseDTO(totalUser, result, (totalUser + USER_PER_PAGE - 1) / USER_PER_PAGE);
-        } catch (RuntimeException exception) {
-            log.error("Error fetching users: {}", exception.getMessage());
-            throw new RuntimeException("Failed to fetch users: " + exception.getMessage(), exception);
+        } catch (ForbiddenException exception) {
+            throw new AccessDeniedException(
+                    String.format(ERROR_FORMAT, exception.getMessage(), keycloakPropsConfig.getClientId())
+            );
         }
     }
 
@@ -71,9 +69,10 @@ public class UserServiceImpl implements UserService {
                     .get(userId)
                     .logout();
             log.info("User session cleared for user ID: {}", userId);
-        } catch (Exception e) {
-            log.error("Error clearing session for user ID {}: {}", userId, e.getMessage());
-            throw new RuntimeException("Failed to clear user session: " + e.getMessage(), e);
+        } catch (ForbiddenException exception) {
+            throw new AccessDeniedException(
+                    String.format(ERROR_FORMAT, exception.getMessage(), keycloakPropsConfig.getClientId())
+            );
         }
     }
 }
