@@ -14,8 +14,8 @@ public class SubjectMapper {
                 .id(subject.getId())
                 .name(subject.getName())
                 .description(subject.getDescription())
-                .schoolClassId(subject.getSchoolClass() != null ? subject.getSchoolClass().getId() : null)
-                .schoolClassName(subject.getSchoolClass() != null ? subject.getSchoolClass().getName() : null)
+//                .schoolClassId(subject.getSchoolClass() != null ? subject.getSchoolClass().getId() : null)
+//                .schoolClassName(subject.getSchoolClass() != null ? subject.getSchoolClass().getName() : null)
                 .build();
     }
 

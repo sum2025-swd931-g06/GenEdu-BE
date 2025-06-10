@@ -47,7 +47,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
 
         return schoolClasses.stream()
 //                .map(schoolClass -> SchoolClassResponseDTO.fromSchoolClass(schoolClass))
-                .map(SchoolClassResponseDTO::fromSchoolClass)
+                .map(SchoolClassMapper::toDTO)
                 .toList();
     }
 
@@ -60,7 +60,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
      */
     public SchoolClassResponseDTO getSchoolClassById(Integer id) {
         SchoolClass schoolClass = getSchoolClassEntityById(id);
-        return SchoolClassResponseDTO.fromSchoolClass(schoolClass);
+        return SchoolClassMapper.toDTO(schoolClass);
     }
 
     /**
@@ -97,7 +97,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
         SchoolClass schoolClass = SchoolClassMapper.toEntity(schoolClassRequestDTO);
         schoolClass = schoolClassRepository.save(schoolClass);
 
-        return SchoolClassResponseDTO.fromSchoolClass(schoolClass);
+        return SchoolClassMapper.toDTO(schoolClass);
     }
 
     /*
@@ -120,7 +120,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
         existingSchoolClass = SchoolClassMapper.toEntity(schoolClassRequestDTO);
 
         existingSchoolClass = schoolClassRepository.save(existingSchoolClass);
-        return SchoolClassResponseDTO.fromSchoolClass(existingSchoolClass);
+        return SchoolClassMapper.toDTO(existingSchoolClass);
     }
 
     /*

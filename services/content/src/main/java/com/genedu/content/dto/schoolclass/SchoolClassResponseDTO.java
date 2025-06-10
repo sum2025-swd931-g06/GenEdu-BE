@@ -1,13 +1,15 @@
 package com.genedu.content.dto.schoolclass;
 
+import com.genedu.content.dto.subject.SubjectResponseDTO;
 import com.genedu.content.model.SchoolClass;
+import lombok.Builder;
 
-public record SchoolClassResponseDTO(String id, String name, String description) {
-    public static SchoolClassResponseDTO fromSchoolClass(SchoolClass schoolClass) {
-        return new SchoolClassResponseDTO(
-                schoolClass.getId().toString(),
-                schoolClass.getName(),
-                schoolClass.getDescription()
-        );
-    }
-}
+import java.util.List;
+
+@Builder
+public record SchoolClassResponseDTO(
+        Integer id,
+        String name,
+        String description,
+        List<SubjectResponseDTO> subjects
+) {}

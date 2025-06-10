@@ -67,15 +67,15 @@ public class SubjectServiceImpl implements SubjectService {
      * @throws IllegalArgumentException if a subject with the same name already exists.
      */
     @Override
-    public SubjectResponseDTO createSubject(SubjectRequestDTO subjectRequestDTO) {
+    public SubjectResponseDTO createSubject(Integer schoolClassId, SubjectRequestDTO subjectRequestDTO) {
         if (subjectRepository.existsByName(subjectRequestDTO.name())) {
             throw new IllegalArgumentException("Subject with name '" + subjectRequestDTO.name() + "' already exists.");
         }
 
-        SchoolClass schoolClass = schoolClassService.getSchoolClassEntityById(subjectRequestDTO.schoolClassId());
-        if (subjectRequestDTO.schoolClassId() == null) {
+        if (schoolClassId == null) {
             throw new IllegalArgumentException("School class ID cannot be null.");
         }
+        SchoolClass schoolClass = schoolClassService.getSchoolClassEntityById(schoolClassId);
 
         Subject createdSubject = SubjectMapper.toEntity(subjectRequestDTO, schoolClass);
 
@@ -92,14 +92,14 @@ public class SubjectServiceImpl implements SubjectService {
      * @throws IllegalArgumentException if the subject is not found or the new name already exists on a different subject.
      */
     @Override
-    public SubjectResponseDTO updateSubject(Long id, SubjectRequestDTO subjectRequestDTO) {
+    public SubjectResponseDTO updateSubject(Long id, Integer schoolClassId, SubjectRequestDTO subjectRequestDTO) {
         Subject existingSubject = getSubjectEntityById(id);
-
-        SchoolClass schoolClass = schoolClassService.getSchoolClassEntityById(subjectRequestDTO.schoolClassId());
 
         if (subjectRepository.existsByNameAndIdNot(subjectRequestDTO.name(), id)) {
             throw new IllegalArgumentException("Subject with name '" + subjectRequestDTO.name() + "' already exists.");
         }
+
+        SchoolClass schoolClass = schoolClassService.getSchoolClassEntityById(schoolClassId);
 
         existingSubject.setName(subjectRequestDTO.name());
         existingSubject.setDescription(subjectRequestDTO.description());
