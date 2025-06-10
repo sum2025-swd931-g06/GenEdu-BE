@@ -2,14 +2,35 @@ package com.genedu.content.dto.schoolclass;
 
 import com.genedu.content.dto.subject.SubjectResponseDTO;
 import com.genedu.content.model.SchoolClass;
-import lombok.Builder;
 
-import java.util.List;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
 
-@Builder
-public record SchoolClassResponseDTO(
-        Integer id,
+import java.time.ZonedDateTime;
+
+public record SchoolClassResponseDTO (
+        String id,
         String name,
         String description,
+        ZonedDateTime createdOn,
+        String createdBy,
+        ZonedDateTime lastModifiedOn,
+        String lastModifiedBy,
         List<SubjectResponseDTO> subjects
-) {}
+
+) {
+    public static SchoolClassResponseDTO fromSchoolClass(SchoolClass schoolClass) {
+        return new SchoolClassResponseDTO(
+                schoolClass.getId().toString(),
+                schoolClass.getName(),
+                schoolClass.getDescription(),
+                schoolClass.getCreatedOn(),
+                schoolClass.getCreatedBy(),
+                schoolClass.getLastModifiedOn(),
+                schoolClass.getLastModifiedBy()
+        );
+    }
+}
+

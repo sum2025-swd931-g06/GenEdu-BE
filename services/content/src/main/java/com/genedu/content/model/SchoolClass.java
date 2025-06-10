@@ -1,5 +1,6 @@
 package com.genedu.content.model;
 
+import com.genedu.commonlibrary.model.AbstractAuditEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import lombok.*;
 @Setter
 @Entity
 @Table(name = "school_classes")
-public class SchoolClass {
+public class SchoolClass extends AbstractAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

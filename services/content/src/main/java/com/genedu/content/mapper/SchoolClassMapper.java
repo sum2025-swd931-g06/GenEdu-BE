@@ -13,10 +13,14 @@ public class SchoolClassMapper {
     }
 
     public static SchoolClassResponseDTO toDTO(SchoolClass entity) {
-        return SchoolClassResponseDTO.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .description(entity.getDescription())
-                .build();
+        return new SchoolClassResponseDTO(
+                entity.getId().toString(),
+                entity.getName(),
+                entity.getDescription(),
+                entity.getCreatedOn(),
+                entity.getCreatedBy(),
+                entity.getLastModifiedOn(),
+                entity.getLastModifiedBy()
+        );
     }
 }
