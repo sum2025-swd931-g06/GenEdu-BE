@@ -21,6 +21,7 @@
         <module>services/discovery</module>
         <module>services/user</module>
         <module>services/content</module>
+        <module>services/common-library</module>
     </modules>
 
     <properties>

@@ -1,10 +1,17 @@
 package com.genedu.content.model;
 
+import com.genedu.commonlibrary.model.AbstractAuditEntity;
 import jakarta.persistence.*;
+import lombok.*;
 
+@RequiredArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
+@Setter
 @Entity
 @Table(name = "subjects")
-public class Subject {
+public class Subject extends AbstractAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

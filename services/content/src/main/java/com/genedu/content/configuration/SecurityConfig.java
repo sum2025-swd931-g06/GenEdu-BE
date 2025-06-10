@@ -43,10 +43,10 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable); // Disable CSRF protection for stateless APIs
         http.cors(Customizer.withDefaults()); // Enable CORS with default settings
 //        http.addFilterAfter(createPolicyEnforcerFilter(), BearerTokenAuthenticationFilter.class); // Keycloak Policy Enforcer Filter
-//        http.authorizeHttpRequests(authorize -> authorize
-//                .requestMatchers(freeResources).permitAll() // Allow free resources
-//                .anyRequest().authenticated() // All other requests require authentication
-//        );
+        http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(freeResources).permitAll() // Allow free resources
+                .anyRequest().authenticated() // All other requests require authentication
+        );
         http.oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(Customizer.withDefaults()) // Use JWT for OAuth2 Resource Server
         );

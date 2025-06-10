@@ -1,6 +1,5 @@
 package com.genedu.content.model;
 
-
 import com.genedu.commonlibrary.model.AbstractAuditEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,8 +10,8 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "lessons")
-public class Lesson extends AbstractAuditEntity {
+@Table(name = "lesson_parts")
+public class LessonPart extends AbstractAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,9 +22,10 @@ public class Lesson extends AbstractAuditEntity {
     @Column(name = "order_number", columnDefinition = "int", nullable = false)
     private Integer orderNumber;
 
-    @Column(name = "description", columnDefinition = "text")
-    private String description;
+    @Column(name = "content", columnDefinition = "text")
+    private String content;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Chapter chapter;
+    @JoinColumn(name = "lesson_id", nullable = false)
+    private Lesson lesson;
 }
