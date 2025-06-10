@@ -5,6 +5,7 @@ import com.genedu.content.dto.schoolclass.SchoolClassResponseDTO;
 import com.genedu.content.mapper.SchoolClassMapper;
 import com.genedu.content.model.SchoolClass;
 import com.genedu.content.service.SchoolClassService;
+import com.genedu.content.utils.TextNormalizerUtils;
 import lombok.RequiredArgsConstructor;
 import com.genedu.content.repository.SchoolClassRepository;
 import org.springframework.stereotype.Service;
@@ -88,7 +89,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
      */
     @Override
     public SchoolClassResponseDTO createSchoolClass(SchoolClassRequestDTO schoolClassRequestDTO) {
-        if (schoolClassRepository.existsByName(schoolClassRequestDTO.name())) {
+        if (schoolClassRepository.existsByName(TextNormalizerUtils.normalizeTextUsingNormalizer(schoolClassRequestDTO.name()))) {
             throw new IllegalArgumentException(
                     "School class with name " + schoolClassRequestDTO.name() + " already exists."
             );

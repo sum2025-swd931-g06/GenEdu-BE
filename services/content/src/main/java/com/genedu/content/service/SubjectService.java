@@ -10,7 +10,8 @@ public interface SubjectService {
     List<SubjectResponseDTO> getAllSubjects();
     Subject getSubjectEntityById(Long id);
     SubjectResponseDTO getSubjectById(Long id);
+    List<SubjectResponseDTO> getSubjectsBySchoolClassId(Integer schoolClassId);
     SubjectResponseDTO createSubject(Integer schoolClassId, SubjectRequestDTO subjectRequestDTO);
-    SubjectResponseDTO updateSubject(Long id, Integer schoolClassId, SubjectRequestDTO subjectRequestDTO);
+    SubjectResponseDTO updateSubject(Long id, SubjectRequestDTO subjectRequestDTO);
     void deleteSubject(Long id);
 }

@@ -44,6 +44,17 @@ public class SubjectServiceImpl implements SubjectService {
         return SubjectMapper.toDTO(getSubjectEntityById(id));
     }
 
+    @Override
+    public List<SubjectResponseDTO> getSubjectsBySchoolClassId(Integer schoolClassId) {
+        if (schoolClassId == null) {
+            throw new IllegalArgumentException("School class ID cannot be null.");
+        }
+        return subjectRepository.findBySchoolClass_Id(schoolClassId)
+                .stream()
+                .map(SubjectMapper::toDTO)
+                .toList();
+    }
+
     /**
      * Retrieves the Subject entity by its ID.
      *
@@ -92,18 +103,15 @@ public class SubjectServiceImpl implements SubjectService {
      * @throws IllegalArgumentException if the subject is not found or the new name already exists on a different subject.
      */
     @Override
-    public SubjectResponseDTO updateSubject(Long id, Integer schoolClassId, SubjectRequestDTO subjectRequestDTO) {
+    public SubjectResponseDTO updateSubject(Long id, SubjectRequestDTO subjectRequestDTO) {
         Subject existingSubject = getSubjectEntityById(id);
 
         if (subjectRepository.existsByNameAndIdNot(subjectRequestDTO.name(), id)) {
             throw new IllegalArgumentException("Subject with name '" + subjectRequestDTO.name() + "' already exists.");
         }
 
-        SchoolClass schoolClass = schoolClassService.getSchoolClassEntityById(schoolClassId);
-
         existingSubject.setName(subjectRequestDTO.name());
         existingSubject.setDescription(subjectRequestDTO.description());
-        existingSubject.setSchoolClass(schoolClass);
 
         Subject updatedSubject = subjectRepository.save(existingSubject);
         return SubjectMapper.toDTO(updatedSubject);

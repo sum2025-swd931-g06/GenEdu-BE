@@ -1,5 +1,6 @@
 package com.genedu.content.dto.subject;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
 import com.genedu.content.model.Subject;
 import lombok.Builder;
@@ -11,5 +12,7 @@ public record SubjectResponseDTO(
         Long id,
         String name,
         String description,
+        
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         List<ChapterResponseDTO> chapters
 ) {}
