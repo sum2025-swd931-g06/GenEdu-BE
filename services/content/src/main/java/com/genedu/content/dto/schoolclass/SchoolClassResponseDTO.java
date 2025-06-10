@@ -1,4 +1,4 @@
-package com.genedu.content.dto;
+package com.genedu.content.dto.schoolclass;
 
 import com.genedu.content.model.SchoolClass;
 
