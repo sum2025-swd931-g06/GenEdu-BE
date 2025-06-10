@@ -5,6 +5,7 @@ import com.genedu.content.dto.schoolclass.SchoolClassResponseDTO;
 import com.genedu.content.mapper.SchoolClassMapper;
 import com.genedu.content.model.SchoolClass;
 import com.genedu.content.service.SchoolClassService;
+import com.genedu.content.utils.TextNormalizerUtils;
 import lombok.RequiredArgsConstructor;
 import com.genedu.content.repository.SchoolClassRepository;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
 
         return schoolClasses.stream()
 //                .map(schoolClass -> SchoolClassResponseDTO.fromSchoolClass(schoolClass))
-                .map(SchoolClassResponseDTO::fromSchoolClass)
+                .map(SchoolClassMapper::toDTO)
                 .toList();
     }
 
@@ -60,7 +61,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
      */
     public SchoolClassResponseDTO getSchoolClassById(Integer id) {
         SchoolClass schoolClass = getSchoolClassEntityById(id);
-        return SchoolClassResponseDTO.fromSchoolClass(schoolClass);
+        return SchoolClassMapper.toDTO(schoolClass);
     }
 
     /**
@@ -88,7 +89,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
      */
     @Override
     public SchoolClassResponseDTO createSchoolClass(SchoolClassRequestDTO schoolClassRequestDTO) {
-        if (schoolClassRepository.existsByName(schoolClassRequestDTO.name())) {
+        if (schoolClassRepository.existsByName(TextNormalizerUtils.normalizeTextUsingNormalizer(schoolClassRequestDTO.name()))) {
             throw new IllegalArgumentException(
                     "School class with name " + schoolClassRequestDTO.name() + " already exists."
             );
@@ -97,7 +98,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
         SchoolClass schoolClass = SchoolClassMapper.toEntity(schoolClassRequestDTO);
         schoolClass = schoolClassRepository.save(schoolClass);
 
-        return SchoolClassResponseDTO.fromSchoolClass(schoolClass);
+        return SchoolClassMapper.toDTO(schoolClass);
     }
 
     /*
@@ -120,7 +121,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
         existingSchoolClass = SchoolClassMapper.toEntity(schoolClassRequestDTO);
 
         existingSchoolClass = schoolClassRepository.save(existingSchoolClass);
-        return SchoolClassResponseDTO.fromSchoolClass(existingSchoolClass);
+        return SchoolClassMapper.toDTO(existingSchoolClass);
     }
 
     /*
