@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 public record SchoolClassResponseDTO (
         String id,
@@ -21,16 +22,5 @@ public record SchoolClassResponseDTO (
         List<SubjectResponseDTO> subjects
 
 ) {
-    public static SchoolClassResponseDTO fromSchoolClass(SchoolClass schoolClass) {
-        return new SchoolClassResponseDTO(
-                schoolClass.getId().toString(),
-                schoolClass.getName(),
-                schoolClass.getDescription(),
-                schoolClass.getCreatedOn(),
-                schoolClass.getCreatedBy(),
-                schoolClass.getLastModifiedOn(),
-                schoolClass.getLastModifiedBy()
-        );
-    }
 }
 

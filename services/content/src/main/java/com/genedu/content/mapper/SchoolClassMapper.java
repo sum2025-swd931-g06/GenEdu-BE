@@ -20,7 +20,8 @@ public class SchoolClassMapper {
                 entity.getCreatedOn(),
                 entity.getCreatedBy(),
                 entity.getLastModifiedOn(),
-                entity.getLastModifiedBy()
+                entity.getLastModifiedBy(),
+                null // Assuming subjects will be set later or handled separately
         );
     }
 }
