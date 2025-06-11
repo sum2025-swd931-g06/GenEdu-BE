@@ -10,9 +10,9 @@ name: genedu cicd flow
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main-deployment" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main-deployment" ]
 
 jobs:
   build:
