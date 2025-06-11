@@ -16,16 +16,15 @@ public class SchoolClassMapper {
     }
 
     public static SchoolClassResponseDTO toDTO(SchoolClass entity) {
-        return new SchoolClassResponseDTO(
-                entity.getId().toString(),
-                entity.getName(),
-                entity.getDescription(),
-                entity.getCreatedOn(),
-                entity.getCreatedBy(),
-                entity.getLastModifiedOn(),
-                entity.getLastModifiedBy(),
-                null // Assuming subjects will be set later or handled separately
-        );
+        return SchoolClassResponseDTO.builder()
+                .id(entity.getId().toString())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .createdOn(entity.getCreatedOn())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedOn(entity.getLastModifiedOn())
+                .lastModifiedBy(entity.getLastModifiedBy())
+                .build();
     }
 
     public static SchoolClassResponseDTO toDTOWithSubjects(SchoolClass entity, List<SubjectResponseDTO> subjects) {

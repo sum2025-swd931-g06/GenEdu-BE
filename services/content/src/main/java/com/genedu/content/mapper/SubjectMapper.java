@@ -1,7 +1,6 @@
 package com.genedu.content.mapper;
 
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
-import com.genedu.content.dto.flatResponse.FlatSchoolClassResponseDTO;
 import com.genedu.content.dto.flatResponse.FlatSchoolClassSubjectDTO;
 import com.genedu.content.dto.subject.SubjectRequestDTO;
 import com.genedu.content.dto.subject.SubjectResponseDTO;
@@ -12,13 +11,14 @@ import java.util.List;
 
 public class SubjectMapper {
     public static SubjectResponseDTO toDTO(Subject subject) {
-        if(subject == null) {
-            return null;
-        }
         return SubjectResponseDTO.builder()
                 .id(subject.getId())
                 .name(subject.getName())
                 .description(subject.getDescription())
+                .createdOn(subject.getCreatedOn())
+                .createdBy(subject.getCreatedBy())
+                .lastModifiedOn(subject.getLastModifiedOn())
+                .lastModifiedBy(subject.getLastModifiedBy())
                 .build();
     }
 
@@ -39,6 +39,10 @@ public class SubjectMapper {
                 .name(subject.getName())
                 .description(subject.getDescription())
                 .chapters(chapters)
+                .createdOn(subject.getCreatedOn())
+                .createdBy(subject.getCreatedBy())
+                .lastModifiedOn(subject.getLastModifiedOn())
+                .lastModifiedBy(subject.getLastModifiedBy())
                 .build();
     }
 
