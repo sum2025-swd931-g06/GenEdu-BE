@@ -1,7 +1,12 @@
 package com.genedu.content.service.impl;
 
+import com.genedu.content.dto.flatResponse.FlatSchoolClassResponseDTO;
+import com.genedu.content.dto.flatResponse.FlatSchoolClassSubjectDTO;
+import com.genedu.content.dto.schoolclass.SchoolClassResponseDTO;
 import com.genedu.content.dto.subject.SubjectRequestDTO;
 import com.genedu.content.dto.subject.SubjectResponseDTO;
+import com.genedu.content.mapper.ChapterMapper;
+import com.genedu.content.mapper.SchoolClassMapper;
 import com.genedu.content.mapper.SubjectMapper;
 import com.genedu.content.model.SchoolClass;
 import com.genedu.content.model.Subject;
@@ -25,10 +30,10 @@ public class SubjectServiceImpl implements SubjectService {
      * @return a list of SubjectResponseDTO representing all subjects.
      */
     @Override
-    public List<SubjectResponseDTO> getAllSubjects() {
+    public List<FlatSchoolClassSubjectDTO> getAllSubjects() {
         return subjectRepository.findAll()
                 .stream()
-                .map(SubjectMapper::toDTO)
+                .map(SubjectMapper::toFlatDTO)
                 .toList();
     }
 
@@ -40,19 +45,18 @@ public class SubjectServiceImpl implements SubjectService {
      * @throws IllegalArgumentException if the ID is null or the subject is not found.
      */
     @Override
-    public SubjectResponseDTO getSubjectById(Long id) {
-        return SubjectMapper.toDTO(getSubjectEntityById(id));
+    public FlatSchoolClassSubjectDTO getSubjectById(Long id) {
+        return SubjectMapper.toFlatDTO(getSubjectEntityById(id));
     }
 
     @Override
-    public List<SubjectResponseDTO> getSubjectsBySchoolClassId(Integer schoolClassId) {
-        if (schoolClassId == null) {
-            throw new IllegalArgumentException("School class ID cannot be null.");
-        }
-        return subjectRepository.findBySchoolClass_Id(schoolClassId)
+    public SchoolClassResponseDTO getSubjectsBySchoolClassId(Integer schoolClassId) {
+        SchoolClass schoolClass = schoolClassService.getSchoolClassEntityById(schoolClassId);
+        List<SubjectResponseDTO> subjects = subjectRepository.findBySchoolClass_Id(schoolClassId)
                 .stream()
                 .map(SubjectMapper::toDTO)
                 .toList();
+        return SchoolClassMapper.toDTOWithSubjects(schoolClass, subjects);
     }
 
     /**
@@ -78,7 +82,7 @@ public class SubjectServiceImpl implements SubjectService {
      * @throws IllegalArgumentException if a subject with the same name already exists.
      */
     @Override
-    public SubjectResponseDTO createSubject(Integer schoolClassId, SubjectRequestDTO subjectRequestDTO) {
+    public FlatSchoolClassSubjectDTO createSubject(Integer schoolClassId, SubjectRequestDTO subjectRequestDTO) {
         if (subjectRepository.existsByName(subjectRequestDTO.name())) {
             throw new IllegalArgumentException("Subject with name '" + subjectRequestDTO.name() + "' already exists.");
         }
@@ -91,7 +95,7 @@ public class SubjectServiceImpl implements SubjectService {
         Subject createdSubject = SubjectMapper.toEntity(subjectRequestDTO, schoolClass);
 
         Subject savedSubject = subjectRepository.save(createdSubject);
-        return SubjectMapper.toDTO(savedSubject);
+        return SubjectMapper.toFlatDTO(savedSubject);
     }
 
     /**
@@ -103,7 +107,7 @@ public class SubjectServiceImpl implements SubjectService {
      * @throws IllegalArgumentException if the subject is not found or the new name already exists on a different subject.
      */
     @Override
-    public SubjectResponseDTO updateSubject(Long id, SubjectRequestDTO subjectRequestDTO) {
+    public FlatSchoolClassSubjectDTO updateSubject(Long id, SubjectRequestDTO subjectRequestDTO) {
         Subject existingSubject = getSubjectEntityById(id);
 
         if (subjectRepository.existsByNameAndIdNot(subjectRequestDTO.name(), id)) {
@@ -114,7 +118,7 @@ public class SubjectServiceImpl implements SubjectService {
         existingSubject.setDescription(subjectRequestDTO.description());
 
         Subject updatedSubject = subjectRepository.save(existingSubject);
-        return SubjectMapper.toDTO(updatedSubject);
+        return SubjectMapper.toFlatDTO(updatedSubject);
     }
 
     /**

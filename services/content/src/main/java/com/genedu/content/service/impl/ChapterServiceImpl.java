@@ -4,7 +4,9 @@ import com.genedu.content.dto.chapter.ChapterRequestDTO;
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
 import com.genedu.content.dto.flatResponse.FlatSubjectChapterDTO;
 import com.genedu.content.dto.lesson.LessonResponseDTO;
+import com.genedu.content.dto.subject.SubjectResponseDTO;
 import com.genedu.content.mapper.ChapterMapper;
+import com.genedu.content.mapper.SubjectMapper;
 import com.genedu.content.model.Chapter;
 import com.genedu.content.model.Subject;
 import com.genedu.content.repository.ChapterRepository;
@@ -30,10 +32,13 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    public List<ChapterResponseDTO> getChaptersBySubjectId(Long subjectId) {
-        return chapterRepository.findBySubject_Id(subjectId).stream()
+    public SubjectResponseDTO getChaptersBySubjectId(Long subjectId) {
+        Subject subject = subjectService.getSubjectEntityById(subjectId);
+        List<ChapterResponseDTO> chapters = chapterRepository.findBySubject_Id(subjectId).stream()
                 .map(ChapterMapper::toDTO)
                 .toList();
+
+        return SubjectMapper.toDTOWithChapters(subject, chapters);
     }
 
     @Override
@@ -73,7 +78,7 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    public ChapterResponseDTO createChapter(Long subjectId, ChapterRequestDTO chapterRequestDTO) {
+    public FlatSubjectChapterDTO createChapter(Long subjectId, ChapterRequestDTO chapterRequestDTO) {
         if(chapterRepository.existsByOrOrderNumberAndSubject_Id(chapterRequestDTO.orderNumber(), subjectId)){
             throw new IllegalArgumentException("Chapter with order number " + chapterRequestDTO.orderNumber() + " already exists for subject ID " + subjectId);
         }
@@ -81,11 +86,11 @@ public class ChapterServiceImpl implements ChapterService {
         Chapter chapter = ChapterMapper.toEntity(chapterRequestDTO, subject);
 
         Chapter savedChapter = chapterRepository.save(chapter);
-        return ChapterMapper.toDTO(savedChapter);
+        return ChapterMapper.toFlatDTO(savedChapter);
     }
 
     @Override
-    public ChapterResponseDTO updateChapter(Long id, ChapterRequestDTO chapterRequestDTO) {
+    public FlatSubjectChapterDTO updateChapter(Long id, ChapterRequestDTO chapterRequestDTO) {
         Chapter existingChapter = getChapterEntityById(id);
 
         if(chapterRepository.existsByOrderNumberAndSubject_IdAndIdNot(chapterRequestDTO.orderNumber(), existingChapter.getSubject().getId(), id)){
@@ -97,7 +102,7 @@ public class ChapterServiceImpl implements ChapterService {
         existingChapter.setDescription(chapterRequestDTO.description());
 
         Chapter updatedChapter = chapterRepository.save(existingChapter);
-        return ChapterMapper.toDTO(updatedChapter);
+        return ChapterMapper.toFlatDTO(updatedChapter);
     }
 
     @Override
