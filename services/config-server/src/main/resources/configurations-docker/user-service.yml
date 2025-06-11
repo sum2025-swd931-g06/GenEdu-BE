@@ -1,10 +1,10 @@
 server:
-  port: 8091
+  port: 8090
 
 spring:
   # Database configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/contentdb
+    url: jdbc:postgresql://host.docker.internal:5432/userdb
     username: admin
     password: admin
   # JPA and Hibernate configuration
@@ -17,7 +17,7 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    # Flyway configuration
+  # Flyway configuration
     flyway:
       enabled: true
       baseline-on-migrate: true
@@ -25,14 +25,13 @@ spring:
       password: admin
       baseline-description: "Baseline init for user service"
       baseline-version: 0
-  # Security configuration
+# Security configuration
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:9099/realms/GenEdu
-          jwk-set-uri: http://localhost:9099/realms/GenEdu/protocol/openid-connect/certs
-
+          issuer-uri: http://host.docker.internal:9099/realms/GenEdu
+          jwk-set-uri: http://host.docker.internal:9099/realms/GenEdu/protocol/openid-connect/certs
 # Spring Doc configuration
 springdoc:
   api-docs:
@@ -42,6 +41,16 @@ springdoc:
     path: /swagger-ui.html
     oauth:
       client-id: ${KC_GENEDU_GENEDU_BE_CLIENT_ID:genedu-be}
-      client-secret: ${KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY:0pQYYepE82DkALnEVhAfZREPeHmtHz3z}
+      client-secret: ${KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY:r2zFR2utotgHybjmw1JAXk8TRyYsvvWz-be}
     csrf:
       enabled: false
+
+# Keycloak configuration
+keycloak:
+  server-url: http://host.docker.internal:9099
+  realm: GenEdu
+  client-id: ${KC_GENEDU_ADMIN_CLI_CLIENT_ID:admin-cli}
+  grant-type: password
+  password: genedu-admin
+  username: genedu-admin
+  client-secret: ${KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY:wEli51b7nULXyzcNAao2jqu1HEAEJgNw}

@@ -1,0 +1,13 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server # Name of the configuration server application
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/configurations-docker   # This is where the configuration files for each service will be stored
+
+

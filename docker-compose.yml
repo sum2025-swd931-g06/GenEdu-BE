@@ -77,6 +77,54 @@ services:
     volumes:
       - ./identity/realm-export.json:/opt/keycloak/data/import/realm-export.json
 
+  config-server:
+    build: ./services/config-server
+    container_name: config-server
+    image: config-server:latest
+    ports:
+      - "8888:8888"
+    environment:
+        - KC_GENEDU_GENEDU_BE_CLIENT_ID
+        - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
+        - KC_GENEDU_ADMIN_CLI_CLIENT_ID
+        - KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY
+    networks:
+      - microservices-net
+
+  discovery-service:
+    build:
+      context: ./services/discovery
+      dockerfile: Dockerfile
+    container_name: discovery
+    image: discovery:latest
+    depends_on:
+      - config-server
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-net
+
+  gateway-service:
+    build:
+      context: ./services/gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    image: gateway:latest
+    depends_on:
+      config-server:
+        condition: service_started
+      discovery-service:
+        condition: service_started
+      keycloak:
+        condition: service_started
+    ports:
+      - "8222:8222"
+    environment:
+      - KC_GENEDU_GENEDU_BE_CLIENT_ID
+      - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
+    networks:
+      - microservices-net
+
 networks:
   microservices-net:
     driver: bridge

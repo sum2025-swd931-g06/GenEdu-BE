@@ -4,7 +4,7 @@ server:
 spring:
   # Database configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/contentdb
+    url: jdbc:postgresql://host.docker.internal:5432/contentdb
     username: admin
     password: admin
   # JPA and Hibernate configuration
@@ -30,8 +30,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:9099/realms/GenEdu
-          jwk-set-uri: http://localhost:9099/realms/GenEdu/protocol/openid-connect/certs
+          issuer-uri: http://host.docker.internal:9099/realms/GenEdu
+          jwk-set-uri: http://host.docker.internal:9099/realms/GenEdu/protocol/openid-connect/certs
 
 # Spring Doc configuration
 springdoc:

@@ -3,12 +3,15 @@ server:
 
 spring:
   profiles:
-    active: native # Use 'native' profile to load configurations from local files
+#    active: native # Use 'native' profile to load configurations from local files
+    active: docker # Use 'native' profile to load configurations from local files
   application:
       name: config-server # Name of the configuration server application
   cloud:
     config:
       server:
+        git:
+          uri:
         native:
           search-locations: classpath:/configurations   # This is where the configuration files for each service will be stored
 
