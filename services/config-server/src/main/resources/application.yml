@@ -1,18 +1,10 @@
 server:
   port: 8888
-
 spring:
-  profiles:
-#    active: native # Use 'native' profile to load configurations from local files
-    active: docker # Use 'native' profile to load configurations from local files
-  application:
-      name: config-server # Name of the configuration server application
   cloud:
     config:
       server:
         git:
-          uri:
-        native:
-          search-locations: classpath:/configurations   # This is where the configuration files for each service will be stored
-
-
+          uri: https://github.com/sum2025-swd931-g06/GenEdu-BE-Config-Server
+          username: sum2025-swd931-g06
+          password: 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

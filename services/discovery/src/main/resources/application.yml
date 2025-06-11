@@ -4,4 +4,4 @@ spring:
   application:
     name: discovery-service
   profiles:
-    active: docker
+    active: native # Use 'docker' profile to load configurations from the Docker environment
