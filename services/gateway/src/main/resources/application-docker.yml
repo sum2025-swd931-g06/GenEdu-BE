@@ -1,5 +1,7 @@
 spring:
-  config:
-    import: optional:configserver:http://host.docker.internal:8888
   application:
     name: gateway-service
+  config:
+    import: optional:configserver:http://host.docker.internal:8888
+    activate:
+      on-profile: docker

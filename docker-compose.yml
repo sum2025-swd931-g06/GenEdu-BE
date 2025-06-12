@@ -30,31 +30,6 @@ services:
       - microservices-net
     restart: unless-stopped
 
-  mongodb:
-    image: mongo
-    container_name: mongo_db
-    ports:
-      - 27017:27017
-    volumes:
-      - mongo:/data
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin
-    networks:
-      - microservices-net
-
-  mongo-express:
-    image: mongo-express
-    container_name: mongo_express
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=admin
-      - ME_CONFIG_MONGODB_SERVER=mongodb
-    networks:
-      - microservices-net
   zipkin:
     container_name: zipkin
     image: openzipkin/zipkin
@@ -83,7 +58,13 @@ services:
     image: config-server:latest
     ports:
       - "8888:8888"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://host.docker.internal:8888/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     environment:
+        - SPRING_PROFILES_ACTIVE=docker
         - KC_GENEDU_GENEDU_BE_CLIENT_ID
         - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
         - KC_GENEDU_ADMIN_CLI_CLIENT_ID
@@ -98,9 +79,17 @@ services:
     container_name: discovery
     image: discovery:latest
     depends_on:
-      - config-server
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://host.docker.internal:8761/eureka/apps"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     ports:
       - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
     networks:
       - microservices-net
 
@@ -110,18 +99,50 @@ services:
       dockerfile: Dockerfile
     container_name: gateway
     image: gateway:latest
-    depends_on:
-      config-server:
-        condition: service_started
-      discovery-service:
-        condition: service_started
-      keycloak:
-        condition: service_started
     ports:
       - "8222:8222"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://host.docker.internal:8222/actuator/health"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
     environment:
+      - SPRING_PROFILES_ACTIVE=docker
       - KC_GENEDU_GENEDU_BE_CLIENT_ID
       - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    networks:
+      - microservices-net
+
+  content-service:
+    build:
+      context: ./services/content
+      dockerfile: Dockerfile
+    container_name: content
+    image: content:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KC_GENEDU_GENEDU_BE_CLIENT_ID
+      - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
+    ports:
+      - "8091:8091"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      postgresql:
+        condition: service_started
     networks:
       - microservices-net
 

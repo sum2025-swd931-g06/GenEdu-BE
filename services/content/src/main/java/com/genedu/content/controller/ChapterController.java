@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/contents")
 @Tag(name = "Chapter", description = "Manage chapters in the system")
 public class ChapterController {
     private final ChapterService chapterService;
