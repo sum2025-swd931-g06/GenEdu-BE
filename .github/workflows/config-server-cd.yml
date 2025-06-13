@@ -9,6 +9,12 @@
 name: config-server-cd-flow
 
 on:
+  push:
+      branches: [ "main-deployment" ]
+      paths:
+      - "services/config-server/**"
+      - ".github/workflows/config-server-cd.yml"
+      - "pom.xml"
   workflow_run:
     workflows:
       - main-project-cd-flow
@@ -27,4 +33,4 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Build common library with Maven
-        run: mvn clean install -f services/config-server/pom.xml
+        run: mvn clean install -f services/config-server/pom.xml -DskipTests

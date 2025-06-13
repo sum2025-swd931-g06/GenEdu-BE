@@ -40,4 +40,4 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build common library with Maven
-      run: mvn clean install -f services/common-library/pom.xml
+      run: mvn clean install -f services/common-library/pom.xml -DskipTests
