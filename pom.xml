@@ -17,11 +17,11 @@
 
     <modules>
         <module>services/config-server</module>
-        <module>services/content</module>
+        <module>services/common-library</module>
         <module>services/discovery</module>
         <module>services/gateway</module>
         <module>services/user</module>
-        <module>services/common-library</module>
+        <module>services/content</module>
     </modules>
 
     <properties>
