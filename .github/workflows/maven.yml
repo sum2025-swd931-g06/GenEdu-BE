@@ -29,17 +29,3 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn clean install -DskipTests
-    - name: Build and Push Docker Images
-      uses: chauvinhtien/docker/build-push-action@v5
-      with:
-          push: true
-          tags: v1,latest
-          chauvinhtien/genedu-gateway:latest
-          chauvinhtien/genedu-discovery:latest
-          chauvinhtien/genedu-user:latest
-          chauvinhtien/genedu-content:latest
-          chauvinhtien/genedu-config:latest
-          chauvinhtien/genedu-keycloak:latest
-          context: .
-          file: ./Dockerfile
-
