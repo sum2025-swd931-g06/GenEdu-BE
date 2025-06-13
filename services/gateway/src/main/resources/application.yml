@@ -3,5 +3,3 @@ spring:
     #    active: dev
     active: docker
 
-
-
