@@ -1,11 +1,13 @@
 package com.genedu.content.service.impl;
 
-import com.genedu.content.dto.flatResponse.FlatSchoolClassResponseDTO;
+import com.genedu.commonlibrary.exception.BadRequestException;
+import com.genedu.commonlibrary.exception.DuplicatedException;
+import com.genedu.commonlibrary.exception.InternalServerErrorException;
+import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.content.dto.flatResponse.FlatSchoolClassSubjectDTO;
 import com.genedu.content.dto.schoolclass.SchoolClassResponseDTO;
 import com.genedu.content.dto.subject.SubjectRequestDTO;
 import com.genedu.content.dto.subject.SubjectResponseDTO;
-import com.genedu.content.mapper.ChapterMapper;
 import com.genedu.content.mapper.SchoolClassMapper;
 import com.genedu.content.mapper.SubjectMapper;
 import com.genedu.content.model.SchoolClass;
@@ -13,22 +15,23 @@ import com.genedu.content.model.Subject;
 import com.genedu.content.repository.SubjectRepository;
 import com.genedu.content.service.SchoolClassService;
 import com.genedu.content.service.SubjectService;
+import com.genedu.content.utils.Constants;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class SubjectServiceImpl implements SubjectService {
     private final SubjectRepository subjectRepository;
     private final SchoolClassService schoolClassService;
 
-    /**
-     * Retrieves all subjects from the database and maps them to DTOs.
-     *
-     * @return a list of SubjectResponseDTO representing all subjects.
-     */
+    @Transactional(readOnly = true)
     @Override
     public List<FlatSchoolClassSubjectDTO> getAllSubjects() {
         return subjectRepository.findAll()
@@ -37,18 +40,14 @@ public class SubjectServiceImpl implements SubjectService {
                 .toList();
     }
 
-    /**
-     * Retrieves a subject by its ID and maps it to a DTO.
-     *
-     * @param id the ID of the subject.
-     * @return the SubjectResponseDTO representing the subject.
-     * @throws IllegalArgumentException if the ID is null or the subject is not found.
-     */
+    @Transactional(readOnly = true)
     @Override
     public FlatSchoolClassSubjectDTO getSubjectById(Long id) {
-        return SubjectMapper.toFlatDTO(getSubjectEntityById(id));
+        Subject subject = getSubjectEntityById(id);
+        return SubjectMapper.toFlatDTO(subject);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public SchoolClassResponseDTO getSubjectsBySchoolClassId(Integer schoolClassId) {
         SchoolClass schoolClass = schoolClassService.getSchoolClassEntityById(schoolClassId);
@@ -59,95 +58,74 @@ public class SubjectServiceImpl implements SubjectService {
         return SchoolClassMapper.toDTOWithSubjects(schoolClass, subjects);
     }
 
-    /**
-     * Retrieves the Subject entity by its ID.
-     *
-     * @param id the ID of the subject.
-     * @return the Subject entity.
-     * @throws IllegalArgumentException if the ID is null or the subject is not found.
-     */
+    @Transactional(readOnly = true)
     @Override
     public Subject getSubjectEntityById(Long id) {
-        validateIdNotNull(id, "Subject");
-
+        validateIdNotNull(id, Constants.ErrorCode.SUBJECT_ID_REQUIRED);
         return subjectRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Subject not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.SUBJECT_NOT_FOUND, id));
     }
 
-    /**
-     * Creates a new subject based on the given request DTO.
-     *
-     * @param subjectRequestDTO the SubjectRequestDTO containing subject details.
-     * @return the SubjectResponseDTO of the created subject.
-     * @throws IllegalArgumentException if a subject with the same name already exists.
-     */
     @Override
     public FlatSchoolClassSubjectDTO createSubject(Integer schoolClassId, SubjectRequestDTO subjectRequestDTO) {
         if (subjectRepository.existsByName(subjectRequestDTO.name())) {
-            throw new IllegalArgumentException("Subject with name '" + subjectRequestDTO.name() + "' already exists.");
+            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_SUBJECT_NAME, subjectRequestDTO.name());
         }
-
         if (schoolClassId == null) {
-            throw new IllegalArgumentException("School class ID cannot be null.");
+            throw new BadRequestException(Constants.ErrorCode.SCHOOL_CLASS_ID_REQUIRED);
         }
         SchoolClass schoolClass = schoolClassService.getSchoolClassEntityById(schoolClassId);
 
         Subject createdSubject = SubjectMapper.toEntity(subjectRequestDTO, schoolClass);
 
-        Subject savedSubject = subjectRepository.save(createdSubject);
-        return SubjectMapper.toFlatDTO(savedSubject);
+        try {
+            Subject savedSubject = subjectRepository.save(createdSubject);
+            return SubjectMapper.toFlatDTO(savedSubject);
+        } catch (Exception e) {
+            log.error("Error creating subject", e);
+            throw new InternalServerErrorException(Constants.ErrorCode.CREATE_SUBJECT_FAILED, e.getMessage());
+        }
     }
 
-    /**
-     * Updates an existing subject by its ID using the provided DTO.
-     *
-     * @param id  the ID of the subject to update.
-     * @param subjectRequestDTO the DTO containing updated subject information.
-     * @return the updated SubjectResponseDTO.
-     * @throws IllegalArgumentException if the subject is not found or the new name already exists on a different subject.
-     */
     @Override
     public FlatSchoolClassSubjectDTO updateSubject(Long id, SubjectRequestDTO subjectRequestDTO) {
         Subject existingSubject = getSubjectEntityById(id);
 
         if (subjectRepository.existsByNameAndIdNot(subjectRequestDTO.name(), id)) {
-            throw new IllegalArgumentException("Subject with name '" + subjectRequestDTO.name() + "' already exists.");
+            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_SUBJECT_NAME, subjectRequestDTO.name());
         }
 
         existingSubject.setName(subjectRequestDTO.name());
         existingSubject.setDescription(subjectRequestDTO.description());
 
-        Subject updatedSubject = subjectRepository.save(existingSubject);
-        return SubjectMapper.toFlatDTO(updatedSubject);
+        try {
+            Subject updatedSubject = subjectRepository.save(existingSubject);
+            return SubjectMapper.toFlatDTO(updatedSubject);
+        } catch (Exception e) {
+            log.error("Error updating subject", e);
+            throw new InternalServerErrorException(Constants.ErrorCode.UPDATE_SUBJECT_FAILED, e.getMessage());
+        }
     }
 
-    /**
-     * Deletes a subject by its ID.
-     *
-     * @param id the ID of the subject to delete.
-     * @throws IllegalArgumentException if the ID is null or the subject does not exist.
-     */
     @Override
     public void deleteSubject(Long id) {
-        validateIdNotNull(id, "Subject");
+        validateIdNotNull(id, Constants.ErrorCode.SUBJECT_ID_REQUIRED);
 
         if (!subjectRepository.existsById(id)) {
-            throw new IllegalArgumentException("Subject not found with id: " + id);
+            throw new NotFoundException(Constants.ErrorCode.SUBJECT_NOT_FOUND, id);
         }
 
-        subjectRepository.deleteById(id);
+        try {
+            subjectRepository.deleteById(id);
+        } catch (Exception e) {
+            log.error("Error deleting subject", e);
+            throw new InternalServerErrorException(Constants.ErrorCode.DELETE_SUBJECT_FAILED, e.getMessage());
+        }
     }
 
-    /**
-     * Validates that the given ID is not null.
-     *
-     * @param id         the ID to validate.
-     * @param entityName the name of the entity (for error message clarity).
-     * @throws IllegalArgumentException if the ID is null.
-     */
-    private void validateIdNotNull(Long id, String entityName) {
+    private void validateIdNotNull(Long id, String errorCode) {
         if (id == null) {
-            throw new IllegalArgumentException(entityName + " ID cannot be null.");
+            throw new BadRequestException(errorCode);
         }
     }
 }
