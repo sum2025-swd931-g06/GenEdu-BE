@@ -40,7 +40,7 @@ jobs:
       - name: Build common library
         run: mvn clean install -f services/common-library/pom.xml -DskipTests
 
-      - name: Build common library with Maven
+      - name: Build service with Maven
         run: mvn clean install -f services/content/pom.xml -DskipTests
 
       - name: Log in to the Container registry

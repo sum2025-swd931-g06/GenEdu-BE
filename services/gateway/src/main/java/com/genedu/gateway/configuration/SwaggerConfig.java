@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.security.*;
         scheme = "bearer",
         type = SecuritySchemeType.OPENIDCONNECT,
         in = SecuritySchemeIn.HEADER,
-        openIdConnectUrl = "http://localhost:9099/realms/GenEdu/.well-known/openid-configuration"
+        openIdConnectUrl = "${OPENID_CONFIG_URL}"
 )
 public class SwaggerConfig {
 }

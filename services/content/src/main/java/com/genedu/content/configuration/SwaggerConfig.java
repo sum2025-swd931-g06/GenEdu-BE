@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
         info = @Info(title = "Gate Way Service API", description = "Gate Way API documentation", version = "1.0"),
         security = @SecurityRequirement(name = "keycloak"),
         servers = {
-                @Server(url = "http://localhost:8222", description = "Gateway server")
+                @Server(url = "${GATEWAY_SERVICE_URL}", description = "Gateway server")
         }
 )
 @SecurityScheme(
@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
         scheme = "bearer",
         type = SecuritySchemeType.OPENIDCONNECT,
         in = SecuritySchemeIn.HEADER,
-        openIdConnectUrl = "http://localhost:9099/realms/GenEdu/.well-known/openid-configuration"
+        openIdConnectUrl = "${OPENID_CONFIG_URL}"
 )
 public class SwaggerConfig {
 }
