@@ -37,7 +37,7 @@ public class SecurityConfig {
             "/actuator/**",
             "/webjars/**",
     };
-//
+
     @Bean
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable); // Disable CSRF protection for stateless APIs

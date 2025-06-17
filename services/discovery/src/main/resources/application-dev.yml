@@ -1,6 +1,6 @@
 spring:
   config:
-    import: optional:configserver:http://localhost:88888
+    import: optional:configserver:http://localhost:8888
     activate:
       on-profile: dev
   application:

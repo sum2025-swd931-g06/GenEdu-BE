@@ -11,13 +11,15 @@
         <module name="discovery" />
         <module name="gateway" />
       </profile>
-      <profile name="Annotation profile for genedu" enabled="true">
+      <profile name="Annotation profile for content" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
+        <module name="project" />
+        <module name="media" />
         <module name="common-library" />
         <module name="user" />
         <module name="content" />
@@ -32,6 +34,8 @@
       <module name="discovery" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="genedu" options="-parameters" />
+      <module name="media" options="-parameters" />
+      <module name="project" options="-parameters" />
       <module name="user" options="-parameters" />
     </option>
   </component>
