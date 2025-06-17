@@ -12,13 +12,13 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/lecture")
+@RequestMapping("api/v1/media")
 public class LectureFileController {
 
-    LectureMediaService lectureMediaService;
+    private final LectureMediaService lectureMediaService;
 
     @PostMapping(
-            path = "/upload",
+            path = "upload/lecture-file",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -27,7 +27,7 @@ public class LectureFileController {
             @RequestParam("file") MultipartFile file
     ) throws IOException {
 
-        return new ResponseEntity<>(lectureMediaService.uploadLectureFile(lectureId, file.getName(), file), HttpStatus.CREATED);
+        return new ResponseEntity<>(lectureMediaService.uploadLectureFile(lectureId, file.getOriginalFilename(), file), HttpStatus.CREATED);
     }
 
     @GetMapping

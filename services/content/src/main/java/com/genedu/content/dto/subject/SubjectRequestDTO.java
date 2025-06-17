@@ -1,7 +1,5 @@
 package com.genedu.content.dto.subject;
 
-import com.genedu.content.model.Subject;
-
 public record SubjectRequestDTO(
         String name,
         String description

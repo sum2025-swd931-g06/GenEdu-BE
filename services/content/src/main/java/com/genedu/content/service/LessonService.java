@@ -4,7 +4,6 @@ import com.genedu.content.dto.chapter.ChapterResponseDTO;
 import com.genedu.content.dto.flatResponse.FlatSubjectChapterLessonDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
 import com.genedu.content.dto.lesson.LessonResponseDTO;
-import com.genedu.content.model.Lesson;
 
 import java.util.List;
 

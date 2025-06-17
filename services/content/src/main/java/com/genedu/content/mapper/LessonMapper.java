@@ -22,9 +22,9 @@ public class LessonMapper {
 
     public static FlatSubjectChapterLessonDTO toDTOWithChapter(Lesson lesson) {
         return FlatSubjectChapterLessonDTO.builder()
-                .subjectId(lesson.getChapter().getSubject().getId())
-                .subjectName(lesson.getChapter().getSubject().getName())
-                .subjectDescription(lesson.getChapter().getSubject().getDescription())
+                .subjectId(lesson.getChapter().getMaterial().getId())
+                .subjectName(lesson.getChapter().getMaterial().getSubject().getName())
+                .subjectDescription(lesson.getChapter().getMaterial().getDescription())
                 .chapterId(lesson.getChapter().getId())
                 .chapterTitle(lesson.getChapter().getTitle())
                 .chapterOrderNumber(lesson.getChapter().getOrderNumber())
