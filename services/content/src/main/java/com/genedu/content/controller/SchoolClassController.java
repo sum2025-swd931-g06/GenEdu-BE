@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/school-classes")
+@RequestMapping("/api/v1/contents/school-classes")
 @Tag(name = "School Class", description = "Manage school classes in the system")
 public class SchoolClassController {
     private final SchoolClassService schoolClassService;

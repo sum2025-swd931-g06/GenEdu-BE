@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/contents")
 @Tag(name = "Lesson", description = "Manage lessons in the system")
 public class LessonController {
     private final LessonService lessonService;

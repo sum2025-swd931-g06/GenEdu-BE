@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/contents")
 @Tag(name = "Subject", description = "Manage subjects in the system")
 public class SubjectController {
 

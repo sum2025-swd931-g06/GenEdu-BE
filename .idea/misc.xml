@@ -14,6 +14,8 @@
         <option value="$PROJECT_DIR$/services/content/pom.xml" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/services/common-library/pom.xml" />
+        <option value="$PROJECT_DIR$/services/project/pom.xml" />
+        <option value="$PROJECT_DIR$/services/media/pom.xml" />
       </list>
     </option>
   </component>
