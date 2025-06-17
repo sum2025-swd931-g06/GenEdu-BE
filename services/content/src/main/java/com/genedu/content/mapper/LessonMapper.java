@@ -13,6 +13,10 @@ public class LessonMapper {
                 .title(lesson.getTitle())
                 .description(lesson.getDescription())
                 .orderNumber(lesson.getOrderNumber())
+                .createdOn(lesson.getCreatedOn())
+                .createdBy(lesson.getCreatedBy())
+                .lastModifiedOn(lesson.getLastModifiedOn())
+                .lastModifiedBy(lesson.getLastModifiedBy())
                 .build();
     }
 

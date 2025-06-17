@@ -2,12 +2,14 @@ package com.genedu.content.dto.flatResponse;
 
 import lombok.Builder;
 
-import java.util.List;
-
 @Builder
-public record FlatSchoolClassResponseDTO<T>(
+public record FlatSchoolClassSubjectDTO(
         Integer schoolClassId,
         String schoolClassName,
         String schoolClassDescription,
-        List<T> subjects
-) {}
+
+        Long subjectId,
+        String subjectName,
+        String subjectDescription
+) {
+}

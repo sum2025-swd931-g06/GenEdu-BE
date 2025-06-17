@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.genedu.content.dto.lesson.LessonResponseDTO;
 import lombok.Builder;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Builder
@@ -13,6 +14,10 @@ public record ChapterResponseDTO(
         String title,
         Integer orderNumber,
         String description,
+        ZonedDateTime createdOn,
+        String createdBy,
+        ZonedDateTime lastModifiedOn,
+        String lastModifiedBy,
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
         List<LessonResponseDTO> lessons

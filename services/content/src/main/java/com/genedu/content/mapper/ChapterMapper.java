@@ -16,6 +16,10 @@ public class ChapterMapper {
                 .orderNumber(chapter.getOrderNumber())
                 .title(chapter.getTitle())
                 .description(chapter.getDescription())
+                .createdOn(chapter.getCreatedOn())
+                .createdBy(chapter.getCreatedBy())
+                .lastModifiedOn(chapter.getLastModifiedOn())
+                .lastModifiedBy(chapter.getLastModifiedBy())
                 .build();
     }
 
@@ -26,6 +30,10 @@ public class ChapterMapper {
                 .title(chapter.getTitle())
                 .description(chapter.getDescription())
                 .lessons(lessons)
+                .createdOn(chapter.getCreatedOn())
+                .createdBy(chapter.getCreatedBy())
+                .lastModifiedOn(chapter.getLastModifiedOn())
+                .lastModifiedBy(chapter.getLastModifiedBy())
                 .build();
     }
 
