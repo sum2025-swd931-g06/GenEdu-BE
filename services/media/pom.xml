@@ -9,10 +9,10 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>content</artifactId>
+    <artifactId>media</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>content</name>
-    <description>content</description>
+    <name>project</name>
+    <description>project</description>
 
     <url/>
     <licenses>
