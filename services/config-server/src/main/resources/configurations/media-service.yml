@@ -1,10 +1,10 @@
 server:
-  port: ${CONTENT_SERVICE_PORT:8091}
+  port: ${MEDIA_SERVICE_PORT:8091}
 
 spring:
   # Database configuration
   datasource:
-    url: ${POSTGRES_CONTENT_DB_URL}
+    url: ${POSTGRES_MEDIA_DB_URL}
     username: ${POSTGRES_USER:admin}
     password: ${POSTGRES_PASSWORD:admin}
 
@@ -46,3 +46,14 @@ springdoc:
       client-secret: ${KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY:0pQYYepE82DkALnEVhAfZREPeHmtHz3z}
     csrf:
       enabled: false
+
+# AWS S3 configuration
+aws:
+  credentials:
+    access-key: test_access_key
+    secret-key: test_secret_access_key
+  region: us-east-1
+  s3:
+    endpoint: http://s3.localhost.localstack.cloud:4566/
+    bucket:
+      name: media-bucket

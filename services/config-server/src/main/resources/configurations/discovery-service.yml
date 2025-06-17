@@ -1,9 +1,9 @@
 server:
-  port: 8761
+  port: ${DISCOVERY_SERVICE_PORT:8761}  # Default port for the discovery service
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: ${DISCOVERY_SERVICE_HOST:localhost}  # Hostname for the Eureka server instance
   client:
     registerWithEureka: false   # This service will not register itself with Eureka
     fetchRegistry: false        # This service will not fetch the registry from Eureka

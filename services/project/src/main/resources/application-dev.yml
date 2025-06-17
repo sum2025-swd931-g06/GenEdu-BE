@@ -1,7 +1,7 @@
 spring:
+  application:
+    name: project-service
   config:
     import: optional:configserver:http://localhost:8888
     activate:
       on-profile: dev
-  application:
-    name: discovery-service
