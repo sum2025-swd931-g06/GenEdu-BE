@@ -1,6 +1,6 @@
 package com.genedu.commonlibrary.exception;
 
-import utils.MessagesUtils;
+import com.genedu.commonlibrary.utils.MessagesUtils;
 
 public class DuplicatedException extends RuntimeException {
 

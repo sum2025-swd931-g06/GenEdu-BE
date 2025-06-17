@@ -1,4 +1,4 @@
-package utils;
+package com.genedu.commonlibrary.utils;
 
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;

@@ -18,7 +18,11 @@ public final class Constants {
         public static final String UPDATE_CHAPTER_FAILED = "UPDATE_CHAPTER_FAILED";
         public static final String DELETE_CHAPTER_FAILED = "DELETE_CHAPTER_FAILED";
 
-        // Subject
+        // Material
+        public static final String MATERIAL_ID_REQUIRED = "MATERIAL_ID_REQUIRED";
+        public static final String MATERIAL_NOT_FOUND = "MATERIAL_NOT_FOUND";
+
+        // Material
         public static final String SUBJECT_ID_REQUIRED = "SUBJECT_ID_REQUIRED";
         public static final String SUBJECT_NOT_FOUND = "SUBJECT_NOT_FOUND";
         public static final String DUPLICATED_SUBJECT_NAME = "DUPLICATED_SUBJECT_NAME";

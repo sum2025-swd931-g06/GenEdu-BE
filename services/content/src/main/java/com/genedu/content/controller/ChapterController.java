@@ -1,9 +1,12 @@
 package com.genedu.content.controller;
 
 import com.genedu.content.dto.chapter.ChapterRequestDTO;
-import com.genedu.content.dto.flatResponse.FlatSubjectChapterDTO;
-import com.genedu.content.dto.subject.SubjectResponseDTO;
+import com.genedu.content.dto.chapter.ChapterResponseDTO;
+import com.genedu.content.dto.flatResponse.FlatMaterialChapterDTO;
+import com.genedu.content.dto.material.MaterialResponseDTO;
+import com.genedu.content.model.Material;
 import com.genedu.content.service.ChapterService;
+import com.genedu.content.service.MaterialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,6 +27,7 @@ import java.util.List;
 @Tag(name = "Chapter", description = "Manage chapters in the system")
 public class ChapterController {
     private final ChapterService chapterService;
+    private final MaterialService materialService;
 
     // TEST
     @Operation(summary = "Get all chapters", description = "Returns a list of all chapters in the system.")
@@ -32,7 +36,7 @@ public class ChapterController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/chapters")
-    public ResponseEntity<List<FlatSubjectChapterDTO>> getAllChapters() {
+    public ResponseEntity<List<FlatMaterialChapterDTO>> getAllChapters() {
         log.info("Fetching all chapters");
         return ResponseEntity.ok(chapterService.getAllChapters());
     }
@@ -44,51 +48,53 @@ public class ChapterController {
             @ApiResponse(responseCode = "404", description = "Chapter not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<FlatSubjectChapterDTO> getChapterById(@PathVariable Long id) {
+    public ResponseEntity<FlatMaterialChapterDTO> getChapterById(@PathVariable Long id) {
         log.info("Fetching chapter with ID: {}", id);
-        FlatSubjectChapterDTO chapter = chapterService.getChapterById(id);
+        FlatMaterialChapterDTO chapter = chapterService.getChapterById(id);
         return ResponseEntity.ok(chapter);
     }
 
-    @GetMapping("/subjects/{subjectId}/chapters")
-    @Operation(summary = "Get all chapters of a subject", description = "Returns a list of all chapters of a subject by its ID.")
+    @GetMapping("/subjects/{material_id}/chapters")
+    @Operation(summary = "Get all chapters of a material", description = "Returns a list of all chapters of a material by its ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved chapter list"),
-            @ApiResponse(responseCode = "404", description = "Subject not found", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Material not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<SubjectResponseDTO> getChaptersBySubjectId(
+    public ResponseEntity<MaterialResponseDTO> getChaptersBySubjectId(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID of the subject to retrieve chapters for", required = true
+                    description = "ID of the material to retrieve chapters for", required = true
             )
-            @PathVariable Long subjectId
+            @PathVariable Long materialId
     ) {
-        log.info("Fetching chapters for subject with ID: {}", subjectId);
-        SubjectResponseDTO chapters = chapterService.getChaptersBySubjectId(subjectId);
-        return ResponseEntity.ok(chapters);
+        log.info("Fetching chapters for material with ID: {}", materialId);
+
+        return ResponseEntity.ok(
+                chapterService.getMaterialwithChapters(materialId)
+        );
     }
 
-    @PostMapping("/subjects/{subjectId}/chapters")
-    @Operation(summary = "Create a new chapter for a subject", description = "Creates a new chapter for a subject by its ID.")
+    @PostMapping("/materials/{materialId}/chapters")
+    @Operation(summary = "Create a new chapter for a material", description = "Creates a new chapter for a material by its ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Chapter successfully created"),
-            @ApiResponse(responseCode = "404", description = "Subject not found", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Material not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<FlatSubjectChapterDTO> createChapter(
+    public ResponseEntity<FlatMaterialChapterDTO> createChapter(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID of the subject to create chapter for", required = true
+                    description = "ID of the material to create chapter for", required = true
             )
-            @PathVariable Long subjectId,
+            @PathVariable Long materialId,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Information of the chapter to create", required = true
             )
             @RequestBody ChapterRequestDTO chapterRequestDTO
     ) {
-        log.info("Creating new chapter for subject with ID: {}", subjectId);
-        FlatSubjectChapterDTO createdChapter = chapterService.createChapter(subjectId, chapterRequestDTO);
+        log.info("Creating new chapter for material with ID: {}", materialId);
+        FlatMaterialChapterDTO createdChapter = chapterService.createChapter(materialId, chapterRequestDTO);
         return ResponseEntity
-                .created(URI.create("/api/v1/subjects/" + subjectId + "/chapters/" + createdChapter.chapterOrderNumber()))
+                .created(URI.create("/api/v1/materials/" + materialId + "/chapters/" + createdChapter.chapterOrderNumber()))
                 .body(createdChapter);
     }
 
@@ -99,7 +105,7 @@ public class ChapterController {
             @ApiResponse(responseCode = "404", description = "Chapter not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<FlatSubjectChapterDTO> updateChapter(
+    public ResponseEntity<FlatMaterialChapterDTO> updateChapter(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "ID of the chapter to update", required = true
             )
@@ -110,7 +116,7 @@ public class ChapterController {
             @RequestBody ChapterRequestDTO chapterRequestDTO
     ) {
         log.info("Updating chapter with ID: {}", id);
-        FlatSubjectChapterDTO updatedChapter = chapterService.updateChapter(id, chapterRequestDTO);
+        FlatMaterialChapterDTO updatedChapter = chapterService.updateChapter(id, chapterRequestDTO);
         return ResponseEntity.ok(updatedChapter);
     }
 

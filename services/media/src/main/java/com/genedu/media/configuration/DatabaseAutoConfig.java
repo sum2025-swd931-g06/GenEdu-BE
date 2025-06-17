@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Configuration
 @EnableJpaRepositories("com.genedu.media.repository")
-@EntityScan({"com.genedu.project.model"})
+@EntityScan({"com.genedu.media.model"})
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class DatabaseAutoConfig {
 

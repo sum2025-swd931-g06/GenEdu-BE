@@ -17,16 +17,17 @@ import java.time.ZonedDateTime;
 @Setter
 @EntityListeners(CustomAuditingEntityListener.class)
 public class AbstractAuditEntity {
-
     @CreationTimestamp
     private ZonedDateTime createdOn;
-
-    @CreatedBy
-    private String createdBy;
 
     @UpdateTimestamp
     private ZonedDateTime lastModifiedOn;
 
+    @CreatedBy
+    private String createdBy;
+
     @LastModifiedBy
     private String lastModifiedBy;
+    
+    private boolean isDeleted = false;
 }

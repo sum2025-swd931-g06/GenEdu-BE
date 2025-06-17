@@ -10,6 +10,7 @@ import com.genedu.content.dto.subject.SubjectRequestDTO;
 import com.genedu.content.dto.subject.SubjectResponseDTO;
 import com.genedu.content.mapper.SchoolClassMapper;
 import com.genedu.content.mapper.SubjectMapper;
+import com.genedu.content.model.Material;
 import com.genedu.content.model.SchoolClass;
 import com.genedu.content.model.Subject;
 import com.genedu.content.repository.SubjectRepository;
@@ -28,6 +29,7 @@ import java.util.List;
 @Service
 @Transactional
 public class SubjectServiceImpl implements SubjectService {
+
     private final SubjectRepository subjectRepository;
     private final SchoolClassService schoolClassService;
 
@@ -42,7 +44,7 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Transactional(readOnly = true)
     @Override
-    public FlatSchoolClassSubjectDTO getSubjectById(Long id) {
+    public FlatSchoolClassSubjectDTO getSubjectById(Integer id) {
         Subject subject = getSubjectEntityById(id);
         return SubjectMapper.toFlatDTO(subject);
     }
@@ -60,7 +62,7 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Transactional(readOnly = true)
     @Override
-    public Subject getSubjectEntityById(Long id) {
+    public Subject getSubjectEntityById(Integer id) {
         validateIdNotNull(id, Constants.ErrorCode.SUBJECT_ID_REQUIRED);
         return subjectRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.SUBJECT_NOT_FOUND, id));
@@ -79,16 +81,16 @@ public class SubjectServiceImpl implements SubjectService {
         Subject createdSubject = SubjectMapper.toEntity(subjectRequestDTO, schoolClass);
 
         try {
-            Subject savedSubject = subjectRepository.save(createdSubject);
-            return SubjectMapper.toFlatDTO(savedSubject);
+            Subject saveSubject = subjectRepository.save(createdSubject);
+            return SubjectMapper.toFlatDTO(saveSubject);
         } catch (Exception e) {
-            log.error("Error creating subject", e);
+            log.error("Error creating material", e);
             throw new InternalServerErrorException(Constants.ErrorCode.CREATE_SUBJECT_FAILED, e.getMessage());
         }
     }
 
     @Override
-    public FlatSchoolClassSubjectDTO updateSubject(Long id, SubjectRequestDTO subjectRequestDTO) {
+    public FlatSchoolClassSubjectDTO updateSubject(Integer id, SubjectRequestDTO subjectRequestDTO) {
         Subject existingSubject = getSubjectEntityById(id);
 
         if (subjectRepository.existsByNameAndIdNot(subjectRequestDTO.name(), id)) {
@@ -102,13 +104,13 @@ public class SubjectServiceImpl implements SubjectService {
             Subject updatedSubject = subjectRepository.save(existingSubject);
             return SubjectMapper.toFlatDTO(updatedSubject);
         } catch (Exception e) {
-            log.error("Error updating subject", e);
+            log.error("Error updating material", e);
             throw new InternalServerErrorException(Constants.ErrorCode.UPDATE_SUBJECT_FAILED, e.getMessage());
         }
     }
 
     @Override
-    public void deleteSubject(Long id) {
+    public void deleteSubject(Integer id) {
         validateIdNotNull(id, Constants.ErrorCode.SUBJECT_ID_REQUIRED);
 
         if (!subjectRepository.existsById(id)) {
@@ -118,12 +120,12 @@ public class SubjectServiceImpl implements SubjectService {
         try {
             subjectRepository.deleteById(id);
         } catch (Exception e) {
-            log.error("Error deleting subject", e);
+            log.error("Error deleting material", e);
             throw new InternalServerErrorException(Constants.ErrorCode.DELETE_SUBJECT_FAILED, e.getMessage());
         }
     }
 
-    private void validateIdNotNull(Long id, String errorCode) {
+    private void validateIdNotNull(Integer id, String errorCode) {
         if (id == null) {
             throw new BadRequestException(errorCode);
         }

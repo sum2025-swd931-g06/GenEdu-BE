@@ -62,7 +62,7 @@ spring:
         - id: media-service
           uri: lb://MEDIA-SERVICE
           predicates:
-            - Path=/api/v1/project/**
+            - Path=/api/v1/media/**
         # Project Service Swagger Route
         - id: media-service-swagger
           uri: lb://MEDIA-SERVICE
