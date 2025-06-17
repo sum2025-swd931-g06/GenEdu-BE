@@ -1,8 +1,8 @@
 package com.genedu.content.controller;
 
 import com.genedu.content.dto.chapter.ChapterRequestDTO;
-import com.genedu.content.dto.chapter.ChapterResponseDTO;
 import com.genedu.content.dto.flatResponse.FlatSubjectChapterDTO;
+import com.genedu.content.dto.subject.SubjectResponseDTO;
 import com.genedu.content.service.ChapterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,11 +25,11 @@ import java.util.List;
 public class ChapterController {
     private final ChapterService chapterService;
 
-    //TEST
-    @Operation(summary = "Lấy tất cả chương", description = "Trả về danh sách tất cả chương trong hệ thống.")
+    // TEST
+    @Operation(summary = "Get all chapters", description = "Returns a list of all chapters in the system.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lấy danh sách chương thành công"),
-            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved chapter list"),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/chapters")
     public ResponseEntity<List<FlatSubjectChapterDTO>> getAllChapters() {
@@ -38,11 +38,11 @@ public class ChapterController {
     }
 
     @GetMapping("/chapters/{id}")
-    @Operation(summary = "Lấy chương theo ID", description = "Trả về thông tin chương theo ID.")
+    @Operation(summary = "Get chapter by ID", description = "Returns chapter information by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lấy chương thành công"),
-            @ApiResponse(responseCode = "404", description = "Chương không tìm thấy", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved chapter"),
+            @ApiResponse(responseCode = "404", description = "Chapter not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<FlatSubjectChapterDTO> getChapterById(@PathVariable Long id) {
         log.info("Fetching chapter with ID: {}", id);
@@ -51,73 +51,79 @@ public class ChapterController {
     }
 
     @GetMapping("/subjects/{subjectId}/chapters")
-    @Operation(summary = "Lấy tất cả chương của môn học", description = "Trả về danh sách tất cả chương của môn học theo ID.")
+    @Operation(summary = "Get all chapters of a subject", description = "Returns a list of all chapters of a subject by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lấy danh sách chương thành công"),
-            @ApiResponse(responseCode = "404", description = "Môn học không tìm thấy", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved chapter list"),
+            @ApiResponse(responseCode = "404", description = "Subject not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<List<ChapterResponseDTO>> getChaptersBySubjectId(
+    public ResponseEntity<SubjectResponseDTO> getChaptersBySubjectId(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID của môn học cần lấy chương", required = true
+                    description = "ID of the subject to retrieve chapters for", required = true
             )
             @PathVariable Long subjectId
     ) {
         log.info("Fetching chapters for subject with ID: {}", subjectId);
-        List<ChapterResponseDTO> chapters = chapterService.getChaptersBySubjectId(subjectId);
+        SubjectResponseDTO chapters = chapterService.getChaptersBySubjectId(subjectId);
         return ResponseEntity.ok(chapters);
     }
 
     @PostMapping("/subjects/{subjectId}/chapters")
-    @Operation(summary = "Tạo chương mới cho môn học", description = "Tạo một chương mới cho môn học theo ID.")
+    @Operation(summary = "Create a new chapter for a subject", description = "Creates a new chapter for a subject by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Tạo chương thành công"),
-            @ApiResponse(responseCode = "404", description = "Môn học không tìm thấy", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
+            @ApiResponse(responseCode = "201", description = "Chapter successfully created"),
+            @ApiResponse(responseCode = "404", description = "Subject not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<ChapterResponseDTO> createChapter(
+    public ResponseEntity<FlatSubjectChapterDTO> createChapter(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID của môn học cần tạo chương", required = true
+                    description = "ID of the subject to create chapter for", required = true
             )
             @PathVariable Long subjectId,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Thông tin chương cần tạo", required = true
+                    description = "Information of the chapter to create", required = true
             )
             @RequestBody ChapterRequestDTO chapterRequestDTO
     ) {
         log.info("Creating new chapter for subject with ID: {}", subjectId);
-        ChapterResponseDTO createdChapter = chapterService.createChapter(subjectId, chapterRequestDTO);
+        FlatSubjectChapterDTO createdChapter = chapterService.createChapter(subjectId, chapterRequestDTO);
         return ResponseEntity
-                .created(URI.create("/api/v1/subjects/" + subjectId + "/chapters/" + createdChapter.orderNumber()))
+                .created(URI.create("/api/v1/subjects/" + subjectId + "/chapters/" + createdChapter.chapterOrderNumber()))
                 .body(createdChapter);
     }
 
     @PutMapping("chapters/{id}")
-    public ResponseEntity<ChapterResponseDTO> updateChapter(
+    @Operation(summary = "Update a chapter", description = "Updates the information of a chapter by its ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Chapter successfully updated"),
+            @ApiResponse(responseCode = "404", description = "Chapter not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    public ResponseEntity<FlatSubjectChapterDTO> updateChapter(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID của chương cần cập nhật", required = true
+                    description = "ID of the chapter to update", required = true
             )
             @PathVariable Long id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Thông tin chương cần cập nhật", required = true
+                    description = "Updated information of the chapter", required = true
             )
             @RequestBody ChapterRequestDTO chapterRequestDTO
     ) {
         log.info("Updating chapter with ID: {}", id);
-        ChapterResponseDTO updatedChapter = chapterService.updateChapter(id, chapterRequestDTO);
+        FlatSubjectChapterDTO updatedChapter = chapterService.updateChapter(id, chapterRequestDTO);
         return ResponseEntity.ok(updatedChapter);
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Xóa chương", description = "Xóa chương theo ID.")
+    @Operation(summary = "Delete a chapter", description = "Deletes a chapter by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Xóa chương thành công"),
-            @ApiResponse(responseCode = "404", description = "Chương không tìm thấy", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
+            @ApiResponse(responseCode = "204", description = "Chapter successfully deleted"),
+            @ApiResponse(responseCode = "404", description = "Chapter not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<Void> deleteChapter(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID của chương cần xóa", required = true
+                    description = "ID of the chapter to delete", required = true
             )
             @PathVariable Long id
     ) {
