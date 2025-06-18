@@ -1,12 +1,15 @@
 package com.genedu.project.service;
 
+import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.commonlibrary.utils.AuthenticationUtils;
 import com.genedu.project.dto.ProjectCreationDTO;
 import com.genedu.project.model.Project;
 import com.genedu.project.model.enumeration.ProjectStatus;
 import com.genedu.project.repository.ProjectRepository;
+import com.genedu.project.utils.Constants;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.ListTokenSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +26,11 @@ public class ProjectService {
     }
 
     public List<Project> getProjectsByUserId(UUID userId) {
-        return projectRepository.findByUserIdAndIsDeletedIsFalse(userId);
+        List<Project> projects = projectRepository.findByUserIdAndIsDeletedIsFalse(userId);
+        if (projects.isEmpty()) {
+            throw new NotFoundException(Constants.ErrorCode.PROJECT_WITH_USERID_NOT_FOUND, userId);
+        }
+        return projects;
     }
 
     public Project getProjectById(UUID id) {
@@ -42,6 +49,7 @@ public class ProjectService {
         project.setSlideNum(projectDTO.getSlideNum() != null ? projectDTO.getSlideNum() : 10);
         project.setStatus(ProjectStatus.DRAFT);
         project.setDeleted(false);
+
         return projectRepository.save(project);
     }
 

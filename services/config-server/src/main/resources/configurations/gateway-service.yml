@@ -50,7 +50,7 @@ spring:
         - id: project-service
           uri: lb://PROJECT-SERVICE
           predicates:
-            - Path=/api/v1/project/**
+            - Path=/api/v1/projects/**
         # Project Service Swagger Route
         - id: project-service-swagger
           uri: lb://PROJECT-SERVICE
