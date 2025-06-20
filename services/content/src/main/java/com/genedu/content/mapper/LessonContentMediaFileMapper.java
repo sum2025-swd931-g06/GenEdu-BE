@@ -23,10 +23,9 @@ public class LessonContentMediaFileMapper {
                 .lessonContentOrderNumber(lessonContentMediaFile.getLessonContent().getOrderNumber())
 
                 .id(lessonContentMediaFile.getId())
-                .mediaFileId(lessonContentMediaFile.getMediaFileId())
-                .orderNumber(lessonContentMediaFile.getOrderNumber())
-                .description(lessonContentMediaFile.getDescription())
-
+                .lessonContentMediaFileId(lessonContentMediaFile.getMediaFileId())
+                .lessonContentMediaFileOrderNumber(lessonContentMediaFile.getOrderNumber())
+                .lessonContentMediaFileDescription(lessonContentMediaFile.getDescription())
                 .build();
     }
 

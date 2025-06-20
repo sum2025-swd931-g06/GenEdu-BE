@@ -10,7 +10,7 @@ public record FlatLessonContentLessonContentMediaFile(
         Integer lessonContentOrderNumber,
 
         Long id,
-        Long mediaFileId,
-        Integer orderNumber,
-        String description
+        Long lessonContentMediaFileId,
+        Integer lessonContentMediaFileOrderNumber,
+        String lessonContentMediaFileDescription
 ) {}

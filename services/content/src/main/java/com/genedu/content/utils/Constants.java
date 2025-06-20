@@ -2,6 +2,15 @@ package com.genedu.content.utils;
 
 public final class Constants {
     public static final class ErrorCode {
+        // Lesson Content Media File
+        public static final String LESSON_CONTENT_MEDIA_FILE_ID_NULL = "LESSON_CONTENT_MEDIA_FILE_ID_NULL";
+        public static final String LESSON_CONTENT_MEDIA_FILE_NOT_FOUND = "LESSON_CONTENT_MEDIA_FILE_NOT_FOUND";
+        public static final String DUPLICATED_LESSON_CONTENT_MEDIA_FILE_ORDER = "DUPLICATED_LESSON_CONTENT_MEDIA_FILE_ORDER";
+        public static final String LESSON_CONTENT_MEDIA_FILE_ORDER_NUMBER_INVALID = "LESSON_CONTENT_MEDIA_FILE_ORDER_NUMBER_INVALID";
+        public static final String LESSON_CONTENT_MEDIA_FILE_CREATION_FAILED = "LESSON_CONTENT_MEDIA_FILE_CREATION_FAILED";
+        public static final String LESSON_CONTENT_MEDIA_FILE_UPDATE_FAILED = "LESSON_CONTENT_MEDIA_FILE_UPDATE_FAILED";
+        public static final String LESSON_CONTENT_MEDIA_FILE_DELETION_FAILED = "LESSON_CONTENT_MEDIA_FILE_DELETION_FAILED";
+
         // Lesson Content
         public static final String LESSON_CONTENT_ID_REQUIRED = "LESSON_CONTENT_ID_REQUIRED";
         public static final String LESSON_CONTENT_NOT_FOUND = "LESSON_CONTENT_NOT_FOUND";
