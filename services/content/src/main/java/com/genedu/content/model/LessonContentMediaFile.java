@@ -1,5 +1,6 @@
 package com.genedu.content.model;
 
+import com.genedu.commonlibrary.model.AbstractAuditEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -12,7 +13,7 @@ import org.hibernate.annotations.ColumnDefault;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "lesson_content_media_files")
-public class LessonContentMediaFile {
+public class LessonContentMediaFile extends AbstractAuditEntity {
     @Id
     @Column(name = "id", nullable = false)
     private Long id;

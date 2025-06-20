@@ -54,7 +54,7 @@ public class SchoolClassController {
         return ResponseEntity.ok(schoolClass);
     }
 
-    @Operation(summary = "Create new school class", description = "Creates a new school class with name and description.")
+    @Operation(summary = "Create new school class", description = "Creates a new school class with name and content.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "School class created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content),
