@@ -5,7 +5,7 @@ import com.genedu.commonlibrary.exception.DuplicatedException;
 import com.genedu.commonlibrary.exception.InternalServerErrorException;
 import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
-import com.genedu.content.dto.flatResponse.FlatSubjectChapterLessonDTO;
+import com.genedu.content.dto.flatResponse.FlatChapterLessonDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
 import com.genedu.content.dto.lesson.LessonResponseDTO;
 import com.genedu.content.mapper.ChapterMapper;
@@ -33,39 +33,42 @@ public class LessonServiceImpl implements LessonService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<FlatSubjectChapterLessonDTO> getAllLessons() {
-        return lessonRepository.findAll().stream()
-                .map(LessonMapper::toDTOWithChapter)
+    public List<FlatChapterLessonDTO> getAllLessons() {
+        return lessonRepository.findAll()
+                .stream()
+                .map(LessonMapper::toFlatDTO)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<LessonResponseDTO> getAllLessonsByChapterId(Long chapterId) {
-        return lessonRepository.findAllByChapterId(chapterId).stream()
+    public FlatChapterLessonDTO getLessonById(Long lessonId) {
+        var lesson = getLessonEntityById(lessonId);
+        return LessonMapper.toFlatDTO(lesson);
+    }
+
+    @Override
+    public ChapterResponseDTO getLessonsByChapterId(Long chapterId) {
+        log.info("Fetching chapter with lessons for chapter ID: {}", chapterId);
+        var lessons = lessonRepository.findByChapterId(chapterId)
+                .stream()
                 .map(LessonMapper::toDTO)
                 .toList();
+
+        Chapter chapter = chapterService.getChapterEntityById(chapterId);
+        return ChapterMapper.toDTOWithLessons(chapter, lessons);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public ChapterResponseDTO getChapterLessonsById(Long id) {
-        Chapter chapter = chapterService.getChapterEntityById(id);
-        List<LessonResponseDTO> lessonResponseDTOs = getAllLessonsByChapterId(id);
-        return ChapterMapper.toDTOWithLessons(chapter, lessonResponseDTOs);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public FlatSubjectChapterLessonDTO getLessonById(Long lessonId) {
+    public Lesson getLessonEntityById(Long lessonId) {
         validateLessonId(lessonId);
-        Lesson lesson = lessonRepository.findById(lessonId)
+        return lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.LESSON_NOT_FOUND, lessonId));
-        return LessonMapper.toDTOWithChapter(lesson);
     }
 
     @Override
-    public FlatSubjectChapterLessonDTO createLesson(Long chapterId, LessonRequestDTO lessonRequestDTO) {
+    public FlatChapterLessonDTO createLesson(Long chapterId, LessonRequestDTO lessonRequestDTO) {
         if (lessonRepository.existsByChapter_IdAndOrderNumber(chapterId, lessonRequestDTO.orderNumber())) {
             throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_LESSON_ORDER, lessonRequestDTO.orderNumber());
         }
@@ -74,7 +77,7 @@ public class LessonServiceImpl implements LessonService {
 
         try {
             Lesson savedLesson = lessonRepository.save(lesson);
-            return LessonMapper.toDTOWithChapter(savedLesson);
+            return LessonMapper.toFlatDTO(savedLesson);
         } catch (Exception e) {
             log.error("Error creating lesson", e);
             throw new InternalServerErrorException(Constants.ErrorCode.CREATE_LESSON_FAILED, e.getMessage());
@@ -82,14 +85,14 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public FlatSubjectChapterLessonDTO updateLesson(Long lessonId, LessonRequestDTO lessonRequestDTO) {
-        Lesson existingLesson = lessonRepository.findById(lessonId)
-                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.LESSON_NOT_FOUND, lessonId));
+    public FlatChapterLessonDTO updateLesson(Long lessonId, LessonRequestDTO lessonRequestDTO) {
+        Lesson existingLesson = getLessonEntityById(lessonId);
 
         if (lessonRepository.existsByChapter_IdAndOrderNumberAndIdNot(
                 existingLesson.getChapter().getId(),
                 lessonRequestDTO.orderNumber(),
-                lessonId)) {
+                lessonId)
+        ) {
             throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_LESSON_ORDER, lessonRequestDTO.orderNumber());
         }
 
@@ -99,7 +102,7 @@ public class LessonServiceImpl implements LessonService {
             existingLesson.setOrderNumber(lessonRequestDTO.orderNumber());
 
             Lesson updatedLesson = lessonRepository.save(existingLesson);
-            return LessonMapper.toDTOWithChapter(updatedLesson);
+            return LessonMapper.toFlatDTO(updatedLesson);
         } catch (Exception e) {
             log.error("Error updating lesson", e);
             throw new InternalServerErrorException(Constants.ErrorCode.UPDATE_LESSON_FAILED, e.getMessage());
@@ -113,7 +116,8 @@ public class LessonServiceImpl implements LessonService {
             throw new NotFoundException(Constants.ErrorCode.LESSON_NOT_FOUND, lessonId);
         }
         try {
-            lessonRepository.deleteById(lessonId);
+            var existingLesson = getLessonEntityById(lessonId);
+            existingLesson.setDeleted(true);
         } catch (Exception e) {
             log.error("Error deleting lesson", e);
             throw new InternalServerErrorException(Constants.ErrorCode.DELETE_LESSON_FAILED, e.getMessage());

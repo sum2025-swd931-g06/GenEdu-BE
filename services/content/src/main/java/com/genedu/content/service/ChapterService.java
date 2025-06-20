@@ -11,12 +11,12 @@ import java.util.List;
 public interface ChapterService {
     List<FlatMaterialChapterDTO> getAllChapters();
     List<ChapterResponseDTO> getChaptersByMaterialId(Long materialId);
-    MaterialResponseDTO getMaterialwithChapters(Long chapterId);
+    MaterialResponseDTO getMaterialWithChapters(Long chapterId);
     FlatMaterialChapterDTO getChapterById(Long id);
     Chapter getChapterEntityById(Long id);
 
-    ChapterResponseDTO getChapterBySubjectIdAndOrderNumber(Long materialId, int orderNumber);
-    Chapter getChapterEntityBySubjectIdAndOrderNumber(Long materialId, int orderNumber);
+    ChapterResponseDTO getChapterByMaterialIdAndOrderNumber(Long materialId, int orderNumber);
+    Chapter getChapterEntityByMaterialIdAndOrderNumber(Long materialId, int orderNumber);
     FlatMaterialChapterDTO createChapter(Long materialId, ChapterRequestDTO chapterRequestDTO);
     FlatMaterialChapterDTO updateChapter(Long id, ChapterRequestDTO chapter);
     void deleteChapter(Long id);

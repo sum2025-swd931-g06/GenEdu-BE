@@ -15,6 +15,8 @@ import lombok.*;
 @Table(name = "lesson_contents")
 public class LessonContent extends AbstractAuditEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lesson_contents_id_gen")
+    @SequenceGenerator(name = "lesson_contents_id_gen", sequenceName = "lesson_contents_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

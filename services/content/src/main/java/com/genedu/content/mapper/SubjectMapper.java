@@ -35,7 +35,7 @@ public class SubjectMapper {
                 .build();
     }
 
-    public static SubjectResponseDTO toDTOWithChapters(Subject material, List<MaterialResponseDTO> materialResponseDTOS) {
+    public static SubjectResponseDTO toDTOWithMaterials(Subject material, List<MaterialResponseDTO> materialResponseDTOS) {
         return SubjectResponseDTO.builder()
                 .id(material.getId())
                 .name(material.getName())
