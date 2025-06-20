@@ -15,8 +15,8 @@ public interface ChapterService {
     FlatMaterialChapterDTO getChapterById(Long id);
     Chapter getChapterEntityById(Long id);
 
-    ChapterResponseDTO getChapterBySubjectIdAndOrderNumber(Long materialId, int orderNumber);
-    Chapter getChapterEntityBySubjectIdAndOrderNumber(Long materialId, int orderNumber);
+    ChapterResponseDTO getChapterByMaterialIdAndOrderNumber(Long materialId, int orderNumber);
+    Chapter getChapterEntityByMaterialIdAndOrderNumber(Long materialId, int orderNumber);
     FlatMaterialChapterDTO createChapter(Long materialId, ChapterRequestDTO chapterRequestDTO);
     FlatMaterialChapterDTO updateChapter(Long id, ChapterRequestDTO chapter);
     void deleteChapter(Long id);

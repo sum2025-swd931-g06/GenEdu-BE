@@ -30,6 +30,7 @@ public class ChapterMapper {
                 .title(chapter.getTitle())
                 .description(chapter.getDescription())
                 .lessons(lessons)
+
                 .createdOn(chapter.getCreatedOn())
                 .createdBy(chapter.getCreatedBy())
                 .lastModifiedOn(chapter.getLastModifiedOn())
@@ -39,9 +40,10 @@ public class ChapterMapper {
 
     public static FlatMaterialChapterDTO toFlatDTO(Chapter chapter) {
         return FlatMaterialChapterDTO.builder()
-                .subjectId(chapter.getMaterial().getId())
-                .subjectName(chapter.getMaterial().getSubject().getName())
-                .subjectDescription(chapter.getMaterial().getDescription())
+                .materialId(chapter.getMaterial().getId())
+                .materialName(chapter.getMaterial().getSubject().getName())
+                .materialDescription(chapter.getMaterial().getDescription())
+
                 .chapterId(chapter.getId())
                 .chapterTitle(chapter.getTitle())
                 .chapterOrderNumber(chapter.getOrderNumber())

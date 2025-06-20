@@ -14,6 +14,7 @@ public final class Constants {
         public static final String CHAPTER_ID_REQUIRED = "CHAPTER_ID_REQUIRED";
         public static final String CHAPTER_NOT_FOUND = "CHAPTER_NOT_FOUND";
         public static final String DUPLICATED_CHAPTER_ORDER = "DUPLICATED_CHAPTER_ORDER";
+        public static final String CHAPTER_ORDER_NUMBER_INVALID = "CHAPTER_ORDER_NUMBER_INVALID";
         public static final String CREATE_CHAPTER_FAILED = "CREATE_CHAPTER_FAILED";
         public static final String UPDATE_CHAPTER_FAILED = "UPDATE_CHAPTER_FAILED";
         public static final String DELETE_CHAPTER_FAILED = "DELETE_CHAPTER_FAILED";
@@ -21,6 +22,11 @@ public final class Constants {
         // Material
         public static final String MATERIAL_ID_REQUIRED = "MATERIAL_ID_REQUIRED";
         public static final String MATERIAL_NOT_FOUND = "MATERIAL_NOT_FOUND";
+        public static final String DUPLICATED_MATERIAL_ORDER = "DUPLICATED_MATERIAL_ORDER";
+        public static final String MATERIAL_ORDER_NUMBER_INVALID = "MATERIAL_ORDER_NUMBER_INVALID";
+        public static final String CREATE_MATERIAL_FAILED = "CREATE_MATERIAL_FAILED";
+        public static final String UPDATE_MATERIAL_FAILED = "UPDATE_MATERIAL_FAILED";
+        public static final String DELETE_MATERIAL_FAILED = "DELETE_MATERIAL_FAILED";
 
         // Material
         public static final String SUBJECT_ID_REQUIRED = "SUBJECT_ID_REQUIRED";

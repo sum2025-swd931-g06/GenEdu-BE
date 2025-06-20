@@ -5,6 +5,7 @@ import com.genedu.commonlibrary.exception.DuplicatedException;
 import com.genedu.commonlibrary.exception.InternalServerErrorException;
 import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
+import com.genedu.content.dto.flatResponse.FlatChapterLessonDTO;
 import com.genedu.content.dto.flatResponse.FlatSubjectChapterLessonDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
 import com.genedu.content.dto.lesson.LessonResponseDTO;
@@ -33,7 +34,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<FlatSubjectChapterLessonDTO> getAllLessons() {
+    public List<FlatChapterLessonDTO> getAllLessons() {
         return lessonRepository.findAll().stream()
                 .map(LessonMapper::toDTOWithChapter)
                 .toList();
@@ -57,7 +58,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Transactional(readOnly = true)
     @Override
-    public FlatSubjectChapterLessonDTO getLessonById(Long lessonId) {
+    public FlatChapterLessonDTO getLessonById(Long lessonId) {
         validateLessonId(lessonId);
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.LESSON_NOT_FOUND, lessonId));
@@ -65,7 +66,7 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public FlatSubjectChapterLessonDTO createLesson(Long chapterId, LessonRequestDTO lessonRequestDTO) {
+    public FlatChapterLessonDTO createLesson(Long chapterId, LessonRequestDTO lessonRequestDTO) {
         if (lessonRepository.existsByChapter_IdAndOrderNumber(chapterId, lessonRequestDTO.orderNumber())) {
             throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_LESSON_ORDER, lessonRequestDTO.orderNumber());
         }
@@ -82,7 +83,7 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public FlatSubjectChapterLessonDTO updateLesson(Long lessonId, LessonRequestDTO lessonRequestDTO) {
+    public FlatChapterLessonDTO updateLesson(Long lessonId, LessonRequestDTO lessonRequestDTO) {
         Lesson existingLesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.LESSON_NOT_FOUND, lessonId));
 

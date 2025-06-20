@@ -6,6 +6,7 @@ import lombok.Builder;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 public record MaterialResponseDTO(
@@ -14,9 +15,9 @@ public record MaterialResponseDTO(
         Integer orderNumber,
         String description,
         ZonedDateTime createdOn,
-        String createdBy,
+        UUID createdBy,
         ZonedDateTime lastModifiedOn,
-        String lastModifiedBy,
+        UUID lastModifiedBy,
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
         List<ChapterResponseDTO> chapters

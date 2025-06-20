@@ -7,6 +7,7 @@ import lombok.Builder;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 public record SubjectResponseDTO(
@@ -14,9 +15,9 @@ public record SubjectResponseDTO(
         String name,
         String description,
         ZonedDateTime createdOn,
-        String createdBy,
+        UUID createdBy,
         ZonedDateTime lastModifiedOn,
-        String lastModifiedBy,
+        UUID lastModifiedBy,
         
         @JsonInclude(JsonInclude.Include.NON_NULL)
         List<MaterialResponseDTO> materials

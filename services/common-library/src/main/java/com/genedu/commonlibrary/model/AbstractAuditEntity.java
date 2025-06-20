@@ -11,6 +11,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @MappedSuperclass
 @Getter
@@ -24,10 +25,10 @@ public class AbstractAuditEntity {
     private ZonedDateTime lastModifiedOn;
 
     @CreatedBy
-    private String createdBy;
+    private UUID createdBy;
 
     @LastModifiedBy
-    private String lastModifiedBy;
+    private UUID lastModifiedBy;
     
     private boolean isDeleted = false;
 }

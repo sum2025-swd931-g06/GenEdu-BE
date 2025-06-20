@@ -1,6 +1,7 @@
 package com.genedu.content.controller;
 
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
+import com.genedu.content.dto.flatResponse.FlatChapterLessonDTO;
 import com.genedu.content.dto.flatResponse.FlatSubjectChapterLessonDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
 import com.genedu.content.service.LessonService;
@@ -23,16 +24,16 @@ public class LessonController {
     private final LessonService lessonService;
 
     @GetMapping("/lessons")
-    public ResponseEntity<List<FlatSubjectChapterLessonDTO>> getAllLessons() {
+    public ResponseEntity<List<FlatChapterLessonDTO>> getAllLessons() {
         log.info("Fetching all lessons");
-        List<FlatSubjectChapterLessonDTO> lessons = lessonService.getAllLessons();
+        var lessons = lessonService.getAllLessons();
         return ResponseEntity.ok(lessons);
     }
 
     @GetMapping("/lessons/{id}")
-    public ResponseEntity<FlatSubjectChapterLessonDTO> getLessonById(@PathVariable Long id) {
+    public ResponseEntity<FlatChapterLessonDTO> getLessonById(@PathVariable Long id) {
         log.info("Fetching lesson with ID: {}", id);
-        FlatSubjectChapterLessonDTO lesson = lessonService.getLessonById(id);
+        var lesson = lessonService.getLessonById(id);
         return ResponseEntity.ok(lesson);
     }
 
@@ -44,21 +45,21 @@ public class LessonController {
     }
 
     @PostMapping("/chapters/{chapterId}/lessons")
-    public ResponseEntity<FlatSubjectChapterLessonDTO> createLesson(
+    public ResponseEntity<FlatChapterLessonDTO> createLesson(
             @PathVariable Long chapterId,
             @Valid @RequestBody LessonRequestDTO lessonRequestDTO) {
         log.info("Creating lesson for chapter ID: {}", chapterId);
-        FlatSubjectChapterLessonDTO createdLesson = lessonService.createLesson(chapterId, lessonRequestDTO);
+        var createdLesson = lessonService.createLesson(chapterId, lessonRequestDTO);
         return ResponseEntity.created(URI.create("/api/v1/lessons/" + createdLesson.lessonId()))
                 .body(createdLesson);
     }
 
     @PutMapping("/lessons/{id}")
-    public ResponseEntity<FlatSubjectChapterLessonDTO> updateLesson(
+    public ResponseEntity<FlatChapterLessonDTO> updateLesson(
             @PathVariable Long id,
             @Valid @RequestBody LessonRequestDTO lessonRequestDTO) {
         log.info("Updating lesson with ID: {}", id);
-        FlatSubjectChapterLessonDTO updatedLesson = lessonService.updateLesson(id, lessonRequestDTO);
+        var updatedLesson = lessonService.updateLesson(id, lessonRequestDTO);
         return ResponseEntity.ok(updatedLesson);
     }
 

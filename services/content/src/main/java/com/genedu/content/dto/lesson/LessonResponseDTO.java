@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Builder
 public record LessonResponseDTO(
@@ -13,7 +14,7 @@ public record LessonResponseDTO(
         Integer orderNumber,
         String description,
         ZonedDateTime createdOn,
-        String createdBy,
+        UUID createdBy,
         ZonedDateTime lastModifiedOn,
-        String lastModifiedBy
+        UUID lastModifiedBy
 ) {}

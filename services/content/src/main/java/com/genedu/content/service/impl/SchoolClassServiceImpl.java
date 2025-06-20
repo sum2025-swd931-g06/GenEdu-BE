@@ -94,7 +94,8 @@ public class SchoolClassServiceImpl implements SchoolClassService {
             throw new NotFoundException(Constants.ErrorCode.SCHOOL_CLASS_NOT_FOUND, id);
         }
         try {
-            schoolClassRepository.deleteById(id);
+            var existingSchoolClass = getSchoolClassEntityById(id);
+            existingSchoolClass.setDeleted(true);
         } catch (Exception e) {
             log.error("Error deleting school class", e);
             throw new InternalServerErrorException(Constants.ErrorCode.DELETE_SCHOOL_CLASS_FAILED, e.getMessage());

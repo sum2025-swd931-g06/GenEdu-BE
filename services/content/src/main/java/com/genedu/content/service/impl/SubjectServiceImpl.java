@@ -118,9 +118,10 @@ public class SubjectServiceImpl implements SubjectService {
         }
 
         try {
-            subjectRepository.deleteById(id);
+            var existingSubject = getSubjectEntityById(id);
+            existingSubject.setDeleted(true);
         } catch (Exception e) {
-            log.error("Error deleting material", e);
+            log.error("Error deleting subject", e);
             throw new InternalServerErrorException(Constants.ErrorCode.DELETE_SUBJECT_FAILED, e.getMessage());
         }
     }
