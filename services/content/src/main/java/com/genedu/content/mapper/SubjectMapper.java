@@ -2,8 +2,10 @@ package com.genedu.content.mapper;
 
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
 import com.genedu.content.dto.flatResponse.FlatSchoolClassSubjectDTO;
+import com.genedu.content.dto.material.MaterialResponseDTO;
 import com.genedu.content.dto.subject.SubjectRequestDTO;
 import com.genedu.content.dto.subject.SubjectResponseDTO;
+import com.genedu.content.model.Material;
 import com.genedu.content.model.SchoolClass;
 import com.genedu.content.model.Subject;
 
@@ -33,16 +35,16 @@ public class SubjectMapper {
                 .build();
     }
 
-    public static SubjectResponseDTO toDTOWithChapters(Subject subject, List<ChapterResponseDTO> chapters) {
+    public static SubjectResponseDTO toDTOWithMaterials(Subject material, List<MaterialResponseDTO> materialResponseDTOS) {
         return SubjectResponseDTO.builder()
-                .id(subject.getId())
-                .name(subject.getName())
-                .description(subject.getDescription())
-                .chapters(chapters)
-                .createdOn(subject.getCreatedOn())
-                .createdBy(subject.getCreatedBy())
-                .lastModifiedOn(subject.getLastModifiedOn())
-                .lastModifiedBy(subject.getLastModifiedBy())
+                .id(material.getId())
+                .name(material.getName())
+                .description(material.getDescription())
+                .materials(materialResponseDTOS)
+                .createdOn(material.getCreatedOn())
+                .createdBy(material.getCreatedBy())
+                .lastModifiedOn(material.getLastModifiedOn())
+                .lastModifiedBy(material.getLastModifiedBy())
                 .build();
     }
 

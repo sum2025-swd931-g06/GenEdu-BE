@@ -28,7 +28,7 @@ public class SubjectController {
 
     @Operation(summary = "Get all subjects", description = "Returns a list of all subjects in the system.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved subject list"),
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved subjects list"),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/subjects")
@@ -49,7 +49,7 @@ public class SubjectController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "ID of the subject to retrieve", required = true
             )
-            @PathVariable Long id
+            @PathVariable Integer id
     ) {
         log.info("Fetching subject with ID: {}", id);
         FlatSchoolClassSubjectDTO subject = subjectService.getSubjectById(id);
@@ -109,34 +109,32 @@ public class SubjectController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "ID of the subject to be updated", required = true
             )
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Updated information of the subject", required = true
             )
             @RequestBody SubjectRequestDTO subjectRequestDTO
     ) {
         log.info("Updating subject with ID: {}", id);
-        FlatSchoolClassSubjectDTO updatedSubject = subjectService.updateSubject(id, subjectRequestDTO);
+        var updatedSubject = subjectService.updateSubject(id, subjectRequestDTO);
         return ResponseEntity.ok(updatedSubject);
     }
 
-    /*
-    @Operation(summary = "Delete a subject", description = "Deletes a subject from the system by its ID.")
+    @Operation(summary = "Delete a material", description = "Deletes a subject from the system by its ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Subject successfully deleted"),
-            @ApiResponse(responseCode = "404", description = "Subject not found", content = @Content),
+            @ApiResponse(responseCode = "404", description = "subject not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/subjects/{id}")
     public ResponseEntity<Void> deleteSubject(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID of the subject to be deleted", required = true
+                    description = "ID of the material to be deleted", required = true
             )
-            @PathVariable Long id
+            @PathVariable Integer id
     ) {
-        log.info("Deleting subject with ID: {}", id);
+        log.info("Deleting material with ID: {}", id);
         subjectService.deleteSubject(id);
         return ResponseEntity.noContent().build();
     }
-    */
 }

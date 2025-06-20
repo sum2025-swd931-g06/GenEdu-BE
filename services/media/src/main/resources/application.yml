@@ -1,6 +1,9 @@
 spring:
   application:
       name: media-service
+  cloud:
+    compatibility-verifier:
+      enabled: false
   profiles:
     active: native
   config:

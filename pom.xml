@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.0</version>
+        <version>3.3.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -22,6 +22,8 @@
         <module>services/gateway</module>
         <module>services/user</module>
         <module>services/content</module>
+        <module>services/media</module>
+        <module>services/project</module>
     </modules>
 
     <properties>
@@ -29,7 +31,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <spring-cloud.version>2025.0.0-RC1</spring-cloud.version>
+        <spring-cloud.version>2023.0.3</spring-cloud.version>
         <springdoc-openapi.version>2.0.2</springdoc-openapi.version>
         <org.projectlombok.version>1.18.36</org.projectlombok.version>
         <revision>0.0.1-SNAPSHOT</revision>

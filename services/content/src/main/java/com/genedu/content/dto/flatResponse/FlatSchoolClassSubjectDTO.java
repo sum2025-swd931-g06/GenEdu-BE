@@ -8,7 +8,7 @@ public record FlatSchoolClassSubjectDTO(
         String schoolClassName,
         String schoolClassDescription,
 
-        Long subjectId,
+        Integer subjectId,
         String subjectName,
         String subjectDescription
 ) {

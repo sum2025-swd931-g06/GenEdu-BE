@@ -1,6 +1,7 @@
 package com.genedu.commonlibrary.model;
 
 import com.genedu.commonlibrary.model.listener.CustomAuditingEntityListener;
+import com.genedu.commonlibrary.model.listener.CustomTimeAuditingEntityListener;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -11,22 +12,24 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @MappedSuperclass
 @Getter
 @Setter
-@EntityListeners(CustomAuditingEntityListener.class)
+@EntityListeners(CustomTimeAuditingEntityListener.class)
 public class AbstractAuditEntity {
-
     @CreationTimestamp
     private ZonedDateTime createdOn;
-
-    @CreatedBy
-    private String createdBy;
 
     @UpdateTimestamp
     private ZonedDateTime lastModifiedOn;
 
+    @CreatedBy
+    private UUID createdBy;
+
     @LastModifiedBy
-    private String lastModifiedBy;
+    private UUID lastModifiedBy;
+    
+    private boolean isDeleted = false;
 }

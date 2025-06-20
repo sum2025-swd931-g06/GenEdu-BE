@@ -6,15 +6,15 @@ import com.genedu.commonlibrary.exception.InternalServerErrorException;
 import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.content.dto.chapter.ChapterRequestDTO;
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
-import com.genedu.content.dto.flatResponse.FlatSubjectChapterDTO;
-import com.genedu.content.dto.subject.SubjectResponseDTO;
+import com.genedu.content.dto.flatResponse.FlatMaterialChapterDTO;
+import com.genedu.content.dto.material.MaterialResponseDTO;
 import com.genedu.content.mapper.ChapterMapper;
-import com.genedu.content.mapper.SubjectMapper;
+import com.genedu.content.mapper.MaterialMapper;
 import com.genedu.content.model.Chapter;
-import com.genedu.content.model.Subject;
+import com.genedu.content.model.Material;
 import com.genedu.content.repository.ChapterRepository;
 import com.genedu.content.service.ChapterService;
-import com.genedu.content.service.SubjectService;
+import com.genedu.content.service.MaterialService;
 import com.genedu.content.utils.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +28,13 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class ChapterServiceImpl implements ChapterService {
+
     private final ChapterRepository chapterRepository;
-    private final SubjectService subjectService;
+    private final MaterialService materialService;
 
     @Transactional(readOnly = true)
     @Override
-    public List<FlatSubjectChapterDTO> getAllChapters() {
+    public List<FlatMaterialChapterDTO> getAllChapters() {
         return chapterRepository.findAll().stream()
                 .map(ChapterMapper::toFlatDTO)
                 .toList();
@@ -41,17 +42,29 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Transactional(readOnly = true)
     @Override
-    public SubjectResponseDTO getChaptersBySubjectId(Long subjectId) {
-        Subject subject = subjectService.getSubjectEntityById(subjectId);
-        List<ChapterResponseDTO> chapters = chapterRepository.findBySubject_Id(subjectId).stream()
+    public List<ChapterResponseDTO> getChaptersByMaterialId(Long materialId) {
+        log.info("Fetching chapters for material with ID: {}", materialId);
+        List<Chapter> chapters = chapterRepository.findByMaterial_Id(materialId);
+        return chapters.stream()
                 .map(ChapterMapper::toDTO)
                 .toList();
-        return SubjectMapper.toDTOWithChapters(subject, chapters);
+    }
+
+    @Override
+    public MaterialResponseDTO getMaterialWithChapters(Long materialId) {
+        var chapters = chapterRepository.findByMaterial_Id(materialId);
+        var chapterResponseDTOS = chapters.stream()
+                .map(ChapterMapper::toDTO)
+                .toList();
+
+        Material materialResponseDTO = materialService.getMaterialEntityById(materialId);
+
+        return MaterialMapper.toDTOWithChapters(materialResponseDTO, chapterResponseDTOS);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public FlatSubjectChapterDTO getChapterById(Long id) {
+    public FlatMaterialChapterDTO getChapterById(Long id) {
         Chapter chapter = getChapterEntityById(id);
         return ChapterMapper.toFlatDTO(chapter);
     }
@@ -66,33 +79,33 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Transactional(readOnly = true)
     @Override
-    public ChapterResponseDTO getChapterBySubjectIdAndOrderNumber(Long subjectId, int orderNumber) {
-        Chapter chapter = getChapterEntityBySubjectIdAndOrderNumber(subjectId, orderNumber);
+    public ChapterResponseDTO getChapterByMaterialIdAndOrderNumber(Long materialId, int orderNumber) {
+        Chapter chapter = getChapterEntityByMaterialIdAndOrderNumber(materialId, orderNumber);
         return ChapterMapper.toDTO(chapter);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Chapter getChapterEntityBySubjectIdAndOrderNumber(Long subjectId, int orderNumber) {
-        if (subjectId == null) {
-            throw new BadRequestException(Constants.ErrorCode.CHAPTER_ID_REQUIRED);
+    public Chapter getChapterEntityByMaterialIdAndOrderNumber(Long materialId, int orderNumber) {
+        if (materialId == null) {
+            throw new BadRequestException(Constants.ErrorCode.MATERIAL_ID_REQUIRED);
         }
         if (orderNumber <= 0) {
-            throw new BadRequestException(Constants.ErrorCode.DUPLICATED_CHAPTER_ORDER, orderNumber);
+            throw new BadRequestException(Constants.ErrorCode.CHAPTER_ORDER_NUMBER_INVALID, orderNumber);
         }
-        return chapterRepository.findBySubject_IdAndOrderNumber(subjectId, orderNumber)
+        return chapterRepository.findByMaterialIdAndOrderNumber(materialId, orderNumber)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.CHAPTER_NOT_FOUND, subjectId, orderNumber));
+                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.CHAPTER_NOT_FOUND, materialId, orderNumber));
     }
 
     @Override
-    public FlatSubjectChapterDTO createChapter(Long subjectId, ChapterRequestDTO chapterRequestDTO) {
-        if (chapterRepository.existsByOrOrderNumberAndSubject_Id(chapterRequestDTO.orderNumber(), subjectId)) {
+    public FlatMaterialChapterDTO createChapter(Long materialId, ChapterRequestDTO chapterRequestDTO) {
+        if (chapterRepository.existsByOrderNumberAndMaterialId(chapterRequestDTO.orderNumber(), materialId)) {
             throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_CHAPTER_ORDER, chapterRequestDTO.orderNumber());
         }
-        Subject subject = subjectService.getSubjectEntityById(subjectId);
-        Chapter chapter = ChapterMapper.toEntity(chapterRequestDTO, subject);
+        Material material = materialService.getMaterialEntityById(materialId);
+        Chapter chapter = ChapterMapper.toEntity(chapterRequestDTO, material);
 
         try {
             Chapter savedChapter = chapterRepository.save(chapter);
@@ -104,19 +117,24 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    public FlatSubjectChapterDTO updateChapter(Long id, ChapterRequestDTO chapterRequestDTO) {
+    public FlatMaterialChapterDTO updateChapter(Long id, ChapterRequestDTO chapterRequestDTO) {
         Chapter existingChapter = getChapterEntityById(id);
 
-        if (chapterRepository.existsByOrderNumberAndSubject_IdAndIdNot(
-                chapterRequestDTO.orderNumber(), existingChapter.getSubject().getId(), id)) {
+        if (chapterRepository.existsByOrderNumberAndMaterial_IdAndIdNot(
+                chapterRequestDTO.orderNumber(),
+                existingChapter.getMaterial().getId(),
+                id)
+        ) {
             throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_CHAPTER_ORDER, chapterRequestDTO.orderNumber());
         }
 
-        existingChapter.setOrderNumber(chapterRequestDTO.orderNumber());
-        existingChapter.setTitle(chapterRequestDTO.title());
-        existingChapter.setDescription(chapterRequestDTO.description());
+
 
         try {
+            existingChapter.setOrderNumber(chapterRequestDTO.orderNumber());
+            existingChapter.setTitle(chapterRequestDTO.title());
+            existingChapter.setDescription(chapterRequestDTO.description());
+
             Chapter updatedChapter = chapterRepository.save(existingChapter);
             return ChapterMapper.toFlatDTO(updatedChapter);
         } catch (Exception e) {
@@ -134,7 +152,8 @@ public class ChapterServiceImpl implements ChapterService {
         }
 
         try {
-            chapterRepository.deleteById(id);
+            var existingChapter = getChapterEntityById(id);
+            existingChapter.setDeleted(true);
         } catch (Exception e) {
             log.error("Error deleting chapter", e);
             throw new InternalServerErrorException(Constants.ErrorCode.DELETE_CHAPTER_FAILED, e.getMessage());

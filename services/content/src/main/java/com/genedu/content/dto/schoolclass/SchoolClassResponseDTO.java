@@ -1,16 +1,12 @@
 package com.genedu.content.dto.schoolclass;
 
 import com.genedu.content.dto.subject.SubjectResponseDTO;
-import com.genedu.content.model.SchoolClass;
 
 import lombok.Builder;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.LastModifiedBy;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 public record SchoolClassResponseDTO (
@@ -18,9 +14,9 @@ public record SchoolClassResponseDTO (
         String name,
         String description,
         ZonedDateTime createdOn,
-        String createdBy,
+        UUID createdBy,
         ZonedDateTime lastModifiedOn,
-        String lastModifiedBy,
+        UUID lastModifiedBy,
         List<SubjectResponseDTO> subjects
 
 ) {

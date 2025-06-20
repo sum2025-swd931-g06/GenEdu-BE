@@ -2,10 +2,10 @@ package com.genedu.content.mapper;
 
 import com.genedu.content.dto.chapter.ChapterRequestDTO;
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
-import com.genedu.content.dto.flatResponse.FlatSubjectChapterDTO;
+import com.genedu.content.dto.flatResponse.FlatMaterialChapterDTO;
 import com.genedu.content.dto.lesson.LessonResponseDTO;
 import com.genedu.content.model.Chapter;
-import com.genedu.content.model.Subject;
+import com.genedu.content.model.Material;
 
 import java.util.List;
 
@@ -16,6 +16,7 @@ public class ChapterMapper {
                 .orderNumber(chapter.getOrderNumber())
                 .title(chapter.getTitle())
                 .description(chapter.getDescription())
+
                 .createdOn(chapter.getCreatedOn())
                 .createdBy(chapter.getCreatedBy())
                 .lastModifiedOn(chapter.getLastModifiedOn())
@@ -26,10 +27,11 @@ public class ChapterMapper {
     public static ChapterResponseDTO toDTOWithLessons(Chapter chapter, List<LessonResponseDTO> lessons) {
         return ChapterResponseDTO.builder()
                 .id(chapter.getId())
-                .orderNumber(chapter.getOrderNumber())
                 .title(chapter.getTitle())
+                .orderNumber(chapter.getOrderNumber())
                 .description(chapter.getDescription())
                 .lessons(lessons)
+
                 .createdOn(chapter.getCreatedOn())
                 .createdBy(chapter.getCreatedBy())
                 .lastModifiedOn(chapter.getLastModifiedOn())
@@ -37,11 +39,12 @@ public class ChapterMapper {
                 .build();
     }
 
-    public static FlatSubjectChapterDTO toFlatDTO(Chapter chapter) {
-        return FlatSubjectChapterDTO.builder()
-                .subjectId(chapter.getSubject().getId())
-                .subjectName(chapter.getSubject().getName())
-                .subjectDescription(chapter.getSubject().getDescription())
+    public static FlatMaterialChapterDTO toFlatDTO(Chapter chapter) {
+        return FlatMaterialChapterDTO.builder()
+                .materialId(chapter.getMaterial().getId())
+                .materialName(chapter.getMaterial().getSubject().getName())
+                .materialDescription(chapter.getMaterial().getDescription())
+
                 .chapterId(chapter.getId())
                 .chapterTitle(chapter.getTitle())
                 .chapterOrderNumber(chapter.getOrderNumber())
@@ -50,15 +53,15 @@ public class ChapterMapper {
     }
 
 
-    public static Chapter toEntity(ChapterRequestDTO chapterRequestDTO, Subject subject) {
-        if (chapterRequestDTO == null || subject == null) {
-            throw new IllegalArgumentException("ChapterRequestDTO and Subject cannot be null");
+    public static Chapter toEntity(ChapterRequestDTO chapterRequestDTO, Material material) {
+        if (chapterRequestDTO == null || material == null) {
+            throw new IllegalArgumentException("ChapterRequestDTO and Material cannot be null");
         }
         return Chapter.builder()
                 .orderNumber(chapterRequestDTO.orderNumber())
                 .title(chapterRequestDTO.title())
                 .description(chapterRequestDTO.description())
-                .subject(subject)
+                .material(material)
                 .build();
     }
 

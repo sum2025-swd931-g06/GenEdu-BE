@@ -1,5 +1,7 @@
 package com.genedu.content.dto.chapter;
 
+import com.genedu.content.model.Chapter;
+
 public record ChapterRequestDTO(
         Integer orderNumber,
         String title,
@@ -13,4 +15,5 @@ public record ChapterRequestDTO(
             throw new IllegalArgumentException("Title cannot be null or blank.");
         }
     }
+
 }

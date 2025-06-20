@@ -33,10 +33,9 @@ resource "aws_s3_bucket" "lecture_bucket" {
     }
     force_destroy = true
     lifecycle {
-        prevent_destroy = false
+        prevent_destroy = true
     }
 }
-
 
 # save generated bucket name to properties file
 resource "local_file" "properties_file" {

@@ -1,3 +1,6 @@
+webclient:
+  gateway:
+    base-url: ${GATEWAY_SERVICE_URL:http://localhost:8222}
 spring:
   application:
     name: project-service

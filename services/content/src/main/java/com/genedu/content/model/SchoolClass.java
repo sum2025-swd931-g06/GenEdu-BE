@@ -1,24 +1,33 @@
 package com.genedu.content.model;
 
 import com.genedu.commonlibrary.model.AbstractAuditEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@RequiredArgsConstructor
-@AllArgsConstructor
-@Builder
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Entity
 @Table(name = "school_classes")
 public class SchoolClass extends AbstractAuditEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chapters_id_gen")
+//    @SequenceGenerator(name = "chapters_id_gen", sequenceName = "chapters_id_seq", allocationSize = 1)
+    @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "name", columnDefinition = "varchar(255)")
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "description", columnDefinition = "text")
+    @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 }
