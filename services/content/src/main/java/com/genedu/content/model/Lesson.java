@@ -19,6 +19,8 @@ import java.util.UUID;
 @Table(name = "lessons")
 public class Lesson extends AbstractAuditEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lessons_id_gen")
+    @SequenceGenerator(name = "lessons_id_gen", sequenceName = "lessons_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 

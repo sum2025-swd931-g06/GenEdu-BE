@@ -15,6 +15,8 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "lesson_content_media_files")
 public class LessonContentMediaFile {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lesson_content_media_files_id_gen")
+    @SequenceGenerator(name = "lesson_content_media_files_id_gen", sequenceName = "lesson_content_media_files_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 
