@@ -21,14 +21,14 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/contents")
-@Tag(name = "Material", description = "Manage subjects in the system")
+@Tag(name = "Subject", description = "Manage subjects in the system")
 public class SubjectController {
 
     private final SubjectService subjectService;
 
     @Operation(summary = "Get all subjects", description = "Returns a list of all subjects in the system.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved material list"),
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved subjects list"),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/subjects")
@@ -38,20 +38,20 @@ public class SubjectController {
         return ResponseEntity.ok(subjects);
     }
 
-    @Operation(summary = "Get material by ID", description = "Returns detailed information of a material by its ID.")
+    @Operation(summary = "Get subject by ID", description = "Returns detailed information of a subject by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved material"),
-            @ApiResponse(responseCode = "404", description = "Material not found", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved subject"),
+            @ApiResponse(responseCode = "404", description = "Subject not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/subjects/{id}")
     public ResponseEntity<FlatSchoolClassSubjectDTO> getSubjectById(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID of the material to retrieve", required = true
+                    description = "ID of the subject to retrieve", required = true
             )
             @PathVariable Integer id
     ) {
-        log.info("Fetching material with ID: {}", id);
+        log.info("Fetching subject with ID: {}", id);
         FlatSchoolClassSubjectDTO subject = subjectService.getSubjectById(id);
         return ResponseEntity.ok(subject);
     }
@@ -59,7 +59,7 @@ public class SubjectController {
     @GetMapping("/school-classes/{schoolClassId}/subjects")
     @Operation(summary = "Get all subjects for a school class", description = "Returns a list of all subjects that belong to a specific school class by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved material list"),
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved subject list"),
             @ApiResponse(responseCode = "404", description = "School class not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
@@ -74,69 +74,67 @@ public class SubjectController {
         return ResponseEntity.ok(subjects);
     }
 
-    @Operation(summary = "Create a new material", description = "Creates a new material for the given school class ID with the provided information.")
+    @Operation(summary = "Create a new subject", description = "Creates a new subject for the given school class ID with the provided information.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Material successfully created"),
+            @ApiResponse(responseCode = "201", description = "Subject successfully created"),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @PostMapping("school-classes/{schoolClassId}/subjects")
     public ResponseEntity<FlatSchoolClassSubjectDTO> createSubject(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID of the school class to create material", required = true
+                    description = "ID of the school class to create subject", required = true
             )
             @PathVariable Integer schoolClassId,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Information of the material to be created", required = true
+                    description = "Information of the subject to be created", required = true
             )
             @RequestBody SubjectRequestDTO subjectRequestDTO
     ) {
-        log.info("Creating new material: {}", subjectRequestDTO);
+        log.info("Creating new subject: {}", subjectRequestDTO);
         FlatSchoolClassSubjectDTO createdSubject = subjectService.createSubject(schoolClassId, subjectRequestDTO);
         return ResponseEntity
                 .created(URI.create("/api/v1/subjects/" + createdSubject.subjectId()))
                 .body(createdSubject);
     }
 
-    @Operation(summary = "Update a material", description = "Updates the information of a material by its ID.")
+    @Operation(summary = "Update a subject", description = "Updates the information of a subject by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Material successfully updated"),
-            @ApiResponse(responseCode = "404", description = "Material not found", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Subject successfully updated"),
+            @ApiResponse(responseCode = "404", description = "Subject not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @PutMapping("/subjects/{id}")
     public ResponseEntity<FlatSchoolClassSubjectDTO> updateSubject(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID of the material to be updated", required = true
+                    description = "ID of the subject to be updated", required = true
             )
             @PathVariable Integer id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Updated information of the material", required = true
+                    description = "Updated information of the subject", required = true
             )
             @RequestBody SubjectRequestDTO subjectRequestDTO
     ) {
-        log.info("Updating material with ID: {}", id);
-        FlatSchoolClassSubjectDTO updatedSubject = subjectService.updateSubject(id, subjectRequestDTO);
+        log.info("Updating subject with ID: {}", id);
+        var updatedSubject = subjectService.updateSubject(id, subjectRequestDTO);
         return ResponseEntity.ok(updatedSubject);
     }
 
-    /*
-    @Operation(summary = "Delete a material", description = "Deletes a material from the system by its ID.")
+    @Operation(summary = "Delete a material", description = "Deletes a subject from the system by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Material successfully deleted"),
-            @ApiResponse(responseCode = "404", description = "Material not found", content = @Content),
+            @ApiResponse(responseCode = "204", description = "Subject successfully deleted"),
+            @ApiResponse(responseCode = "404", description = "subject not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/subjects/{id}")
     public ResponseEntity<Void> deleteSubject(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "ID of the material to be deleted", required = true
             )
-            @PathVariable Long id
+            @PathVariable Integer id
     ) {
         log.info("Deleting material with ID: {}", id);
         subjectService.deleteSubject(id);
         return ResponseEntity.noContent().build();
     }
-    */
 }

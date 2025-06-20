@@ -2,8 +2,10 @@ package com.genedu.content.mapper;
 
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
 import com.genedu.content.dto.flatResponse.FlatSubjectMaterialDTO;
+import com.genedu.content.dto.material.MaterialRequestDTO;
 import com.genedu.content.dto.material.MaterialResponseDTO;
 import com.genedu.content.model.Material;
+import com.genedu.content.model.Subject;
 
 import java.util.List;
 
@@ -44,6 +46,13 @@ public class MaterialMapper {
                 .title(material.getTitle())
                 .orderNumber(material.getOrderNumber())
                 .description(material.getDescription())
+                .build();
+    }
+    public static Material toEntity(MaterialRequestDTO materialRequestDTO, Subject subject) {
+        return Material.builder()
+                .title(materialRequestDTO.title())
+                .orderNumber(materialRequestDTO.orderNumber())
+                .description(materialRequestDTO.description())
                 .build();
     }
 }

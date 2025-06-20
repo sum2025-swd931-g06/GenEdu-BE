@@ -6,6 +6,7 @@ import com.genedu.content.dto.flatResponse.FlatSubjectMaterialDTO;
 import com.genedu.content.dto.material.MaterialRequestDTO;
 import com.genedu.content.dto.schoolclass.SchoolClassResponseDTO;
 import com.genedu.content.dto.subject.SubjectRequestDTO;
+import com.genedu.content.dto.subject.SubjectResponseDTO;
 import com.genedu.content.service.MaterialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,7 +29,7 @@ import java.util.List;
 public class MaterialController {
     private final MaterialService materialService;
 
-    @Operation(summary = "Get all subjects", description = "Returns a list of all subjects in the system.")
+    @Operation(summary = "Get all materials", description = "Returns a list of all materials in the system.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved material list"),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
@@ -36,8 +37,8 @@ public class MaterialController {
     @GetMapping("/materials")
     public ResponseEntity<List<FlatSubjectMaterialDTO>> getAllMaterials() {
         log.info("Fetching all materials");
-        List<FlatSubjectMaterialDTO> subjects = materialService.getAllMaterials();
-        return ResponseEntity.ok(subjects);
+        var materials = materialService.getAllMaterials();
+        return ResponseEntity.ok(materials);
     }
 
     @Operation(summary = "Get material by ID", description = "Returns detailed information of a material by its ID.")
@@ -54,38 +55,38 @@ public class MaterialController {
             @PathVariable Long id
     ) {
         log.info("Fetching material with ID: {}", id);
-        FlatSubjectMaterialDTO subject = materialService.getMaterialById(id);
-        return ResponseEntity.ok(subject);
+        FlatSubjectMaterialDTO material = materialService.getMaterialById(id);
+        return ResponseEntity.ok(material);
     }
 
-    @GetMapping("/school-classes/{materialId}/subjects")
-    @Operation(summary = "Get all materials for a subject", description = "Returns a list of all subjects that belong to a specific school class by its ID.")
+    @GetMapping("/subjects/{subjectId}/materials")
+    @Operation(summary = "Get all materials for a subject", description = "Returns a list of all materials that belong to a specific subject by its ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved material list"),
-            @ApiResponse(responseCode = "404", description = "School class not found", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Subject not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<SchoolClassResponseDTO> getMaterialBySchoolClassId(
+    public ResponseEntity<SubjectResponseDTO> getMaterialsBySubjectId(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID of the school class to retrieve subjects", required = true
+                    description = "ID of the subject to retrieve materials", required = true
             )
             @PathVariable Integer subjectId
     ) {
-        log.info("Fetching subjects for school class with ID: {}", subjectId);
-        SchoolClassResponseDTO subjects = materialService.getMaterialsBySubjectId(subjectId);
-        return ResponseEntity.ok(subjects);
+        log.info("Fetching materials for subject with ID: {}", subjectId);
+        var materials = materialService.getMaterialsBySubjectId(subjectId);
+        return ResponseEntity.ok(materials);
     }
 
-    @Operation(summary = "Create a new material", description = "Creates a new material for the given school class ID with the provided information.")
+    @Operation(summary = "Create a new material", description = "Creates a new material for the given subject ID with the provided information.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Material successfully created"),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    @PostMapping("school-classes/{materialId}/subjects")
+    @PostMapping("subjects/{subjectId}/subjects")
     public ResponseEntity<FlatSubjectMaterialDTO> createSubject(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID of the school class to create material", required = true
+                    description = "ID of the subject to create material", required = true
             )
             @PathVariable Integer subjectId,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -111,7 +112,7 @@ public class MaterialController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "ID of the material to be updated", required = true
             )
-            @PathVariable Integer id,
+            @PathVariable Long id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Updated information of the material", required = true
             )
@@ -120,5 +121,18 @@ public class MaterialController {
         log.info("Updating material with ID: {}", id);
         FlatSubjectMaterialDTO updatedMaterial = materialService.updateMaterial(id, materialRequestDTO);
         return ResponseEntity.ok(updatedMaterial);
+    }
+
+    @DeleteMapping("/materials/{id}")
+    @Operation(summary = "Delete a material", description = "Deletes a material by its ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Material successfully deleted"),
+            @ApiResponse(responseCode = "404", description = "Material not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    public ResponseEntity<Void> deleteMaterial(@PathVariable Long id) {
+        log.info("Deleting material with ID: {}", id);
+        materialService.deleteMaterial(id);
+        return ResponseEntity.noContent().build();
     }
 }

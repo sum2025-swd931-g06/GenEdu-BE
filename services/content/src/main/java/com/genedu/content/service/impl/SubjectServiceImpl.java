@@ -7,10 +7,8 @@ import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.content.dto.flatResponse.FlatSchoolClassSubjectDTO;
 import com.genedu.content.dto.schoolclass.SchoolClassResponseDTO;
 import com.genedu.content.dto.subject.SubjectRequestDTO;
-import com.genedu.content.dto.subject.SubjectResponseDTO;
 import com.genedu.content.mapper.SchoolClassMapper;
 import com.genedu.content.mapper.SubjectMapper;
-import com.genedu.content.model.Material;
 import com.genedu.content.model.SchoolClass;
 import com.genedu.content.model.Subject;
 import com.genedu.content.repository.SubjectRepository;
@@ -53,7 +51,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public SchoolClassResponseDTO getSubjectsBySchoolClassId(Integer schoolClassId) {
         SchoolClass schoolClass = schoolClassService.getSchoolClassEntityById(schoolClassId);
-        List<SubjectResponseDTO> subjects = subjectRepository.findBySchoolClass_Id(schoolClassId)
+        var subjects = subjectRepository.findBySchoolClass_Id(schoolClassId)
                 .stream()
                 .map(SubjectMapper::toDTO)
                 .toList();
@@ -93,14 +91,17 @@ public class SubjectServiceImpl implements SubjectService {
     public FlatSchoolClassSubjectDTO updateSubject(Integer id, SubjectRequestDTO subjectRequestDTO) {
         Subject existingSubject = getSubjectEntityById(id);
 
-        if (subjectRepository.existsByNameAndIdNot(subjectRequestDTO.name(), id)) {
+        if (subjectRepository.existsByNameAndIdNot(
+                subjectRequestDTO.name(),
+                id)
+        ) {
             throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_SUBJECT_NAME, subjectRequestDTO.name());
         }
 
-        existingSubject.setName(subjectRequestDTO.name());
-        existingSubject.setDescription(subjectRequestDTO.description());
-
         try {
+            existingSubject.setName(subjectRequestDTO.name());
+            existingSubject.setDescription(subjectRequestDTO.description());
+
             Subject updatedSubject = subjectRepository.save(existingSubject);
             return SubjectMapper.toFlatDTO(updatedSubject);
         } catch (Exception e) {
@@ -118,9 +119,10 @@ public class SubjectServiceImpl implements SubjectService {
         }
 
         try {
-            subjectRepository.deleteById(id);
+            var existingSubject = getSubjectEntityById(id);
+            existingSubject.setDeleted(true);
         } catch (Exception e) {
-            log.error("Error deleting material", e);
+            log.error("Error deleting subject", e);
             throw new InternalServerErrorException(Constants.ErrorCode.DELETE_SUBJECT_FAILED, e.getMessage());
         }
     }

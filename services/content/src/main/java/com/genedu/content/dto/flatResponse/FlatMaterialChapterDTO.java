@@ -5,8 +5,8 @@ import lombok.Builder;
 @Builder
 public record FlatMaterialChapterDTO(
         Long materialId,
-        String subjectName,
-        String subjectDescription,
+        String materialName,
+        String materialDescription,
 
         Long chapterId,
         String chapterTitle,
