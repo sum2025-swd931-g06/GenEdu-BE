@@ -1,6 +1,5 @@
 package com.genedu.content.model;
 
-import com.genedu.commonlibrary.model.AbstractAuditEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
