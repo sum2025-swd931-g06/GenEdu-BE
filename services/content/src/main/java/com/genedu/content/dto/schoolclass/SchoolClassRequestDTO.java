@@ -1,7 +1,5 @@
 package com.genedu.content.dto.schoolclass;
 
-import com.genedu.content.model.SchoolClass;
-
 public record SchoolClassRequestDTO(
         String name,
         String description

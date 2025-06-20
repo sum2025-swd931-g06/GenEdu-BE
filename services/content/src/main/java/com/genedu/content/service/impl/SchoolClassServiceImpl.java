@@ -1,140 +1,110 @@
 package com.genedu.content.service.impl;
 
+import com.genedu.commonlibrary.exception.BadRequestException;
+import com.genedu.commonlibrary.exception.DuplicatedException;
+import com.genedu.commonlibrary.exception.InternalServerErrorException;
+import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.content.dto.schoolclass.SchoolClassRequestDTO;
 import com.genedu.content.dto.schoolclass.SchoolClassResponseDTO;
 import com.genedu.content.mapper.SchoolClassMapper;
 import com.genedu.content.model.SchoolClass;
+import com.genedu.content.repository.SchoolClassRepository;
 import com.genedu.content.service.SchoolClassService;
+import com.genedu.content.utils.Constants;
 import com.genedu.content.utils.TextNormalizerUtils;
 import lombok.RequiredArgsConstructor;
-import com.genedu.content.repository.SchoolClassRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class SchoolClassServiceImpl implements SchoolClassService {
     private final SchoolClassRepository schoolClassRepository;
 
-//    @Override
-//    public List<SchoolClassResponseDTO> getAllSchoolClasses(int pageNo) {
-//        List<SchoolClass> schoolClasses = schoolClassRepository.findAll();
-//
-//        if (schoolClasses.isEmpty()) {
-//            return List.of();
-//        }
-//
-//        return schoolClasses.stream()
-//                .map(schoolClass -> new SchoolClassResponseDTO(
-//                        schoolClass.getId().toString(),
-//                        schoolClass.getName(),
-//                        schoolClass.getDescription()))
-//                .toList();
-//    }
-
-    /*
-     * Fetches all school classes and converts them to DTOs.
-     *
-     * @return List of SchoolClassResponseDTO
-     */
+    @Transactional(readOnly = true)
     @Override
     public List<SchoolClassResponseDTO> getAllSchoolClasses() {
         List<SchoolClass> schoolClasses = schoolClassRepository.findAll();
-
-        if (schoolClasses.isEmpty()) {
-            return List.of();
-        }
-
         return schoolClasses.stream()
-//                .map(schoolClass -> SchoolClassResponseDTO.fromSchoolClass(schoolClass))
                 .map(SchoolClassMapper::toDTO)
                 .toList();
     }
 
-    /**
-     * Retrieves a SchoolClass by its ID and converts it to a DTO.
-     * Throws IllegalArgumentException if the ID is null or not found.
-     *
-     * @param id ID of the school class.
-     * @return SchoolClassResponseDTO containing school class details.
-     */
+    @Transactional(readOnly = true)
+    @Override
     public SchoolClassResponseDTO getSchoolClassById(Integer id) {
         SchoolClass schoolClass = getSchoolClassEntityById(id);
         return SchoolClassMapper.toDTO(schoolClass);
     }
 
-    /**
-     * Retrieves a SchoolClass entity by its ID.
-     * Throws IllegalArgumentException if the ID is null or not found.
-     *
-     * @param id ID of the school class.
-     * @return SchoolClass entity.
-     */
+    @Transactional(readOnly = true)
     @Override
     public SchoolClass getSchoolClassEntityById(Integer id) {
-        if (id == null) {
-            throw new IllegalArgumentException("School class ID cannot be null.");
-        }
-
+        validateIdNotNull(id);
         return schoolClassRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("School class not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.SCHOOL_CLASS_NOT_FOUND, id));
     }
 
-    /*
-     * Creates a new school class from the provided DTO.
-     *
-     * @param schoolClassRequestDTO DTO containing school class details
-     * @return SchoolClassResponseDTO of the created school class
-     */
     @Override
     public SchoolClassResponseDTO createSchoolClass(SchoolClassRequestDTO schoolClassRequestDTO) {
-        if (schoolClassRepository.existsByName(TextNormalizerUtils.normalizeTextUsingNormalizer(schoolClassRequestDTO.name()))) {
-            throw new IllegalArgumentException(
-                    "School class with name " + schoolClassRequestDTO.name() + " already exists."
-            );
+        String normalizedName = TextNormalizerUtils.normalizeTextUsingNormalizer(schoolClassRequestDTO.name());
+        if (schoolClassRepository.existsByName(normalizedName)) {
+            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_SCHOOL_CLASS_NAME, schoolClassRequestDTO.name());
         }
-
         SchoolClass schoolClass = SchoolClassMapper.toEntity(schoolClassRequestDTO);
-        schoolClass = schoolClassRepository.save(schoolClass);
-
-        return SchoolClassMapper.toDTO(schoolClass);
+        try {
+            SchoolClass savedSchoolClass = schoolClassRepository.save(schoolClass);
+            return SchoolClassMapper.toDTO(savedSchoolClass);
+        } catch (Exception e) {
+            log.error("Error creating school class", e);
+            throw new InternalServerErrorException(Constants.ErrorCode.CREATE_SCHOOL_CLASS_FAILED, e.getMessage());
+        }
     }
 
-    /*
-     * Updates an existing school class with the provided DTO.
-     *
-     * @param id ID of the school class to update
-     * @param schoolClassRequestDTO DTO containing updated school class details
-     * @return SchoolClassResponseDTO of the updated school class
-     */
     @Override
     public SchoolClassResponseDTO updateSchoolClass(Integer id, SchoolClassRequestDTO schoolClassRequestDTO) {
-        SchoolClass existingSchoolClass = schoolClassRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("School class with ID " + id + " does not exist."));
+        SchoolClass existingSchoolClass = getSchoolClassEntityById(id);
 
-        if (schoolClassRepository.existsByNameAndIdNot(schoolClassRequestDTO.name(), id)) {
-            throw new IllegalArgumentException(
-                    "School class with name " + schoolClassRequestDTO.name() + " already exists.");
+        String normalizedName = TextNormalizerUtils.normalizeTextUsingNormalizer(schoolClassRequestDTO.name());
+        if (schoolClassRepository.existsByNameAndIdNot(normalizedName, id)) {
+            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_SCHOOL_CLASS_NAME, schoolClassRequestDTO.name());
         }
 
-        existingSchoolClass = SchoolClassMapper.toEntity(schoolClassRequestDTO);
+        existingSchoolClass.setName(schoolClassRequestDTO.name());
+        existingSchoolClass.setDescription(schoolClassRequestDTO.description());
 
-        existingSchoolClass = schoolClassRepository.save(existingSchoolClass);
-        return SchoolClassMapper.toDTO(existingSchoolClass);
+        try {
+            SchoolClass updatedSchoolClass = schoolClassRepository.save(existingSchoolClass);
+            return SchoolClassMapper.toDTO(updatedSchoolClass);
+        } catch (Exception e) {
+            log.error("Error updating school class", e);
+            throw new InternalServerErrorException(Constants.ErrorCode.UPDATE_SCHOOL_CLASS_FAILED, e.getMessage());
+        }
     }
 
-    /*
-     * Deletes a school class by its ID.
-     *
-     * @param id ID of the school class to delete
-     */
+    @Override
     public void deleteSchoolClass(Integer id) {
+        validateIdNotNull(id);
         if (!schoolClassRepository.existsById(id)) {
-            throw new IllegalArgumentException("School class with ID " + id + " does not exist.");
+            throw new NotFoundException(Constants.ErrorCode.SCHOOL_CLASS_NOT_FOUND, id);
         }
-        schoolClassRepository.deleteById(id);
+        try {
+            var existingSchoolClass = getSchoolClassEntityById(id);
+            existingSchoolClass.setDeleted(true);
+        } catch (Exception e) {
+            log.error("Error deleting school class", e);
+            throw new InternalServerErrorException(Constants.ErrorCode.DELETE_SCHOOL_CLASS_FAILED, e.getMessage());
+        }
     }
 
-
+    private void validateIdNotNull(Integer id) {
+        if (id == null) {
+            throw new BadRequestException(Constants.ErrorCode.SCHOOL_CLASS_ID_REQUIRED);
+        }
+    }
 }

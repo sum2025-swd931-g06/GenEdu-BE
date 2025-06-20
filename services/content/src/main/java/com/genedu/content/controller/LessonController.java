@@ -1,12 +1,11 @@
 package com.genedu.content.controller;
 
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
-import com.genedu.content.dto.flatResponse.FlatSchoolClassResponseDTO;
-import com.genedu.content.dto.flatResponse.FlatSubjectChapterLessonDTO;
+import com.genedu.content.dto.flatResponse.FlatChapterLessonDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
-import com.genedu.content.service.ChapterService;
 import com.genedu.content.service.LessonService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,51 +17,58 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/contents")
 @Tag(name = "Lesson", description = "Manage lessons in the system")
 public class LessonController {
     private final LessonService lessonService;
 
     @GetMapping("/lessons")
-    public ResponseEntity<List<FlatSubjectChapterLessonDTO>> getAllLessons() {
+    public ResponseEntity<List<FlatChapterLessonDTO>> getAllLessons() {
         log.info("Fetching all lessons");
-        List<FlatSubjectChapterLessonDTO> lessons = lessonService.getAllLessons();
+        var lessons = lessonService.getAllLessons();
         return ResponseEntity.ok(lessons);
     }
 
     @GetMapping("/lessons/{id}")
-    public ResponseEntity<FlatSubjectChapterLessonDTO> getLessonById(Long id) {
+    public ResponseEntity<FlatChapterLessonDTO> getLessonById(@PathVariable Long id) {
         log.info("Fetching lesson with ID: {}", id);
-        FlatSubjectChapterLessonDTO lesson = lessonService.getLessonById(id);
+        var lesson = lessonService.getLessonById(id);
         return ResponseEntity.ok(lesson);
     }
 
     @GetMapping("/chapters/{chapterId}/lessons")
-    public ResponseEntity<ChapterResponseDTO> getAllLessonsByChapterId(Long chapterId) {
+    public ResponseEntity<ChapterResponseDTO> getLessonsByChapterId(@PathVariable Long chapterId) {
         log.info("Fetching all lessons for chapter ID: {}", chapterId);
-        ChapterResponseDTO lessons = lessonService.getChapterLessonsById(chapterId);
-
+        ChapterResponseDTO lessons = lessonService.getLessonsByChapterId(chapterId);
         return ResponseEntity.ok(lessons);
     }
 
     @PostMapping("/chapters/{chapterId}/lessons")
-    public ResponseEntity<FlatSubjectChapterLessonDTO> createLesson(Long chapterId, LessonRequestDTO lessonRequestDTO) {
+    public ResponseEntity<FlatChapterLessonDTO> createLesson(
+            @PathVariable Long chapterId,
+            @Valid @RequestBody LessonRequestDTO lessonRequestDTO) {
         log.info("Creating lesson for chapter ID: {}", chapterId);
-        FlatSubjectChapterLessonDTO createdLesson = lessonService.createLesson(chapterId, lessonRequestDTO);
-        return ResponseEntity.created(URI.create("/api/v1/lessons/" + createdLesson.lessonId())).body(createdLesson);
+        var createdLesson = lessonService.createLesson(chapterId, lessonRequestDTO);
+        return ResponseEntity
+                .created(URI.create("/api/v1/lessons/" + createdLesson.lessonId()))
+                .body(createdLesson);
     }
 
     @PutMapping("/lessons/{id}")
-    public ResponseEntity<FlatSubjectChapterLessonDTO> updateLesson(Long id, @RequestBody LessonRequestDTO lessonRequestDTO) {
-        log.info("Updating lesson with ID: {} for chapter ID: {}", id);
-        FlatSubjectChapterLessonDTO updatedLesson = lessonService.updateLesson(id, lessonRequestDTO);
+    public ResponseEntity<FlatChapterLessonDTO> updateLesson(
+            @PathVariable Long id,
+            @Valid @RequestBody LessonRequestDTO lessonRequestDTO) {
+        log.info("Updating lesson with ID: {}", id);
+        var updatedLesson = lessonService.updateLesson(id, lessonRequestDTO);
         return ResponseEntity.ok(updatedLesson);
     }
 
     @DeleteMapping("/lessons/{id}")
-    public ResponseEntity<Void> deleteLesson(Long id) {
+    public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
         log.info("Deleting lesson with ID: {}", id);
         lessonService.deleteLesson(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 }

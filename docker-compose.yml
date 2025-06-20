@@ -9,8 +9,27 @@ services:
     volumes:
       - postgres:/data/postgres
       - ./postgres_init.sql:/docker-entrypoint-initdb.d/postgres_init.sql
+    hostname: postgresql
     ports:
       - "5432:5432"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  pgvector:
+    container_name: ms_pg_vector
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres-vector
+      PGDATA: /data/postgres-vector
+      DIMENSION: 1024
+    volumes:
+        - postgres:/data/postgres-vector
+        - ./postgres_vector_init.sql:/docker-entrypoint-initdb.d/postgres_vector_init.sql
+    ports:
+      - 5434:5432
     networks:
       - microservices-net
     restart: unless-stopped
@@ -30,34 +49,10 @@ services:
       - microservices-net
     restart: unless-stopped
 
-  mongodb:
-    image: mongo
-    container_name: mongo_db
-    ports:
-      - 27017:27017
-    volumes:
-      - mongo:/data
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin
-    networks:
-      - microservices-net
-
-  mongo-express:
-    image: mongo-express
-    container_name: mongo_express
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=admin
-      - ME_CONFIG_MONGODB_SERVER=mongodb
-    networks:
-      - microservices-net
   zipkin:
     container_name: zipkin
     image: openzipkin/zipkin
+    hostname: zipkin
     ports:
       - "9411:9411"
     networks:
@@ -67,6 +62,7 @@ services:
     container_name: keycloak-ms
     image: quay.io/keycloak/keycloak:24.0.3
     command: 'start-dev --import-realm'
+    hostname: keycloak
     ports:
       - 9099:8080
     environment:
@@ -76,6 +72,353 @@ services:
       - microservices-net
     volumes:
       - ./identity/realm-export.json:/opt/keycloak/data/import/realm-export.json
+
+  config-server:
+    build: ./services/config-server
+    container_name: config-server
+    image: config-server:latest
+    ports:
+      - 8888:8888
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://config-server:8888/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      # This file is used to set environment variables for the application.
+      # Development and production environments may have different configurations.
+      # Main Configuration
+      - PUBLIC_HOST
+      - INTERNAL_HOST
+      - APPLICATION_NAME
+      # PgAdmin Configuration
+      - PGADMIN_DEFAULT_EMAIL
+      - PGADMIN_DEFAULT_PASSWORD
+      - PGADMIN_PORT
+      # Database Configuration
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - POSTGRES_CONTENT_DB
+      - POSTGRES_USER_DB
+      - POSTGRES_CONTENT_DB_URL
+      - POSTGRES_USER_DB_URL
+      # Keycloak Configuration
+      - KEYCLOAK_HOST
+      - KEYCLOAK_PORT
+      - KEYCLOAK_URL
+      - KEYCLOAK_ADMIN_USER
+      - KEYCLOAK_ADMIN_PASSWORD
+      #Keycloak Volume Configuration
+      - KEYCLOAK_VOLUME_URL
+      # Keycloak Realm Configuration
+      - KEYCLOAK_REALM_NAME=GenEdu
+      # KC GenEdu Backend Configuration
+      - KC_GENEDU_GENEDU_BE_CLIENT_ID
+      - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
+      # KC GenEdu Admin CLI Configuration
+      - KC_GENEDU_ADMIN_CLI_CLIENT_ID
+      - KC_GENEDU_ADMIN_CLI_ADMIN_USERNAME
+      - KC_GENEDU_ADMIN_CLI_ADMIN_PASSWORD
+      - KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY
+      # Discovery Server Configuration
+      - DISCOVERY_SERVER_HOST
+      - DISCOVERY_SERVICE_PORT
+      - DISCOVERY_SERVICE_URL
+      - DISCOVERY_SERVICE_SELF_URL
+      # Zipkin Configuration
+      - ZIPKIN_SERVICE_HOST
+      - ZIPKIN_SERVICE_PORT
+      - ZIPKIN_URL
+      #Oauth2 Configuration
+      - JWT_ISSUER_URI
+      - JWT_SET_JWKS_URI
+      # Gateway Configuration
+      - GATEWAY_SERVICE_HOST
+      - GATEWAY_SERVICE_PORT
+      - GATEWAY_SERVICE_URL
+      - GATEWAY_SERVICE_ACTUATOR_URL
+      # Config Server Configuration
+      - CONFIG_SERVER_HOST
+      - CONFIG_SERVER_PORT
+      - CONFIG_SERVER_URL
+      - CONFIG_SERVER_ACTUATOR_URL
+      # User Service Configuration
+      - USER_SERVICE_HOST
+      - USER_SERVICE_PORT
+      # Content Service Configuration
+      - CONTENT_SERVICE_HOST
+      - CONTENT_SERVICE_PORT
+    networks:
+      - microservices-net
+
+  discovery-service:
+    build:
+      context: ./services/discovery
+      dockerfile: Dockerfile
+    container_name: discovery
+    hostname: discovery
+    image: discovery:latest
+    depends_on:
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://discovery:8761/eureka/apps"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - PUBLIC_HOST
+      - INTERNAL_HOST
+      - APPLICATION_NAME
+      # PgAdmin Configuration
+      - PGADMIN_DEFAULT_EMAIL
+      - PGADMIN_DEFAULT_PASSWORD
+      - PGADMIN_PORT
+      # Database Configuration
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - POSTGRES_CONTENT_DB
+      - POSTGRES_USER_DB
+      - POSTGRES_CONTENT_DB_URL
+      - POSTGRES_USER_DB_URL
+      # Keycloak Configuration
+      - KEYCLOAK_HOST
+      - KEYCLOAK_PORT
+      - KEYCLOAK_URL
+      - KEYCLOAK_ADMIN_USER
+      - KEYCLOAK_ADMIN_PASSWORD
+      # Keycloak Volume Configuration
+      - KEYCLOAK_VOLUME_URL
+      # Keycloak Realm Configuration
+      - KEYCLOAK_REALM_NAME=GenEdu
+      # KC GenEdu Backend Configuration
+      - KC_GENEDU_GENEDU_BE_CLIENT_ID
+      - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
+      # KC GenEdu Admin CLI Configuration
+      - KC_GENEDU_ADMIN_CLI_CLIENT_ID
+      - KC_GENEDU_ADMIN_CLI_ADMIN_USERNAME
+      - KC_GENEDU_ADMIN_CLI_ADMIN_PASSWORD
+      - KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY
+      # Discovery Server Configuration
+      - DISCOVERY_SERVER_HOST
+      - DISCOVERY_SERVICE_PORT
+      - DISCOVERY_SERVICE_URL
+      - DISCOVERY_SERVICE_SELF_URL
+      # Zipkin Configuration
+      - ZIPKIN_SERVICE_HOST
+      - ZIPKIN_SERVICE_PORT
+      - ZIPKIN_URL
+      #Oauth2 Configuration
+      - JWT_ISSUER_URI
+      - JWT_SET_JWKS_URI
+      # Gateway Configuration
+      - GATEWAY_SERVICE_HOST
+      - GATEWAY_SERVICE_PORT
+      - GATEWAY_SERVICE_URL
+      - GATEWAY_SERVICE_ACTUATOR_URL
+      # Config Server Configuration
+      - CONFIG_SERVER_HOST
+      - CONFIG_SERVER_PORT
+      - CONFIG_SERVER_URL
+      - CONFIG_SERVER_ACTUATOR_URL
+      # User Service Configuration
+      - USER_SERVICE_HOST
+      - USER_SERVICE_PORT
+      # Content Service Configuration
+      - CONTENT_SERVICE_HOST
+      - CONTENT_SERVICE_PORT
+    networks:
+      - microservices-net
+
+  gateway-service:
+    build:
+      context: ./services/gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    hostname: gateway
+    image: gateway:latest
+    ports:
+      - "8222:8222"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://gateway:8222/actuator/health"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=docker
+      # This file is used to set environment variables for the application.
+      # Development and production environments may have different configurations.
+      # Main Configuration
+      - PUBLIC_HOST
+      - INTERNAL_HOST
+      - APPLICATION_NAME
+      # PgAdmin Configuration
+      - PGADMIN_DEFAULT_EMAIL
+      - PGADMIN_DEFAULT_PASSWORD
+      - PGADMIN_PORT
+      # Database Configuration
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - POSTGRES_CONTENT_DB
+      - POSTGRES_USER_DB
+      - POSTGRES_CONTENT_DB_URL
+      - POSTGRES_USER_DB_URL
+      # Keycloak Configuration
+      - KEYCLOAK_HOST
+      - KEYCLOAK_PORT
+      - KEYCLOAK_URL
+      - KEYCLOAK_ADMIN_USER
+      - KEYCLOAK_ADMIN_PASSWORD
+      #Keycloak Volume Configuration
+      - KEYCLOAK_VOLUME_URL
+      # Keycloak Realm Configuration
+      - KEYCLOAK_REALM_NAME=GenEdu
+      # KC GenEdu Backend Configuration
+      - KC_GENEDU_GENEDU_BE_CLIENT_ID
+      - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
+      # KC GenEdu Admin CLI Configuration
+      - KC_GENEDU_ADMIN_CLI_CLIENT_ID
+      - KC_GENEDU_ADMIN_CLI_ADMIN_USERNAME
+      - KC_GENEDU_ADMIN_CLI_ADMIN_PASSWORD
+      - KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY
+      # Discovery Server Configuration
+      - DISCOVERY_SERVER_HOST
+      - DISCOVERY_SERVICE_PORT
+      - DISCOVERY_SERVICE_URL
+      - DISCOVERY_SERVICE_SELF_URL
+      # Zipkin Configuration
+      - ZIPKIN_SERVICE_HOST
+      - ZIPKIN_SERVICE_PORT
+      - ZIPKIN_URL
+      #Oauth2 Configuration
+      - JWT_ISSUER_URI
+      - JWT_SET_JWKS_URI
+      # Gateway Configuration
+      - GATEWAY_SERVICE_HOST
+      - GATEWAY_SERVICE_PORT
+      - GATEWAY_SERVICE_URL
+      - GATEWAY_SERVICE_ACTUATOR_URL
+      # Config Server Configuration
+      - CONFIG_SERVER_HOST
+      - CONFIG_SERVER_PORT
+      - CONFIG_SERVER_URL
+      - CONFIG_SERVER_ACTUATOR_URL
+      # User Service Configuration
+      - USER_SERVICE_HOST
+      - USER_SERVICE_PORT
+      # Content Service Configuration
+      - CONTENT_SERVICE_HOST
+      - CONTENT_SERVICE_PORT
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    networks:
+      - microservices-net
+
+  content-service:
+    build:
+      context: ./services/content
+      dockerfile: Dockerfile
+    container_name: content
+    image: content:latest
+    hostname: content
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      # This file is used to set environment variables for the application.
+      # Development and production environments may have different configurations.
+      # Main Configuration
+      - PUBLIC_HOST
+      - INTERNAL_HOST
+      - APPLICATION_NAME
+      # PgAdmin Configuration
+      - PGADMIN_DEFAULT_EMAIL
+      - PGADMIN_DEFAULT_PASSWORD
+      - PGADMIN_PORT
+      # Database Configuration
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - POSTGRES_CONTENT_DB
+      - POSTGRES_USER_DB
+      - POSTGRES_CONTENT_DB_URL
+      - POSTGRES_USER_DB_URL
+      # Keycloak Configuration
+      - KEYCLOAK_HOST
+      - KEYCLOAK_PORT
+      - KEYCLOAK_URL
+      - KEYCLOAK_ADMIN_USER
+      - KEYCLOAK_ADMIN_PASSWORD
+      #Keycloak Volume Configuration
+      - KEYCLOAK_VOLUME_URL
+      # Keycloak Realm Configuration
+      - KEYCLOAK_REALM_NAME=GenEdu
+      # KC GenEdu Backend Configuration
+      - KC_GENEDU_GENEDU_BE_CLIENT_ID
+      - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
+      # KC GenEdu Admin CLI Configuration
+      - KC_GENEDU_ADMIN_CLI_CLIENT_ID
+      - KC_GENEDU_ADMIN_CLI_ADMIN_USERNAME
+      - KC_GENEDU_ADMIN_CLI_ADMIN_PASSWORD
+      - KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY
+      # Discovery Server Configuration
+      - DISCOVERY_SERVER_HOST
+      - DISCOVERY_SERVICE_PORT
+      - DISCOVERY_SERVICE_URL
+      - DISCOVERY_SERVICE_SELF_URL
+      # Zipkin Configuration
+      - ZIPKIN_SERVICE_HOST
+      - ZIPKIN_SERVICE_PORT
+      - ZIPKIN_URL
+      #Oauth2 Configuration
+      - JWT_ISSUER_URI
+      - JWT_SET_JWKS_URI
+      # Gateway Configuration
+      - GATEWAY_SERVICE_HOST
+      - GATEWAY_SERVICE_PORT
+      - GATEWAY_SERVICE_URL
+      - GATEWAY_SERVICE_ACTUATOR_URL
+      # Config Server Configuration
+      - CONFIG_SERVER_HOST
+      - CONFIG_SERVER_PORT
+      - CONFIG_SERVER_URL
+      - CONFIG_SERVER_ACTUATOR_URL
+      # User Service Configuration
+      - USER_SERVICE_HOST
+      - USER_SERVICE_PORT
+      # Content Service Configuration
+      - CONTENT_SERVICE_HOST
+      - CONTENT_SERVICE_PORT
+    ports:
+      - "8091:8091"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      postgresql:
+        condition: service_started
+    networks:
+      - microservices-net
 
 networks:
   microservices-net:

@@ -1,7 +1,35 @@
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    # Path to the Swagger UI
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    # Configuration for Swagger UI Services
+    urls:
+      - name: User Service
+        url: /aggregate/user-service/v3/api-docs
+      - name: Content Service
+        url: /aggregate/content-service/v3/api-docs
+      - name: Project Service
+        url: /aggregate/project-service/v3/api-docs
+      - name: Media Service
+        url: /aggregate/media-service/v3/api-docs
+    oauth:
+      client-id: ${KC_GENEDU_GENEDU_BE_CLIENT_ID:genedu-be}
+      client-secret: ${KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY:0pQYYepE82DkALnEVhAfZREPeHmtHz3z}
+    csrf:
+      enabled: false
+    use-root-path: true
+
 spring:
+  application:
+      name: gateway-service
+  profiles:
+    active: native
   config:
     import: optional:configserver:http://localhost:8888
-  application:
-    name: gateway-service
+
 
 

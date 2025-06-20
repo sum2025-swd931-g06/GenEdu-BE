@@ -1,8 +1,8 @@
 package com.genedu.content.controller;
 
+import com.genedu.content.dto.flatResponse.FlatSchoolClassSubjectDTO;
+import com.genedu.content.dto.schoolclass.SchoolClassResponseDTO;
 import com.genedu.content.dto.subject.SubjectRequestDTO;
-import com.genedu.content.dto.subject.SubjectResponseDTO;
-import com.genedu.content.service.ChapterService;
 import com.genedu.content.service.SubjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,121 +20,121 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/contents")
 @Tag(name = "Subject", description = "Manage subjects in the system")
 public class SubjectController {
-    private final SubjectService subjectService;
-    private final ChapterService chapterService;
 
-    @Operation(summary = "Lấy tất cả môn học", description = "Trả về danh sách tất cả môn học trong hệ thống.")
+    private final SubjectService subjectService;
+
+    @Operation(summary = "Get all subjects", description = "Returns a list of all subjects in the system.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lấy danh sách môn học thành công"),
-            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved subjects list"),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/subjects")
-    public ResponseEntity<List<SubjectResponseDTO>> getAllSubjects() {
+    public ResponseEntity<List<FlatSchoolClassSubjectDTO>> getAllSubjects() {
         log.info("Fetching all subjects");
-        List<SubjectResponseDTO> subjects = subjectService.getAllSubjects();
+        List<FlatSchoolClassSubjectDTO> subjects = subjectService.getAllSubjects();
         return ResponseEntity.ok(subjects);
     }
 
-    @Operation(summary = "Lấy môn học theo ID", description = "Trả về thông tin môn học theo ID.")
+    @Operation(summary = "Get subject by ID", description = "Returns detailed information of a subject by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lấy môn học thành công"),
-            @ApiResponse(responseCode = "404", description = "Môn học không tìm thấy", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved subject"),
+            @ApiResponse(responseCode = "404", description = "Subject not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/subjects/{id}")
-    public ResponseEntity<SubjectResponseDTO> getSubjectById(
+    public ResponseEntity<FlatSchoolClassSubjectDTO> getSubjectById(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID của môn học cần lấy thông tin", required = true
+                    description = "ID of the subject to retrieve", required = true
             )
-            @PathVariable Long id
+            @PathVariable Integer id
     ) {
         log.info("Fetching subject with ID: {}", id);
-        SubjectResponseDTO subject = subjectService.getSubjectById(id);
+        FlatSchoolClassSubjectDTO subject = subjectService.getSubjectById(id);
         return ResponseEntity.ok(subject);
     }
 
     @GetMapping("/school-classes/{schoolClassId}/subjects")
-    @Operation(summary = "Lấy tất cả môn học của lớp học", description = "Trả về danh sách tất cả môn học của lớp học theo ID.")
+    @Operation(summary = "Get all subjects for a school class", description = "Returns a list of all subjects that belong to a specific school class by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lấy danh sách môn học thành công"),
-            @ApiResponse(responseCode = "404", description = "Lớp học không tìm thấy", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved subject list"),
+            @ApiResponse(responseCode = "404", description = "School class not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<List<SubjectResponseDTO>> getSubjectsBySchoolClassId(
+    public ResponseEntity<SchoolClassResponseDTO> getSubjectsBySchoolClassId(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID của lớp học cần lấy môn học", required = true
+                    description = "ID of the school class to retrieve subjects", required = true
             )
             @PathVariable Integer schoolClassId
     ) {
         log.info("Fetching subjects for school class with ID: {}", schoolClassId);
-        List<SubjectResponseDTO> subjects = subjectService.getSubjectsBySchoolClassId(schoolClassId);
+        SchoolClassResponseDTO subjects = subjectService.getSubjectsBySchoolClassId(schoolClassId);
         return ResponseEntity.ok(subjects);
     }
 
-    @Operation(summary = "Tạo môn học mới", description = "Tạo một môn học mới với thông tin được cung cấp.")
+    @Operation(summary = "Create a new subject", description = "Creates a new subject for the given school class ID with the provided information.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Tạo môn học thành công"),
-            @ApiResponse(responseCode = "400", description = "Yêu cầu không hợp lệ", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
+            @ApiResponse(responseCode = "201", description = "Subject successfully created"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @PostMapping("school-classes/{schoolClassId}/subjects")
-    public ResponseEntity<SubjectResponseDTO> createSubject(
+    public ResponseEntity<FlatSchoolClassSubjectDTO> createSubject(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID của lớp học cần tạo môn học", required = true
+                    description = "ID of the school class to create subject", required = true
             )
             @PathVariable Integer schoolClassId,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Thông tin môn học cần tạo", required = true
+                    description = "Information of the subject to be created", required = true
             )
             @RequestBody SubjectRequestDTO subjectRequestDTO
     ) {
         log.info("Creating new subject: {}", subjectRequestDTO);
-        SubjectResponseDTO createdSubject = subjectService.createSubject(schoolClassId, subjectRequestDTO);
+        FlatSchoolClassSubjectDTO createdSubject = subjectService.createSubject(schoolClassId, subjectRequestDTO);
         return ResponseEntity
-                .created(URI.create("/api/v1/subjects/" + createdSubject.id()))
+                .created(URI.create("/api/v1/subjects/" + createdSubject.subjectId()))
                 .body(createdSubject);
     }
 
-    @Operation(summary = "Cập nhật môn học", description = "Cập nhật thông tin môn học theo ID.")
+    @Operation(summary = "Update a subject", description = "Updates the information of a subject by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cập nhật môn học thành công"),
-            @ApiResponse(responseCode = "404", description = "Môn học không tìm thấy", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Subject successfully updated"),
+            @ApiResponse(responseCode = "404", description = "Subject not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @PutMapping("/subjects/{id}")
-    public ResponseEntity<SubjectResponseDTO> updateSubject(
+    public ResponseEntity<FlatSchoolClassSubjectDTO> updateSubject(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "ID của môn học cần cập nhật", required = true
+                    description = "ID of the subject to be updated", required = true
             )
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Thông tin môn học cần cập nhật", required = true
+                    description = "Updated information of the subject", required = true
             )
             @RequestBody SubjectRequestDTO subjectRequestDTO
     ) {
         log.info("Updating subject with ID: {}", id);
-        SubjectResponseDTO updatedSubject = subjectService.updateSubject(id, subjectRequestDTO);
+        var updatedSubject = subjectService.updateSubject(id, subjectRequestDTO);
         return ResponseEntity.ok(updatedSubject);
     }
-//
-//    @Operation(summary = "Xóa môn học", description = "Xóa môn học theo ID.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "204", description = "Xóa môn học thành công"),
-//            @ApiResponse(responseCode = "404", description = "Môn học không tìm thấy", content = @Content),
-//            @ApiResponse(responseCode = "500", description = "Lỗi server", content = @Content)
-//    })
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteSubject(
-//            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-//                    description = "ID của môn học cần xóa", required = true
-//            )
-//            @PathVariable Long id
-//    ) {
-//        log.info("Deleting subject with ID: {}", id);
-//        subjectService.deleteSubject(id);
-//        return ResponseEntity.noContent().build();
-//    }
+
+    @Operation(summary = "Delete a material", description = "Deletes a subject from the system by its ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Subject successfully deleted"),
+            @ApiResponse(responseCode = "404", description = "subject not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    @DeleteMapping("/subjects/{id}")
+    public ResponseEntity<Void> deleteSubject(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "ID of the material to be deleted", required = true
+            )
+            @PathVariable Integer id
+    ) {
+        log.info("Deleting material with ID: {}", id);
+        subjectService.deleteSubject(id);
+        return ResponseEntity.noContent().build();
+    }
 }
