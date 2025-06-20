@@ -2,6 +2,14 @@ package com.genedu.content.utils;
 
 public final class Constants {
     public static final class ErrorCode {
+        // Lesson Content
+        public static final String LESSON_CONTENT_ID_REQUIRED = "LESSON_CONTENT_ID_REQUIRED";
+        public static final String LESSON_CONTENT_NOT_FOUND = "LESSON_CONTENT_NOT_FOUND";
+        public static final String DUPLICATED_LESSON_CONTENT_ORDER = "DUPLICATED_LESSON_CONTENT_ORDER";
+        public static final String LESSON_CONTENT_ORDER_NUMBER_INVALID = "LESSON_CONTENT_ORDER_NUMBER_INVALID";
+        public static final String LESSON_CONTENT_CREATION_FAILED = "LESSON_CONTENT_CREATION_FAILED";
+
+
         // Lesson
         public static final String LESSON_ID_REQUIRED = "LESSON_ID_REQUIRED";
         public static final String LESSON_NOT_FOUND = "LESSON_NOT_FOUND";

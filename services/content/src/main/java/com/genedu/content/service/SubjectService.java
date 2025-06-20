@@ -13,6 +13,7 @@ public interface SubjectService {
     Subject getSubjectEntityById(Integer id);
     FlatSchoolClassSubjectDTO getSubjectById(Integer id);
     SchoolClassResponseDTO getSubjectsBySchoolClassId(Integer schoolClassId);
+
     FlatSchoolClassSubjectDTO createSubject(Integer schoolClassId, SubjectRequestDTO subjectRequestDTO);
     FlatSchoolClassSubjectDTO updateSubject(Integer id, SubjectRequestDTO subjectRequestDTO);
     void deleteSubject(Integer id);

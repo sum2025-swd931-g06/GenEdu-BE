@@ -43,6 +43,7 @@ public class ChapterServiceImpl implements ChapterService {
     @Transactional(readOnly = true)
     @Override
     public List<ChapterResponseDTO> getChaptersByMaterialId(Long materialId) {
+        log.info("Fetching chapters for material with ID: {}", materialId);
         List<Chapter> chapters = chapterRepository.findByMaterial_Id(materialId);
         return chapters.stream()
                 .map(ChapterMapper::toDTO)
@@ -50,9 +51,9 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    public MaterialResponseDTO getMaterialwithChapters(Long materialId) {
-        List<Chapter> chapters = chapterRepository.findByMaterial_Id(materialId);
-        List<ChapterResponseDTO> chapterResponseDTOS = chapters.stream()
+    public MaterialResponseDTO getMaterialWithChapters(Long materialId) {
+        var chapters = chapterRepository.findByMaterial_Id(materialId);
+        var chapterResponseDTOS = chapters.stream()
                 .map(ChapterMapper::toDTO)
                 .toList();
 
@@ -100,7 +101,7 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public FlatMaterialChapterDTO createChapter(Long materialId, ChapterRequestDTO chapterRequestDTO) {
-        if (chapterRepository.existsByOrOrderNumberAndMaterialId(chapterRequestDTO.orderNumber(), materialId)) {
+        if (chapterRepository.existsByOrderNumberAndMaterialId(chapterRequestDTO.orderNumber(), materialId)) {
             throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_CHAPTER_ORDER, chapterRequestDTO.orderNumber());
         }
         Material material = materialService.getMaterialEntityById(materialId);
@@ -120,16 +121,20 @@ public class ChapterServiceImpl implements ChapterService {
         Chapter existingChapter = getChapterEntityById(id);
 
         if (chapterRepository.existsByOrderNumberAndMaterial_IdAndIdNot(
-                chapterRequestDTO.orderNumber(), existingChapter.getMaterial().getId(), id)
+                chapterRequestDTO.orderNumber(),
+                existingChapter.getMaterial().getId(),
+                id)
         ) {
             throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_CHAPTER_ORDER, chapterRequestDTO.orderNumber());
         }
 
-        existingChapter.setOrderNumber(chapterRequestDTO.orderNumber());
-        existingChapter.setTitle(chapterRequestDTO.title());
-        existingChapter.setDescription(chapterRequestDTO.description());
+
 
         try {
+            existingChapter.setOrderNumber(chapterRequestDTO.orderNumber());
+            existingChapter.setTitle(chapterRequestDTO.title());
+            existingChapter.setDescription(chapterRequestDTO.description());
+
             Chapter updatedChapter = chapterRepository.save(existingChapter);
             return ChapterMapper.toFlatDTO(updatedChapter);
         } catch (Exception e) {
@@ -147,7 +152,8 @@ public class ChapterServiceImpl implements ChapterService {
         }
 
         try {
-            chapterRepository.deleteById(id);
+            var existingChapter = getChapterEntityById(id);
+            existingChapter.setDeleted(true);
         } catch (Exception e) {
             log.error("Error deleting chapter", e);
             throw new InternalServerErrorException(Constants.ErrorCode.DELETE_CHAPTER_FAILED, e.getMessage());

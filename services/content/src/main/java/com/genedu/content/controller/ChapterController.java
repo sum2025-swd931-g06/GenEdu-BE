@@ -4,7 +4,6 @@ import com.genedu.content.dto.chapter.ChapterRequestDTO;
 import com.genedu.content.dto.flatResponse.FlatMaterialChapterDTO;
 import com.genedu.content.dto.material.MaterialResponseDTO;
 import com.genedu.content.service.ChapterService;
-import com.genedu.content.service.MaterialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -66,7 +65,7 @@ public class ChapterController {
         log.info("Fetching chapters for material with ID: {}", materialId);
 
         return ResponseEntity.ok(
-                chapterService.getMaterialwithChapters(materialId)
+                chapterService.getMaterialWithChapters(materialId)
         );
     }
 

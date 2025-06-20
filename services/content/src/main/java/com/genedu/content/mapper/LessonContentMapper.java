@@ -16,6 +16,7 @@ public class LessonContentMapper {
                 .id(lessonContent.getId())
                 .orderNumber(lessonContent.getOrderNumber())
                 .title(lessonContent.getTitle())
+                .content(lessonContent.getContent())
                 .createdOn(lessonContent.getCreatedOn())
                 .createdBy(lessonContent.getCreatedBy())
                 .lastModifiedOn(lessonContent.getLastModifiedOn())

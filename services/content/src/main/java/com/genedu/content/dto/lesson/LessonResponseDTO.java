@@ -1,7 +1,7 @@
 package com.genedu.content.dto.lesson;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.genedu.content.dto.lessoncontent.LessonContentResponseDTO;
 import lombok.Builder;
 
 import java.time.ZonedDateTime;
@@ -20,5 +20,5 @@ public record LessonResponseDTO(
         UUID lastModifiedBy,
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        List<LessonResponseDTO> lessons
+        List<LessonContentResponseDTO> lessonContents
 ) {}

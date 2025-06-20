@@ -13,10 +13,6 @@ public class LessonContentMediaFileMapper {
                 .mediaFileId(lessonContentMediaFile.getMediaFileId())
                 .orderNumber(lessonContentMediaFile.getOrderNumber())
                 .description(lessonContentMediaFile.getDescription())
-                .createdOn(lessonContentMediaFile.getCreatedOn())
-                .createdBy(lessonContentMediaFile.getCreatedBy())
-                .lastModifiedOn(lessonContentMediaFile.getLastModifiedOn())
-                .lastModifiedBy(lessonContentMediaFile.getLastModifiedBy())
                 .build();
     }
     public static FlatLessonContentLessonContentMediaFile toFlatDTO(LessonContentMediaFile lessonContentMediaFile) {

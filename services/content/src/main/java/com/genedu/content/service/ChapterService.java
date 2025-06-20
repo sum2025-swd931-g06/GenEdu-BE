@@ -11,7 +11,7 @@ import java.util.List;
 public interface ChapterService {
     List<FlatMaterialChapterDTO> getAllChapters();
     List<ChapterResponseDTO> getChaptersByMaterialId(Long materialId);
-    MaterialResponseDTO getMaterialwithChapters(Long chapterId);
+    MaterialResponseDTO getMaterialWithChapters(Long chapterId);
     FlatMaterialChapterDTO getChapterById(Long id);
     Chapter getChapterEntityById(Long id);
 

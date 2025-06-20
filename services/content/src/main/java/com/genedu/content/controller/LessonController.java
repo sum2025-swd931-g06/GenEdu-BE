@@ -2,7 +2,6 @@ package com.genedu.content.controller;
 
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
 import com.genedu.content.dto.flatResponse.FlatChapterLessonDTO;
-import com.genedu.content.dto.flatResponse.FlatSubjectChapterLessonDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
 import com.genedu.content.service.LessonService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,9 +37,9 @@ public class LessonController {
     }
 
     @GetMapping("/chapters/{chapterId}/lessons")
-    public ResponseEntity<ChapterResponseDTO> getAllLessonsByChapterId(@PathVariable Long chapterId) {
+    public ResponseEntity<ChapterResponseDTO> getLessonsByChapterId(@PathVariable Long chapterId) {
         log.info("Fetching all lessons for chapter ID: {}", chapterId);
-        ChapterResponseDTO lessons = lessonService.getChapterLessonsById(chapterId);
+        ChapterResponseDTO lessons = lessonService.getLessonsByChapterId(chapterId);
         return ResponseEntity.ok(lessons);
     }
 
@@ -50,7 +49,8 @@ public class LessonController {
             @Valid @RequestBody LessonRequestDTO lessonRequestDTO) {
         log.info("Creating lesson for chapter ID: {}", chapterId);
         var createdLesson = lessonService.createLesson(chapterId, lessonRequestDTO);
-        return ResponseEntity.created(URI.create("/api/v1/lessons/" + createdLesson.lessonId()))
+        return ResponseEntity
+                .created(URI.create("/api/v1/lessons/" + createdLesson.lessonId()))
                 .body(createdLesson);
     }
 
@@ -67,6 +67,8 @@ public class LessonController {
     public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
         log.info("Deleting lesson with ID: {}", id);
         lessonService.deleteLesson(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 }

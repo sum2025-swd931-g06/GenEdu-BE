@@ -13,7 +13,7 @@ import org.hibernate.annotations.ColumnDefault;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "lesson_content_media_files")
-public class LessonContentMediaFile extends AbstractAuditEntity {
+public class LessonContentMediaFile {
     @Id
     @Column(name = "id", nullable = false)
     private Long id;

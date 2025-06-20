@@ -10,10 +10,6 @@ public record LessonContentMediaFileResponseDTO(
         Long id,
         Long mediaFileId,
         Integer orderNumber,
-        String description,
-        ZonedDateTime createdOn,
-        UUID createdBy,
-        ZonedDateTime lastModifiedOn,
-        UUID lastModifiedBy
+        String description
 ) {
 }

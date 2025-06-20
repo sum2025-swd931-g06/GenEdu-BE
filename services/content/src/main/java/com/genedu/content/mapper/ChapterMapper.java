@@ -16,6 +16,7 @@ public class ChapterMapper {
                 .orderNumber(chapter.getOrderNumber())
                 .title(chapter.getTitle())
                 .description(chapter.getDescription())
+
                 .createdOn(chapter.getCreatedOn())
                 .createdBy(chapter.getCreatedBy())
                 .lastModifiedOn(chapter.getLastModifiedOn())
@@ -26,8 +27,8 @@ public class ChapterMapper {
     public static ChapterResponseDTO toDTOWithLessons(Chapter chapter, List<LessonResponseDTO> lessons) {
         return ChapterResponseDTO.builder()
                 .id(chapter.getId())
-                .orderNumber(chapter.getOrderNumber())
                 .title(chapter.getTitle())
+                .orderNumber(chapter.getOrderNumber())
                 .description(chapter.getDescription())
                 .lessons(lessons)
 

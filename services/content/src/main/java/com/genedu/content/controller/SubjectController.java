@@ -116,7 +116,7 @@ public class SubjectController {
             @RequestBody SubjectRequestDTO subjectRequestDTO
     ) {
         log.info("Updating subject with ID: {}", id);
-        FlatSchoolClassSubjectDTO updatedSubject = subjectService.updateSubject(id, subjectRequestDTO);
+        var updatedSubject = subjectService.updateSubject(id, subjectRequestDTO);
         return ResponseEntity.ok(updatedSubject);
     }
 
