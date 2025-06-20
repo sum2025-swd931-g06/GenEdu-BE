@@ -2,35 +2,79 @@ package com.genedu.project.service;
 
 import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.commonlibrary.utils.AuthenticationUtils;
-import com.genedu.project.dto.ProjectCreationDTO;
+import com.genedu.project.dto.ProjectRequestDTO;
+import com.genedu.project.dto.ProjectResponseDTO;
 import com.genedu.project.model.Project;
 import com.genedu.project.model.enumeration.ProjectStatus;
 import com.genedu.project.repository.ProjectRepository;
 import com.genedu.project.utils.Constants;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.ListTokenSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.genedu.project.dto.client.LectureFileUploadDTO;
+import com.genedu.project.dto.client.LectureFileDownloadDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
     private final ProjectRepository projectRepository;
+    private final LectureMediaWebClientService lectureMediaWebClientService;
 
-    public List<Project> getAllProjects() {
-        return projectRepository.findByIsDeletedIsFalse();
+    public List<ProjectResponseDTO> getAllProjects() {
+        List<Project> projects = projectRepository.findByIsDeletedIsFalse();
+        List<ProjectResponseDTO> projectResponseDTOs = projects.stream()
+                .map(project -> ProjectResponseDTO.builder()
+                        .id(project.getId())
+                        .title(project.getTitle())
+                        .lessonId(project.getLessonId())
+                        .slideNum(project.getSlideNum())
+                        .status(project.getStatus())
+                        .customInstructions(project.getCustomInstructions())
+                        .userId(project.getUserId())
+                        .lessonPlanFileUrl(
+                                project.getLessonPlanFileId() != null
+                                    ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(project.getLessonPlanFileId())
+                                    : null
+                        )
+                        .build())
+                .toList();
+        if (projectResponseDTOs.isEmpty()) {
+            throw new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND);
+        }
+        return projectResponseDTOs;
     }
 
-    public List<Project> getProjectsByUserId(UUID userId) {
+    public List<ProjectResponseDTO> getProjectsByUserId(UUID userId) {
         List<Project> projects = projectRepository.findByUserIdAndIsDeletedIsFalse(userId);
         if (projects.isEmpty()) {
             throw new NotFoundException(Constants.ErrorCode.PROJECT_WITH_USERID_NOT_FOUND, userId);
         }
-        return projects;
+
+        List<ProjectResponseDTO> projectResponseDTOS = projects.stream()
+                .map(project -> ProjectResponseDTO.builder()
+                        .id(project.getId())
+                        .title(project.getTitle())
+                        .lessonId(project.getLessonId())
+                        .slideNum(project.getSlideNum())
+                        .status(project.getStatus())
+                        .customInstructions(project.getCustomInstructions())
+                        .userId(project.getUserId())
+                        .lessonPlanFileUrl(
+                                project.getLessonPlanFileId() != null
+                                        ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(project.getLessonPlanFileId())
+                                        : null
+                        )
+                        .build())
+                .toList();
+        return projectResponseDTOS;
     }
 
     public Project getProjectById(UUID id) {
@@ -39,32 +83,58 @@ public class ProjectService {
     }
 
     @Transactional
-    public Project createProject(ProjectCreationDTO projectDTO) {
+    public ProjectResponseDTO createProject(ProjectRequestDTO projectDTO) {
         Project project = new Project();
         project.setUserId(AuthenticationUtils.getUserId());
         project.setLessonId(projectDTO.getLessonId());
         project.setTitle(projectDTO.getTitle());
-        project.setLessonPlanFileId(projectDTO.getLessonPlanFileId());
         project.setCustomInstructions(projectDTO.getCustomInstructions());
         project.setSlideNum(projectDTO.getSlideNum() != null ? projectDTO.getSlideNum() : 10);
         project.setStatus(ProjectStatus.DRAFT);
         project.setDeleted(false);
 
-        return projectRepository.save(project);
+        Project savedProject = projectRepository.save(project);
+
+        return ProjectResponseDTO.builder()
+                .id(savedProject.getId())
+                .title(savedProject.getTitle())
+                .lessonId(savedProject.getLessonId())
+                .slideNum(savedProject.getSlideNum())
+                .status(savedProject.getStatus())
+                .customInstructions(savedProject.getCustomInstructions())
+                .userId(savedProject.getUserId())
+                .lessonPlanFileUrl(
+                        savedProject.getLessonPlanFileId() != null
+                                ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(savedProject.getLessonPlanFileId())
+                                : null
+                )
+                .build();
     }
 
     @Transactional
-    public Project updateProject(UUID id, Project projectDetails) {
+    public ProjectResponseDTO updateProject(UUID id, ProjectRequestDTO projectDetails) {
         Project project = getProjectById(id);
 
         // Update the project fields
         project.setTitle(projectDetails.getTitle());
-        project.setLessonPlanFileId(projectDetails.getLessonPlanFileId());
         project.setCustomInstructions(projectDetails.getCustomInstructions());
-        project.setStatus(projectDetails.getStatus());
         project.setSlideNum(projectDetails.getSlideNum());
 
-        return projectRepository.save(project);
+        Project updatedProject = projectRepository.save(project);
+        return ProjectResponseDTO.builder()
+                .id(updatedProject.getId())
+                .title(updatedProject.getTitle())
+                .lessonId(updatedProject.getLessonId())
+                .slideNum(updatedProject.getSlideNum())
+                .status(updatedProject.getStatus())
+                .customInstructions(updatedProject.getCustomInstructions())
+                .userId(updatedProject.getUserId())
+                .lessonPlanFileUrl(
+                        updatedProject.getLessonPlanFileId() != null
+                                ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(updatedProject.getLessonPlanFileId())
+                                : null
+                )
+                .build();
     }
 
     @Transactional
@@ -72,5 +142,60 @@ public class ProjectService {
         Project project = getProjectById(id);
         project.setDeleted(true);
         projectRepository.save(project);
+    }
+
+    @Transactional
+    public ProjectResponseDTO updateLessonPlanFile(LectureFileUploadDTO lectureFileUploadDTO) {
+        Project project = getProjectById(lectureFileUploadDTO.getProjectId());
+        MultipartFile mediaFile = lectureFileUploadDTO.getMediaFile();
+
+        if (mediaFile == null || mediaFile.isEmpty()) {
+            throw new IllegalArgumentException("Media file cannot be null or empty");
+        }
+
+        LectureFileDownloadDTO savedLectureFile = lectureMediaWebClientService.uploadLectureFile(lectureFileUploadDTO);
+        project.setLessonPlanFileId(savedLectureFile.getId());
+
+        Project updatedProject = projectRepository.save(project);
+
+        return ProjectResponseDTO.builder()
+                .id(updatedProject.getId())
+                .title(updatedProject.getTitle())
+                .lessonId(updatedProject.getLessonId())
+                .slideNum(updatedProject.getSlideNum())
+                .status(updatedProject.getStatus())
+                .customInstructions(updatedProject.getCustomInstructions())
+                .userId(updatedProject.getUserId())
+                .lessonPlanFileUrl(
+                        updatedProject.getLessonPlanFileId() != null
+                                ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(updatedProject.getLessonPlanFileId())
+                                : null
+                )
+                .build();
+    }
+
+    public List<ProjectResponseDTO> getCurrentUserProjects() {
+        UUID currentUserId = AuthenticationUtils.getUserId();
+        List<Project> projects = projectRepository.findByUserIdAndIsDeletedIsFalse(currentUserId);
+        if (projects.isEmpty()) {
+            throw new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND);
+        }
+
+        return projects.stream()
+                .map(project -> ProjectResponseDTO.builder()
+                        .id(project.getId())
+                        .title(project.getTitle())
+                        .lessonId(project.getLessonId())
+                        .slideNum(project.getSlideNum())
+                        .status(project.getStatus())
+                        .customInstructions(project.getCustomInstructions())
+                        .userId(project.getUserId())
+                        .lessonPlanFileUrl(
+                                project.getLessonPlanFileId() != null
+                                        ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(project.getLessonPlanFileId())
+                                        : null
+                        )
+                        .build())
+                .collect(toList());
     }
 }

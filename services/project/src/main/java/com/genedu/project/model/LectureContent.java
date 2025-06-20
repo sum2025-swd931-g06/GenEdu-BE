@@ -1,6 +1,6 @@
 package com.genedu.project.model;
 
-import com.genedu.commonlibrary.model.AbstractAuditEntity;
+import com.genedu.commonlibrary.model.AbstractTimeAuditEntity;
 import com.genedu.project.model.enumeration.LectureStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Table(name = "lecture_contents")
 @Getter
 @Setter
-public class LectureContent extends AbstractAuditEntity {
+public class LectureContent extends AbstractTimeAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

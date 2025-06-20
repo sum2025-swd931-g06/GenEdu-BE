@@ -16,6 +16,24 @@ services:
       - microservices-net
     restart: unless-stopped
 
+  pgvector:
+    container_name: ms_pg_vector
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres-vector
+      PGDATA: /data/postgres-vector
+      DIMENSION: 1024
+    volumes:
+        - postgres:/data/postgres-vector
+        - ./postgres_vector_init.sql:/docker-entrypoint-initdb.d/postgres_vector_init.sql
+    ports:
+      - 5434:5432
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
   pgadmin:
     container_name: ms_pgadmin
     image: dpage/pgadmin4

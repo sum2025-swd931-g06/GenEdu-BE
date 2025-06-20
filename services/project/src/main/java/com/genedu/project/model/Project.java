@@ -1,6 +1,6 @@
 package com.genedu.project.model;
 
-import com.genedu.commonlibrary.model.AbstractAuditEntity;
+import com.genedu.commonlibrary.model.AbstractTimeAuditEntity;
 import com.genedu.project.model.enumeration.ProjectStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class Project extends AbstractAuditEntity {
+public class Project extends AbstractTimeAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -53,10 +53,9 @@ public class Project extends AbstractAuditEntity {
 
     @Column(
             name = "lesson_plan_file_id",
-            columnDefinition = "uuid",
-            nullable = false
+            columnDefinition = "bigint"
     )
-    private UUID lessonPlanFileId;
+    private Long lessonPlanFileId;
 
     @Column(
             name = "custom_instructions",

@@ -1,0 +1,23 @@
+server:
+  port: 8094
+spring:
+  application:
+    name: lecture-content-service
+  datasource:
+    url: jdbc:postgresql://localhost:5434/postgres
+    username: admin
+    password: admin
+  ai:
+    openai:
+      api-key: AIzaSyCymIKibdct7yzqXiiOsPUo3upUqvDvW1U
+      base-url: https://generativelanguage.googleapis.com/v1beta/openai
+      embedding:
+        options:
+          model: text-embedding-004
+      chat:
+        options:
+          model: gemini-2.0-flash
+
+  config:
+      import: optional:configserver:http://localhost:8888
+

@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="config-server" />
+        <module name="lecture-content" />
         <module name="discovery" />
         <module name="gateway" />
       </profile>
@@ -34,6 +35,7 @@
       <module name="discovery" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="genedu" options="-parameters" />
+      <module name="lecture-content" options="-parameters" />
       <module name="media" options="-parameters" />
       <module name="project" options="-parameters" />
       <module name="user" options="-parameters" />
