@@ -1,5 +1,3 @@
-CREATE SEQUENCE IF NOT EXISTS chapters_id_seq START WITH 1 INCREMENT BY 1;
-
 CREATE TABLE chapters
 (
     id               BIGINT       NOT NULL,
