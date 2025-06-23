@@ -15,7 +15,6 @@ import java.util.Objects;
 
 @Service
 public class LectureMediaWebClientService {
-
     private final WebClient webClient;
 
     public LectureMediaWebClientService(WebClient webClient) {
@@ -33,10 +32,12 @@ public class LectureMediaWebClientService {
 
     public LectureFileDownloadDTO uploadLectureFile(LectureFileUploadDTO fileUploadDTO) {
         MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
+
         bodyBuilder.part("mediaFile", fileUploadDTO.getMediaFile().getResource(), MediaType.MULTIPART_FORM_DATA)
                 .filename(Objects.requireNonNull(fileUploadDTO.getMediaFile().getOriginalFilename()))
                 .contentType(MediaType.parseMediaType(Objects.requireNonNull(fileUploadDTO.getMediaFile().getContentType())));
         bodyBuilder.part("projectId", fileUploadDTO.getProjectId().toString());
+
         return webClient.post()
                 .uri("/medias/projects/lesson-plans/upload")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + AuthenticationUtils.extractJwt())

@@ -1,21 +1,45 @@
+CREATE SEQUENCE IF NOT EXISTS chapters_id_seq START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE IF NOT EXISTS lesson_content_media_files_id_seq START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE IF NOT EXISTS lesson_contents_id_seq START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE IF NOT EXISTS lessons_id_seq START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE IF NOT EXISTS materials_id_seq START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE IF NOT EXISTS school_classes_id_seq START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE IF NOT EXISTS subjects_id_seq START WITH 1 INCREMENT BY 1;
+
+-- Alter table để id tự tăng theo sequence
+ALTER TABLE school_classes ALTER COLUMN id SET DEFAULT nextval('school_classes_id_seq');
+ALTER TABLE subjects ALTER COLUMN id SET DEFAULT nextval('subjects_id_seq');
+ALTER TABLE materials ALTER COLUMN id SET DEFAULT nextval('materials_id_seq');
+ALTER TABLE chapters ALTER COLUMN id SET DEFAULT nextval('chapters_id_seq');
+ALTER TABLE lessons ALTER COLUMN id SET DEFAULT nextval('lessons_id_seq');
+ALTER TABLE lesson_contents ALTER COLUMN id SET DEFAULT nextval('lesson_contents_id_seq');
+ALTER TABLE lesson_content_media_files ALTER COLUMN id SET DEFAULT nextval('lesson_content_media_files_id_seq');
+
+
 -- SCHOOL CLASSES
-INSERT INTO school_classes (id, name, description, is_deleted) VALUES
-                                                                   (10, 'Lớp 10', 'Khối lớp 10 THPT', false),
-                                                                   (11, 'Lớp 11', 'Khối lớp 11 THPT', false),
-                                                                   (12, 'Lớp 12', 'Khối lớp 12 THPT', false);
+INSERT INTO school_classes (name, description, is_deleted) VALUES
+                                                                   ('Lớp 10', 'Khối lớp 10 THPT', false),
+                                                                   ('Lớp 11', 'Khối lớp 11 THPT', false),
+                                                                   ('Lớp 12', 'Khối lớp 12 THPT', false);
 
 -- SUBJECTS (id tự tăng)
 INSERT INTO subjects (name, description, school_class_id, is_deleted) VALUES
-                                                                          ('Lịch sử', 'Lịch sử lớp 10', 10, false),
-                                                                          ('Toán học', 'Toán học lớp 10', 10, false),
-                                                                          ('Ngữ văn', 'Ngữ văn lớp 10', 10, false),
-                                                                          ('Tiếng Anh', 'Tiếng Anh lớp 10', 10, false),
-                                                                          ('Địa lý', 'Địa lý lớp 10', 10, false),
-                                                                          ('Vật lý', 'Vật lý lớp 10', 10, false),
-                                                                          ('Hóa học', 'Hóa học lớp 10', 10, false),
-                                                                          ('Sinh học', 'Sinh học lớp 10', 10, false),
-                                                                          ('Tin học', 'Tin học lớp 10', 10, false),
-                                                                          ('GDCD', 'Giáo dục công dân lớp 10', 10, false);
+                                                                          ('Lịch sử', 'Lịch sử lớp 10', 1, false),
+                                                                          ('Toán học', 'Toán học lớp 10', 1, false),
+                                                                          ('Ngữ văn', 'Ngữ văn lớp 10', 1, false),
+                                                                          ('Tiếng Anh', 'Tiếng Anh lớp 10', 1, false),
+                                                                          ('Địa lý', 'Địa lý lớp 10', 1, false),
+                                                                          ('Vật lý', 'Vật lý lớp 10', 1, false),
+                                                                          ('Hóa học', 'Hóa học lớp 10', 1, false),
+                                                                          ('Sinh học', 'Sinh học lớp 10', 1, false),
+                                                                          ('Tin học', 'Tin học lớp 10', 1, false),
+                                                                          ('GDCD', 'Giáo dục công dân lớp 10', 1, false);
 
 -- MATERIALS (id tự tăng, mapping subject_id theo thứ tự insert)
 -- Lịch sử: 3 sách
