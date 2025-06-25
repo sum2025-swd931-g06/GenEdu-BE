@@ -23,8 +23,8 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Project> getProjectById(@PathVariable UUID id) {
-        Project project = projectService.getProjectById(id);
+    public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable UUID id) {
+        ProjectResponseDTO project = projectService.getProjectById(id);
         return new ResponseEntity<>(project, HttpStatus.OK);
     }
     

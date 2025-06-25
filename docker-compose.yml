@@ -1,3 +1,12 @@
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  pgdata_sql:
+  pgdata_vector:
+  pgadmin:
+
 services:
   postgresql:
     container_name: ms_pg_sql
@@ -7,7 +16,7 @@ services:
       POSTGRES_PASSWORD: admin
       PGDATA: /data/postgres
     volumes:
-      - postgres:/data/postgres
+      - pgdata_sql:/data/postgres
       - ./postgres_init.sql:/docker-entrypoint-initdb.d/postgres_init.sql
     hostname: postgresql
     ports:
@@ -22,11 +31,13 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: postgres-vector
+      POSTGRES_DB: postgres
       PGDATA: /data/postgres-vector
-      DIMENSION: 1024
+      DIMENSION: 768
+    labels:
+      - "org.springframework.boot.service-connection=postgres"
     volumes:
-        - postgres:/data/postgres-vector
+        - pgdata_vector:/data/postgres-vector
         - ./postgres_vector_init.sql:/docker-entrypoint-initdb.d/postgres_vector_init.sql
     ports:
       - 5434:5432
@@ -420,11 +431,3 @@ services:
     networks:
       - microservices-net
 
-networks:
-  microservices-net:
-    driver: bridge
-
-volumes:
-  postgres:
-  pgadmin:
-  mongo:

@@ -4,6 +4,7 @@ import com.genedu.content.dto.chapter.ChapterResponseDTO;
 import com.genedu.content.dto.flatResponse.FlatChapterLessonDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
 import com.genedu.content.service.LessonService;
+import com.genedu.content.service.webclient.LectureContentClient;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
 @Tag(name = "Lesson", description = "Manage lessons in the system")
 public class LessonController {
     private final LessonService lessonService;
+    private final LectureContentClient lectureContentClient;
 
     @GetMapping("/lessons")
     public ResponseEntity<List<FlatChapterLessonDTO>> getAllLessons() {
@@ -67,6 +69,17 @@ public class LessonController {
     public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
         log.info("Deleting lesson with ID: {}", id);
         lessonService.deleteLesson(id);
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
+    @PostMapping("/lessons/{lessonId}/sync")
+    public ResponseEntity<Void> syncLesson(
+            @PathVariable Long lessonId
+    ) {
+        log.info("Syncing lesson with ID: {}", lessonId);
+        lectureContentClient.createVectorEmbeddings(lessonId);
         return ResponseEntity
                 .noContent()
                 .build();

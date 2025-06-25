@@ -1,15 +1,13 @@
-package com.genedu.lecturecontent.dto;
-
-import lombok.Data;
+package com.genedu.content.dto.client;
 
 public record LectureContentRequestDTO(
-    String schoolClassId,
-    String subjectId,
-    String materialId,
-    String chapterId,
-    String lessonId,
-    String lessonContentId,
-    String content
+        String schoolClassId,
+        String subjectId,
+        String materialId,
+        String chapterId,
+        String lessonId,
+        String lessonContentId,
+        String content
 ) {
     public LectureContentRequestDTO {
         if (schoolClassId == null || schoolClassId.isBlank()) {

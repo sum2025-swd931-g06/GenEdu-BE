@@ -17,7 +17,9 @@ import com.genedu.project.dto.client.LectureFileUploadDTO;
 import com.genedu.project.dto.client.LectureFileDownloadDTO;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.stream.Collectors.toList;
@@ -52,6 +54,11 @@ public class ProjectService {
         return projectResponseDTOs;
     }
 
+    public Project getProjectEntityById(UUID id) {
+        return projectRepository.findByIdAndIsDeletedIsFalse(id)
+                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND, id));
+    }
+
     public List<ProjectResponseDTO> getProjectsByUserId(UUID userId) {
         List<Project> projects = projectRepository.findByUserIdAndIsDeletedIsFalse(userId);
         if (projects.isEmpty()) {
@@ -77,9 +84,25 @@ public class ProjectService {
         return projectResponseDTOS;
     }
 
-    public Project getProjectById(UUID id) {
-        return projectRepository.findByIdAndIsDeletedIsFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + id));
+    public ProjectResponseDTO getProjectById(UUID id) {
+        Optional<Project> project = projectRepository.findByIdAndIsDeletedIsFalse(id);
+        if (project.isEmpty()) {
+            throw new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND, id);
+        }
+        return ProjectResponseDTO.builder()
+                .id(project.get().getId())
+                .title(project.get().getTitle())
+                .lessonId(project.get().getLessonId())
+                .slideNum(project.get().getSlideNum())
+                .status(project.get().getStatus())
+                .customInstructions(project.get().getCustomInstructions())
+                .userId(project.get().getUserId())
+                .lessonPlanFileUrl(
+                        project.get().getLessonPlanFileId() != null
+                                ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(project.get().getLessonPlanFileId())
+                                : null
+                )
+                .build();
     }
 
     @Transactional
@@ -113,7 +136,7 @@ public class ProjectService {
 
     @Transactional
     public ProjectResponseDTO updateProject(UUID id, ProjectRequestDTO projectDetails) {
-        Project project = getProjectById(id);
+        Project project = getProjectEntityById(id);
 
         // Update the project fields
         project.setTitle(projectDetails.getTitle());
@@ -139,14 +162,15 @@ public class ProjectService {
 
     @Transactional
     public void deleteProject(UUID id) {
-        Project project = getProjectById(id);
+        Project project = getProjectEntityById(id);
         project.setDeleted(true);
         projectRepository.save(project);
     }
 
     @Transactional
     public ProjectResponseDTO updateLessonPlanFile(LectureFileUploadDTO lectureFileUploadDTO) {
-        Project project = getProjectById(lectureFileUploadDTO.getProjectId());
+        Project project = getProjectEntityById(lectureFileUploadDTO.getProjectId());
+        
         MultipartFile mediaFile = lectureFileUploadDTO.getMediaFile();
 
         if (mediaFile == null || mediaFile.isEmpty()) {

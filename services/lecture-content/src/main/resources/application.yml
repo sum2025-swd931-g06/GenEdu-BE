@@ -1,5 +1,11 @@
 server:
   port: 8094
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+
 spring:
   application:
     name: lecture-content-service
@@ -8,15 +14,28 @@ spring:
     username: admin
     password: admin
   ai:
-    openai:
-      api-key: AIzaSyCymIKibdct7yzqXiiOsPUo3upUqvDvW1U
-      base-url: https://generativelanguage.googleapis.com/v1beta/openai
+    ollama:
+      base-url: http://localhost:7869
+      init:
+        pull-model-strategy: when_missing
+        timeout: 5m
       embedding:
         options:
-          model: text-embedding-004
+          model: nomic-embed-text:v1.5
+        enabled: true
       chat:
         options:
-          model: gemini-2.0-flash
+          model: llama3.2:latest
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        index-type: hnsw
+        dimensions: 768
+        table-name: lecture_content_embeddings
+  #  main:
+#    allow-bean-definition-overriding: true
+  webflux:
+    base-path: /api
 
   config:
       import: optional:configserver:http://localhost:8888
