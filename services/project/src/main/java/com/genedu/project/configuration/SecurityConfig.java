@@ -64,21 +64,4 @@ public class SecurityConfig {
 
         return jwtAuthenticationConverter;
     }
-
-//    private ServletPolicyEnforcerFilter createPolicyEnforcerFilter() {
-//        return new ServletPolicyEnforcerFilter(new ConfigurationResolver() {
-//            @Override
-//            public PolicyEnforcerConfig resolve(HttpRequest request) {
-//                try {
-//                    // Set the base URL for the policy enforcer
-//                    return JsonSerialization.
-//                            readValue(getClass().getResourceAsStream("/policy-enforcer.json"),
-//                                    PolicyEnforcerConfig.class);
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//        });
-//    }
-
 }

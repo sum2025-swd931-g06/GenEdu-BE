@@ -1,29 +1,39 @@
 package com.genedu.lecturecontent.controller;
 
 import com.genedu.lecturecontent.dto.LectureContentRequestDTO;
-import com.genedu.lecturecontent.service.LectureContentService;
-import org.springframework.web.bind.annotation.*;
+import com.genedu.lecturecontent.service.LectureContentVectorService;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/lecture-contents")
 public class LectureContentController {
-    private final LectureContentService lectureContentService;
+    private static final Logger log = Logger.getLogger(LectureContentController.class.getName());
+    private final LectureContentVectorService lectureContentVectorService;
 
-    public LectureContentController(LectureContentService lectureContentService) {
-        this.lectureContentService = lectureContentService;
+    public LectureContentController(LectureContentVectorService lectureContentVectorService) {
+        this.lectureContentVectorService = lectureContentVectorService;
     }
 
-    @GetMapping("/update")
-    public String updateLectureContent(
-            ) {
-        List<LectureContentRequestDTO> lectureContentRequestDTOs = List.of(
-                new LectureContentRequestDTO("class1", "subject1", "material1", "lesson1", "part1", "This is the content for class 1, subject 1, material 1, lesson 1, part 1."),
-                new LectureContentRequestDTO("class2", "subject2", "material2", "lesson2", "part2", "This is the content for class 2, subject 2, material 2, lesson 2, part 2."),
-                new LectureContentRequestDTO("class3", "subject3", "material3", "lesson3", "part3", "This is the content for class 3, subject 3, material 3, lesson 3, part 3.")
-        );
-        lectureContentService.embedLectureContentToVectorStore(lectureContentRequestDTOs);
-        return "Lecture content updated successfully.";
+    @PostMapping(
+        value = "/embeddings",
+        produces = "application/json" + ";charset=UTF-8",
+        consumes = "application/json" + ";charset=UTF-8"
+    )
+    public List<LectureContentRequestDTO> createVectorEmbeddings(
+            @RequestBody List<LectureContentRequestDTO> lectureContentRequestDTOs
+    ) {
+        log.info("Creating vector embeddings for lecture content...");
+        List<LectureContentRequestDTO> embeddings = lectureContentVectorService.createVectorEmbeddings(lectureContentRequestDTOs);
+        if (embeddings.isEmpty()) {
+            log.warning("No embeddings created. The input list was empty.");
+        }
+        return embeddings;
     }
 }

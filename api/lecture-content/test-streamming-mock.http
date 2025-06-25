@@ -1,0 +1,7 @@
+GET /m1/973637-958601-default/user/projects/14583ca1-03eb-41d9-a407-471aed4803c0/lecture-contents HTTP/1.1
+Host: mock.apidog.com
+User-Agent: Apidog/1.0.0 (https://apidog.com)
+Content-Type: text/event-stream
+Accept: */*
+Host: mock.apidog.com
+Connection: keep-alive

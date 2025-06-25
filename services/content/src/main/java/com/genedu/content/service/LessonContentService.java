@@ -2,6 +2,7 @@ package com.genedu.content.service;
 
 import com.genedu.content.dto.chapter.ChapterRequestDTO;
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
+import com.genedu.content.dto.client.LectureContentRequestDTO;
 import com.genedu.content.dto.flatResponse.FlatLessonLessonContentDTO;
 import com.genedu.content.dto.flatResponse.FlatMaterialChapterDTO;
 import com.genedu.content.dto.lesson.LessonResponseDTO;
@@ -22,9 +23,12 @@ public interface LessonContentService {
     LessonResponseDTO getLessonWithLessonContents(Long lessonId);
 
 
-
     LessonContentResponseDTO getLessonContentByLessonIdAndOrderNumber(Long lessonId, int orderNumber);
     LessonContent getLessonContentEntityByLessonIdAndOrderNumber(Long lessonId, int orderNumber);
     FlatLessonLessonContentDTO createLessonContent(Long lessonId, LessonContentRequestDTO lessonContentRequestDTO);
     FlatLessonLessonContentDTO updateLessonContent(Long id, LessonContentRequestDTO lessonContentRequestDTO);
-    void deleteLessonContent(Long id);}
+    void deleteLessonContent(Long id);
+
+    List<LectureContentRequestDTO> getLectureContentsByLessonId(Long lessonId);
+}
+
