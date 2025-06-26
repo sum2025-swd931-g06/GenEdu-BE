@@ -16,6 +16,7 @@ public class LessonMapper {
                 .title(lesson.getTitle())
                 .description(lesson.getDescription())
                 .orderNumber(lesson.getOrderNumber())
+                .status(lesson.getStatus())
 
                 .createdOn(lesson.getCreatedOn())
                 .createdBy(lesson.getCreatedBy())
@@ -31,6 +32,7 @@ public class LessonMapper {
                 .orderNumber(lesson.getOrderNumber())
                 .description(lesson.getDescription())
                 .lessonContents(lessonContents)
+                .status(lesson.getStatus())
 
                 .createdOn(lesson.getCreatedOn())
                 .createdBy(lesson.getCreatedBy())
@@ -50,6 +52,7 @@ public class LessonMapper {
                 .lessonTitle(lesson.getTitle())
                 .lessonOrderNumber(lesson.getOrderNumber())
                 .lessonDescription(lesson.getDescription())
+                .lessonStatus(lesson.getStatus())
                 .build();
     }
 

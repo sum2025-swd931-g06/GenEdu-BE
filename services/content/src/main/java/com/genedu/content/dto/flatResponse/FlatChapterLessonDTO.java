@@ -12,6 +12,7 @@ public record FlatChapterLessonDTO(
         Long lessonId,
         String lessonTitle,
         Integer lessonOrderNumber,
-        String lessonDescription
+        String lessonDescription,
+        String lessonStatus
 ) {
 }

@@ -18,6 +18,7 @@ public record LessonResponseDTO(
         UUID createdBy,
         ZonedDateTime lastModifiedOn,
         UUID lastModifiedBy,
+        String status,
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
         List<LessonContentResponseDTO> lessonContents

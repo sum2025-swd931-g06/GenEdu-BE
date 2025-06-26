@@ -8,6 +8,7 @@ public record FlatLessonLessonContentDTO(
         String lessonTitle,
         String lessonDescription,
         Integer lessonOrderNumber,
+        String lessonStatus,
 
         Long lessonContentId,
         String lessonContentTitle,

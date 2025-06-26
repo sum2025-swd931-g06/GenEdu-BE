@@ -46,6 +46,7 @@ public class LessonContentMapper {
                 .lessonTitle(lessonContent.getLesson().getTitle())
                 .lessonDescription(lessonContent.getLesson().getDescription())
                 .lessonOrderNumber(lessonContent.getLesson().getOrderNumber())
+                .lessonStatus(lessonContent.getLesson().getStatus())
 
                 .lessonContentId(lessonContent.getId())
                 .lessonContentTitle(lessonContent.getTitle())
