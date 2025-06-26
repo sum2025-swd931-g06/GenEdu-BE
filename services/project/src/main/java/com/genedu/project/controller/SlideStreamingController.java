@@ -101,7 +101,7 @@ public class SlideStreamingController {
                                     ))
                                     .build()
                             )
-                            .concatWith( // 🕒 optional delay between slides after last word
+                            .concatWith(
                                     Mono.delay(Duration.ofSeconds(1)).then(Mono.empty())
                             );
                 });

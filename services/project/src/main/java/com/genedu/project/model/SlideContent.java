@@ -15,7 +15,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class SlideContent extends AbstractTimeAuditEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(
