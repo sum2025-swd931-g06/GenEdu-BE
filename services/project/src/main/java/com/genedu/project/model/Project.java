@@ -17,7 +17,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Project extends AbstractTimeAuditEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(
