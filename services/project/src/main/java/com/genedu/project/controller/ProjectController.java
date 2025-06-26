@@ -19,7 +19,6 @@ import java.util.UUID;
 @RequestMapping("/api/v1/projects")
 @RequiredArgsConstructor
 public class ProjectController {
-
     private final ProjectService projectService;
 
     @GetMapping("/{id}")
@@ -55,13 +54,14 @@ public class ProjectController {
     }
 
     @PutMapping(
-            value = "/lesson-plan",
+            value = "/{projectId}lesson-plan",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<ProjectResponseDTO> uploadLectureFile(
-            @ModelAttribute LectureFileUploadDTO projectDTO
+            @ModelAttribute LectureFileUploadDTO lectureFileUploadDTO,
+            @PathVariable UUID projectId
     ) {
-        ProjectResponseDTO updatedProject = projectService.updateLessonPlanFile(projectDTO);
+        ProjectResponseDTO updatedProject = projectService.updateLessonPlanFile(lectureFileUploadDTO);
         return new ResponseEntity<>(updatedProject, HttpStatus.OK);
     }
 

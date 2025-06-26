@@ -1,9 +1,11 @@
 package com.genedu.project.service;
 
+import com.genedu.commonlibrary.exception.BadRequestException;
 import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.commonlibrary.utils.AuthenticationUtils;
 import com.genedu.project.dto.ProjectRequestDTO;
 import com.genedu.project.dto.ProjectResponseDTO;
+import com.genedu.project.mapper.ProjectMapper;
 import com.genedu.project.model.Project;
 import com.genedu.project.model.enumeration.ProjectStatus;
 import com.genedu.project.repository.ProjectRepository;
@@ -29,24 +31,12 @@ import static java.util.stream.Collectors.toList;
 public class ProjectService {
     private final ProjectRepository projectRepository;
     private final LectureMediaWebClientService lectureMediaWebClientService;
+    private final ProjectMapper projectMapper;
 
     public List<ProjectResponseDTO> getAllProjects() {
         List<Project> projects = projectRepository.findByIsDeletedIsFalse();
         List<ProjectResponseDTO> projectResponseDTOs = projects.stream()
-                .map(project -> ProjectResponseDTO.builder()
-                        .id(project.getId())
-                        .title(project.getTitle())
-                        .lessonId(project.getLessonId())
-                        .slideNum(project.getSlideNum())
-                        .status(project.getStatus())
-                        .customInstructions(project.getCustomInstructions())
-                        .userId(project.getUserId())
-                        .lessonPlanFileUrl(
-                                project.getLessonPlanFileId() != null
-                                    ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(project.getLessonPlanFileId())
-                                    : null
-                        )
-                        .build())
+                .map(projectMapper::toDTO)
                 .toList();
         if (projectResponseDTOs.isEmpty()) {
             throw new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND);
@@ -65,23 +55,9 @@ public class ProjectService {
             throw new NotFoundException(Constants.ErrorCode.PROJECT_WITH_USERID_NOT_FOUND, userId);
         }
 
-        List<ProjectResponseDTO> projectResponseDTOS = projects.stream()
-                .map(project -> ProjectResponseDTO.builder()
-                        .id(project.getId())
-                        .title(project.getTitle())
-                        .lessonId(project.getLessonId())
-                        .slideNum(project.getSlideNum())
-                        .status(project.getStatus())
-                        .customInstructions(project.getCustomInstructions())
-                        .userId(project.getUserId())
-                        .lessonPlanFileUrl(
-                                project.getLessonPlanFileId() != null
-                                        ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(project.getLessonPlanFileId())
-                                        : null
-                        )
-                        .build())
+        return projects.stream()
+                .map(projectMapper::toDTO)
                 .toList();
-        return projectResponseDTOS;
     }
 
     public ProjectResponseDTO getProjectById(UUID id) {
@@ -89,76 +65,46 @@ public class ProjectService {
         if (project.isEmpty()) {
             throw new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND, id);
         }
-        return ProjectResponseDTO.builder()
-                .id(project.get().getId())
-                .title(project.get().getTitle())
-                .lessonId(project.get().getLessonId())
-                .slideNum(project.get().getSlideNum())
-                .status(project.get().getStatus())
-                .customInstructions(project.get().getCustomInstructions())
-                .userId(project.get().getUserId())
-                .lessonPlanFileUrl(
-                        project.get().getLessonPlanFileId() != null
-                                ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(project.get().getLessonPlanFileId())
-                                : null
-                )
-                .build();
+        return projectMapper.toDTO(project.get());
     }
 
     @Transactional
     public ProjectResponseDTO createProject(ProjectRequestDTO projectDTO) {
         Project project = new Project();
+
         project.setUserId(AuthenticationUtils.getUserId());
-        project.setLessonId(projectDTO.getLessonId());
-        project.setTitle(projectDTO.getTitle());
-        project.setCustomInstructions(projectDTO.getCustomInstructions());
-        project.setSlideNum(projectDTO.getSlideNum() != null ? projectDTO.getSlideNum() : 10);
+        project.setLessonId(projectDTO.lessonId());
+        project.setTitle(projectDTO.title());
+        project.setCustomInstructions(projectDTO.customInstructions());
+        project.setSlideNum(projectDTO.slideNumber() != null ? projectDTO.slideNumber() : 10);
         project.setStatus(ProjectStatus.DRAFT);
         project.setDeleted(false);
 
         Project savedProject = projectRepository.save(project);
 
-        return ProjectResponseDTO.builder()
-                .id(savedProject.getId())
-                .title(savedProject.getTitle())
-                .lessonId(savedProject.getLessonId())
-                .slideNum(savedProject.getSlideNum())
-                .status(savedProject.getStatus())
-                .customInstructions(savedProject.getCustomInstructions())
-                .userId(savedProject.getUserId())
-                .lessonPlanFileUrl(
-                        savedProject.getLessonPlanFileId() != null
-                                ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(savedProject.getLessonPlanFileId())
-                                : null
-                )
-                .build();
+        return projectMapper.toDTO(savedProject);
     }
 
-    @Transactional
-    public ProjectResponseDTO updateProject(UUID id, ProjectRequestDTO projectDetails) {
-        Project project = getProjectEntityById(id);
+@Transactional
+public ProjectResponseDTO updateProject(UUID id, ProjectRequestDTO projectDetails) {
+    Project project = getProjectEntityById(id);
 
-        // Update the project fields
-        project.setTitle(projectDetails.getTitle());
-        project.setCustomInstructions(projectDetails.getCustomInstructions());
-        project.setSlideNum(projectDetails.getSlideNum());
-
-        Project updatedProject = projectRepository.save(project);
-        return ProjectResponseDTO.builder()
-                .id(updatedProject.getId())
-                .title(updatedProject.getTitle())
-                .lessonId(updatedProject.getLessonId())
-                .slideNum(updatedProject.getSlideNum())
-                .status(updatedProject.getStatus())
-                .customInstructions(updatedProject.getCustomInstructions())
-                .userId(updatedProject.getUserId())
-                .lessonPlanFileUrl(
-                        updatedProject.getLessonPlanFileId() != null
-                                ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(updatedProject.getLessonPlanFileId())
-                                : null
-                )
-                .build();
+    if (projectDetails.title() != null) {
+        project.setTitle(projectDetails.title());
     }
+    if (projectDetails.lessonId() != null) {
+        project.setLessonId(projectDetails.lessonId());
+    }
+    if (projectDetails.customInstructions() != null) {
+        project.setCustomInstructions(projectDetails.customInstructions());
+    }
+    if (projectDetails.slideNumber() != null) {
+        project.setSlideNum(projectDetails.slideNumber());
+    }
+
+    Project updatedProject = projectRepository.save(project);
+    return projectMapper.toDTO(updatedProject);
+}
 
     @Transactional
     public void deleteProject(UUID id) {
@@ -170,11 +116,11 @@ public class ProjectService {
     @Transactional
     public ProjectResponseDTO updateLessonPlanFile(LectureFileUploadDTO lectureFileUploadDTO) {
         Project project = getProjectEntityById(lectureFileUploadDTO.getProjectId());
-        
+
         MultipartFile mediaFile = lectureFileUploadDTO.getMediaFile();
 
         if (mediaFile == null || mediaFile.isEmpty()) {
-            throw new IllegalArgumentException("Media file cannot be null or empty");
+            throw new BadRequestException("Media file cannot be null or empty");
         }
 
         LectureFileDownloadDTO savedLectureFile = lectureMediaWebClientService.uploadLectureFile(lectureFileUploadDTO);
@@ -182,20 +128,7 @@ public class ProjectService {
 
         Project updatedProject = projectRepository.save(project);
 
-        return ProjectResponseDTO.builder()
-                .id(updatedProject.getId())
-                .title(updatedProject.getTitle())
-                .lessonId(updatedProject.getLessonId())
-                .slideNum(updatedProject.getSlideNum())
-                .status(updatedProject.getStatus())
-                .customInstructions(updatedProject.getCustomInstructions())
-                .userId(updatedProject.getUserId())
-                .lessonPlanFileUrl(
-                        updatedProject.getLessonPlanFileId() != null
-                                ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(updatedProject.getLessonPlanFileId())
-                                : null
-                )
-                .build();
+        return projectMapper.toDTO(updatedProject);
     }
 
     public List<ProjectResponseDTO> getCurrentUserProjects() {
@@ -206,20 +139,7 @@ public class ProjectService {
         }
 
         return projects.stream()
-                .map(project -> ProjectResponseDTO.builder()
-                        .id(project.getId())
-                        .title(project.getTitle())
-                        .lessonId(project.getLessonId())
-                        .slideNum(project.getSlideNum())
-                        .status(project.getStatus())
-                        .customInstructions(project.getCustomInstructions())
-                        .userId(project.getUserId())
-                        .lessonPlanFileUrl(
-                                project.getLessonPlanFileId() != null
-                                        ? lectureMediaWebClientService.getLessonPlanFileUrlByLessonPlanId(project.getLessonPlanFileId())
-                                        : null
-                        )
-                        .build())
+                .map(projectMapper::toDTO)
                 .collect(toList());
     }
 }

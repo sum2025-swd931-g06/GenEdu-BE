@@ -1,24 +1,28 @@
 package com.genedu.project.dto;
 
+import com.genedu.commonlibrary.exception.BadRequestException;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ProjectRequestDTO {
-    @NotNull(message = "Lesson ID must not be null")
-    private Long lessonId;
-
-    @NotBlank(message = "Title must not be blank")
-    @Size(max = 255, message = "Title must be less than 255 characters")
-    private String title;
-
-    private String customInstructions;
-
-    private Integer slideNum;
+public record ProjectRequestDTO(
+     Long lessonId,
+     String title,
+     String customInstructions,
+     Integer slideNumber
+) {
+    public ProjectRequestDTO {
+        if (lessonId == null || lessonId <= 0) {
+            throw new BadRequestException("Lesson ID must be a positive number.");
+        }
+        if (title == null || title.isBlank() || title.length() > 255) {
+            throw new BadRequestException("Title must not be blank and must be less than 255 characters.");
+        }
+        if (customInstructions != null && customInstructions.length() > 1000) {
+            throw new BadRequestException("Custom instructions must be less than 1000 characters.");
+        }
+        if (slideNumber != null && slideNumber < 1) {
+            throw new BadRequestException("Slide number must be at least 1.");
+        }
+    }
 }

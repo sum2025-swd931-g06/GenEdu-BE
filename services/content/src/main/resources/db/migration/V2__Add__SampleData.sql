@@ -76,19 +76,19 @@ INSERT INTO chapters (material_id, title, order_number, description, is_deleted)
 
 -- LESSONS (id tự tăng, mapping chapter_id theo thứ tự insert)
 INSERT INTO lessons (chapter_id, title, order_number, description, status, is_deleted) VALUES
-                                                                                           (1, 'Cách mạng công nghiệp', 1, 'Bài 1: Cách mạng công nghiệp', 'UN_SYNC', false),
-                                                                                           (1, 'Cách mạng tư sản Pháp', 2, 'Bài 2: Cách mạng tư sản Pháp', 'UN_SYNC', false),
-                                                                                           (2, 'Phong trào Cần Vương', 1, 'Bài 1: Phong trào Cần Vương', 'UN_SYNC', false),
-                                                                                           (2, 'Khởi nghĩa Yên Thế', 2, 'Bài 2: Khởi nghĩa Yên Thế', 'UN_SYNC', false),
-                                                                                           (3, 'Diễn biến Cách mạng tháng Tám', 1, 'Bài 1: Diễn biến Cách mạng tháng Tám', 'UN_SYNC', false),
-                                                                                           (4, 'Chiến tranh thế giới thứ nhất', 1, 'Bài 1: Chiến tranh thế giới thứ nhất', 'UN_SYNC', false),
-                                                                                           (5, 'Đổi mới và hội nhập', 1, 'Bài 1: Đổi mới và hội nhập', 'UN_SYNC', false),
-                                                                                           (6, 'Khái niệm hàm số bậc nhất', 1, 'Bài 1: Khái niệm hàm số bậc nhất', 'UN_SYNC', false),
-                                                                                           (6, 'Đồ thị hàm số bậc nhất', 2, 'Bài 2: Đồ thị hàm số bậc nhất', 'UN_SYNC', false),
-                                                                                           (7, 'Khái niệm hàm số bậc hai', 1, 'Bài 1: Khái niệm hàm số bậc hai', 'UN_SYNC', false),
-                                                                                           (8, 'Truyền thuyết và cổ tích', 1, 'Bài 1: Truyền thuyết và cổ tích', 'UN_SYNC', false),
-                                                                                           (8, 'Truyện ngụ ngôn', 2, 'Bài 2: Truyện ngụ ngôn', 'UN_SYNC', false),
-                                                                                           (9, 'Thơ mới', 1, 'Bài 1: Thơ mới', 'UN_SYNC', false);
+                                                                                           (1, 'Cách mạng công nghiệp', 1, 'Bài 1: Cách mạng công nghiệp', 'PUBLISHED', false),
+                                                                                           (1, 'Cách mạng tư sản Pháp', 2, 'Bài 2: Cách mạng tư sản Pháp', 'PUBLISHED', false),
+                                                                                           (2, 'Phong trào Cần Vương', 1, 'Bài 1: Phong trào Cần Vương', 'PUBLISHED', false),
+                                                                                           (2, 'Khởi nghĩa Yên Thế', 2, 'Bài 2: Khởi nghĩa Yên Thế', 'PUBLISHED', false),
+                                                                                           (3, 'Diễn biến Cách mạng tháng Tám', 1, 'Bài 1: Diễn biến Cách mạng tháng Tám', 'PUBLISHED', false),
+                                                                                           (4, 'Chiến tranh thế giới thứ nhất', 1, 'Bài 1: Chiến tranh thế giới thứ nhất', 'PUBLISHED', false),
+                                                                                           (5, 'Đổi mới và hội nhập', 1, 'Bài 1: Đổi mới và hội nhập', 'PUBLISHED', false),
+                                                                                           (6, 'Khái niệm hàm số bậc nhất', 1, 'Bài 1: Khái niệm hàm số bậc nhất', 'PUBLISHED', false),
+                                                                                           (6, 'Đồ thị hàm số bậc nhất', 2, 'Bài 2: Đồ thị hàm số bậc nhất', 'PUBLISHED', false),
+                                                                                           (7, 'Khái niệm hàm số bậc hai', 1, 'Bài 1: Khái niệm hàm số bậc hai', 'PUBLISHED', false),
+                                                                                           (8, 'Truyền thuyết và cổ tích', 1, 'Bài 1: Truyền thuyết và cổ tích', 'PUBLISHED', false),
+                                                                                           (8, 'Truyện ngụ ngôn', 2, 'Bài 2: Truyện ngụ ngôn', 'PUBLISHED', false),
+                                                                                           (9, 'Thơ mới', 1, 'Bài 1: Thơ mới', 'PUBLISHED', false);
 
 -- LESSON CONTENTS (id tự tăng, mapping lesson_id theo thứ tự insert)
 INSERT INTO lesson_contents (lesson_id, title, order_number, content, is_deleted) VALUES

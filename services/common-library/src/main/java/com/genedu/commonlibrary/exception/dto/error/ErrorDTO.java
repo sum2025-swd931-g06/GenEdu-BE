@@ -1,4 +1,4 @@
-package com.genedu.commonlibrary.exception.DTO.error;
+package com.genedu.commonlibrary.exception.dto.error;
 
 import java.util.ArrayList;
 import java.util.List;
