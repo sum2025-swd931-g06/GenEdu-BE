@@ -29,6 +29,7 @@ public class SecurityConfig {
             "/aggregate/**",
             "/actuator/**",
             "/webjars/**",
+            "*"
     };
 
     @Bean

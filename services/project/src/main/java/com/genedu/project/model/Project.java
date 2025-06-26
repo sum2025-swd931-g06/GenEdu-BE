@@ -3,10 +3,7 @@ package com.genedu.project.model;
 import com.genedu.commonlibrary.model.AbstractTimeAuditEntity;
 import com.genedu.project.model.enumeration.ProjectStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +13,10 @@ import java.util.UUID;
 @Table(name = "projects")
 @Getter
 @Setter
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Project extends AbstractTimeAuditEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(
