@@ -31,7 +31,7 @@ public class ProjectFileController {
         return ResponseEntity.ok(uploadedFile);
     }
 
-    @GetMapping("projects/lesson-plans/{fileId}/url")
+    @GetMapping("/projects/lesson-plans/{fileId}/url")
     public ResponseEntity<String> getLessonPlanFileUrlByLessonPlanId(
             @PathVariable Long fileId
     ) {

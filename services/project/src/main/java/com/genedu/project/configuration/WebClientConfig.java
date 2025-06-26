@@ -8,11 +8,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class WebClientConfig {
-    @Bean
+    private static final String lectureMediaServiceUrl = "http://media-service/api/v1";
+
+    @Bean(name = "lectureMediaWebClient")
     @LoadBalanced
-    public WebClient webClient() {
+    public WebClient.Builder webClientBuilder() {
         return WebClient.builder()
-                .baseUrl("/api/v1")
-                .build();
+                .baseUrl(lectureMediaServiceUrl);
     }
 }

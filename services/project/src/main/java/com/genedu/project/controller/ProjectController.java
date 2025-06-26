@@ -54,7 +54,7 @@ public class ProjectController {
     }
 
     @PutMapping(
-            value = "/{projectId}lesson-plan",
+            value = "/{projectId}/lesson-plan",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<ProjectResponseDTO> uploadLectureFile(
