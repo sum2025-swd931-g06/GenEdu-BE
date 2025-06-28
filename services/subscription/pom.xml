@@ -8,12 +8,11 @@
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-
-    <artifactId>media</artifactId>
+    <groupId>com.genedu</groupId>
+    <artifactId>subscription</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>media</name>
-    <description>media</description>
-
+    <name>subscription</name>
+    <description>subscription</description>
     <url/>
     <licenses>
         <license/>
@@ -28,7 +27,7 @@
         <url/>
     </scm>
     <properties>
-        <org.apache.poi.version>5.4.1</org.apache.poi.version>
+        <java.version>17</java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -70,46 +69,14 @@
             <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-policy-enforcer</artifactId>
-            <version>25.0.3</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>s3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>${org.apache.poi.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.genedu</groupId>
             <artifactId>common-library</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>software.amazon.awssdk</groupId>
-                <artifactId>bom</artifactId>
-                <version>2.26.28</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.awspring.cloud</groupId>
-                <artifactId>spring-cloud-aws-dependencies</artifactId>
-                <version>3.4.0</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -1,7 +1,8 @@
 package com.genedu.project.controller;
 
+import com.genedu.commonlibrary.webclient.dto.LessonPlanFileUploadDTO;
 import com.genedu.project.dto.ProjectResponseDTO;
-import com.genedu.project.dto.client.LectureFileUploadDTO;
+
 import com.genedu.project.dto.ProjectRequestDTO;
 import com.genedu.project.model.Project;
 import com.genedu.project.service.ProjectService;
@@ -58,10 +59,10 @@ public class ProjectController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<ProjectResponseDTO> uploadLectureFile(
-            @ModelAttribute LectureFileUploadDTO lectureFileUploadDTO,
+            @ModelAttribute LessonPlanFileUploadDTO lectureFileUploadDTO,
             @PathVariable UUID projectId
     ) {
-        ProjectResponseDTO updatedProject = projectService.updateLessonPlanFile(lectureFileUploadDTO);
+        ProjectResponseDTO updatedProject = projectService.updateLessonPlanFile(lectureFileUploadDTO, projectId);
         return new ResponseEntity<>(updatedProject, HttpStatus.OK);
     }
 

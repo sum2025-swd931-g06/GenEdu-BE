@@ -24,6 +24,7 @@
         <module>services/content</module>
         <module>services/media</module>
         <module>services/project</module>
+        <module>services/subscription</module>
     </modules>
 
     <properties>

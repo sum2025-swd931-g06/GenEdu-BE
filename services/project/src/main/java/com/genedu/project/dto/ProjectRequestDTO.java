@@ -1,9 +1,6 @@
 package com.genedu.project.dto;
 
 import com.genedu.commonlibrary.exception.BadRequestException;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 public record ProjectRequestDTO(
      Long lessonId,

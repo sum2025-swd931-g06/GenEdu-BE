@@ -84,6 +84,7 @@ public class ApiExceptionHandler {
         return buildErrorResponse(status, INVALID_REQUEST_INFORMATION_MESSAGE, errors, ex, request, 0);
     }
 
+
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorDTO> handleNotFoundException(NotFoundException ex, WebRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;

@@ -3,6 +3,8 @@ package com.genedu.project.service;
 import com.genedu.commonlibrary.exception.BadRequestException;
 import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.commonlibrary.utils.AuthenticationUtils;
+import com.genedu.commonlibrary.webclient.dto.LessonPlanFileDownloadDTO;
+import com.genedu.commonlibrary.webclient.dto.LessonPlanFileUploadDTO;
 import com.genedu.project.dto.ProjectRequestDTO;
 import com.genedu.project.dto.ProjectResponseDTO;
 import com.genedu.project.mapper.ProjectMapper;
@@ -10,16 +12,11 @@ import com.genedu.project.model.Project;
 import com.genedu.project.model.enumeration.ProjectStatus;
 import com.genedu.project.repository.ProjectRepository;
 import com.genedu.project.utils.Constants;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.genedu.project.dto.client.LectureFileUploadDTO;
-import com.genedu.project.dto.client.LectureFileDownloadDTO;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -114,16 +111,16 @@ public ProjectResponseDTO updateProject(UUID id, ProjectRequestDTO projectDetail
     }
 
     @Transactional
-    public ProjectResponseDTO updateLessonPlanFile(LectureFileUploadDTO lectureFileUploadDTO) {
-        Project project = getProjectEntityById(lectureFileUploadDTO.getProjectId());
+    public ProjectResponseDTO updateLessonPlanFile(LessonPlanFileUploadDTO lessonPlanFileUploadDTO, UUID projectId) {
+        Project project = getProjectEntityById(projectId);
 
-        MultipartFile mediaFile = lectureFileUploadDTO.getMediaFile();
+        MultipartFile mediaFile = lessonPlanFileUploadDTO.getMediaFile();
 
         if (mediaFile == null || mediaFile.isEmpty()) {
             throw new BadRequestException("Media file cannot be null or empty");
         }
 
-        LectureFileDownloadDTO savedLectureFile = lectureMediaWebClientService.uploadLectureFile(lectureFileUploadDTO);
+        LessonPlanFileDownloadDTO savedLectureFile = lectureMediaWebClientService.uploadLectureFile(lessonPlanFileUploadDTO);
         project.setLessonPlanFileId(savedLectureFile.getId());
 
         Project updatedProject = projectRepository.save(project);

@@ -1,5 +1,4 @@
 package com.genedu.lecturecontent.dto;
-
 import lombok.Data;
 
 public record LectureContentRequestDTO(

@@ -1,5 +1,6 @@
 package com.genedu.lecturecontent.controller;
 
+import com.genedu.lecturecontent.webclient.ProjectWebClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
@@ -14,24 +15,31 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
-import javax.print.Doc;
-import java.net.Authenticator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/slide-contents")
 @RequiredArgsConstructor
 public class SlideContentController {
-    ChatClient chatClient;
     private final OllamaChatModel chatModel;
     private final VectorStore vectorStore;
     private final Logger log = Logger.getLogger(SlideContentController.class.getName());
 
     @Value("classpath:prompts/sys-slide-content-template.st")
     private Resource systemPromptTemplate;
+
+//    @PostMapping(
+//        value = "/projects/{projectId}/stream",
+//        produces = "application/json;charset=UTF-8",
+//        consumes = "application/json;charset=UTF-8"
+//    )public Flux<String> streamSlideContentByProjectId(
+//            @PathVariable UUID projectId
+//    ) {
+//
+//    }
 
     @PostMapping(
         value = "/stream",

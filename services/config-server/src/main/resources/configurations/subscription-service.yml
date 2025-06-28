@@ -1,9 +1,9 @@
 server:
-  port: ${CONTENT_SERVICE_PORT:8091}
+  port: ${SUBSCRIPTION_SERVICE_PORT:8094}
 spring:
   # Database configuration
   datasource:
-    url: ${POSTGRES_CONTENT_DB_URL}
+    url: ${POSTGRES_SUBSCRIPTION_DB_URL}
     username: ${POSTGRES_USER:admin}
     password: ${POSTGRES_PASSWORD:admin}
   # JPA and Hibernate configuration
@@ -22,7 +22,7 @@ spring:
       baseline-on-migrate: true
       user: ${POSTGRES_USER:admin}
       password: ${POSTGRES_PASSWORD:admin}
-      baseline-description: "Baseline init for user service"
+      baseline-description: "Baseline init for subscription service"
       baseline-version: 0
   # Security configuration
   security:

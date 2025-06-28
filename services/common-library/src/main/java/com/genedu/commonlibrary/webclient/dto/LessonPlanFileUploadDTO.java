@@ -1,4 +1,4 @@
-package com.genedu.media.dto;
+package com.genedu.commonlibrary.webclient.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
