@@ -1,4 +1,4 @@
-package com.genedu.notification;
+package com.genedu.notification.domain.notifications;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,7 @@
-package com.genedu.notification;
+package com.genedu.notification.domain.notifications;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.genedu.commonlibrary.model.AbstractTimeAuditEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -62,7 +63,8 @@ public class NotificationEntity extends AbstractTimeAuditEntity {
     private LocalDateTime time;
 
     @Column(name = "isRead", columnDefinition = "boolean default false")
-    private boolean isRead;
+    @JsonProperty(value = "isRead")
+    private boolean read;
 
     @Enumerated(EnumType.STRING)
     private NotificationIcon iconName;

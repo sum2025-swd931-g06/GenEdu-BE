@@ -1,9 +1,10 @@
-package com.genedu.notification;
+package com.genedu.notification.domain.notifications;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.genedu.notification.NotificationEntity.NotificationColor;
-import com.genedu.notification.NotificationEntity.NotificationIcon;
-import com.genedu.notification.NotificationEntity.NotificationType;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.genedu.notification.domain.notifications.NotificationEntity.NotificationColor;
+import com.genedu.notification.domain.notifications.NotificationEntity.NotificationIcon;
+import com.genedu.notification.domain.notifications.NotificationEntity.NotificationType;
 import java.time.LocalDateTime;
 
 public interface NotificationPort {
@@ -15,7 +16,7 @@ public interface NotificationPort {
         String title,
         String description,
         LocalDateTime time,
-        boolean isRead,
+        @JsonProperty("isRead") Boolean read,
         NotificationIcon iconName,
         NotificationColor iconColorHex,
         String userId

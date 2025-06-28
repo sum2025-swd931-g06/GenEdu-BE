@@ -1,8 +1,8 @@
-package com.genedu.notification;
+package com.genedu.notification.domain.notifications;
 
-import com.genedu.notification.NotificationEntity.NotificationColor;
-import com.genedu.notification.NotificationEntity.NotificationIcon;
-import com.genedu.notification.NotificationEntity.NotificationType;
+import com.genedu.notification.domain.notifications.NotificationEntity.NotificationColor;
+import com.genedu.notification.domain.notifications.NotificationEntity.NotificationIcon;
+import com.genedu.notification.domain.notifications.NotificationEntity.NotificationType;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +33,8 @@ public class NotificationApplication implements CommandLineRunner {
                 .title("Welcome to the App!")
                 .description("Thank you for joining GenEdu.")
                 .time(LocalDateTime.now())
+                .read(true)
                 .userId("3f77c248-042e-4824-9d8f-c8b9ee17db17")
-                .isRead(false)
                 .iconName(NotificationIcon.MESSAGE)
                 .iconColorHex(NotificationColor.BLUE)
                 .build();
@@ -44,7 +44,7 @@ public class NotificationApplication implements CommandLineRunner {
                 .title("Account Inactivity")
                 .description("You haven’t logged in for 7 days.")
                 .time(LocalDateTime.now().minusDays(1))
-                .isRead(false)
+                .read(false)
                 .userId("3f77c248-042e-4824-9d8f-c8b9ee17db17")
                 .iconName(NotificationIcon.ALERT)
                 .iconColorHex(NotificationColor.YELLOW)

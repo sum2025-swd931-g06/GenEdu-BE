@@ -1,4 +1,4 @@
-package com.genedu.notification;
+package com.genedu.notification.init;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;

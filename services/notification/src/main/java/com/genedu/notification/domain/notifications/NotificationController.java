@@ -1,10 +1,16 @@
-package com.genedu.notification;
+package com.genedu.notification.domain.notifications;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,11 +33,27 @@ public class NotificationController {
         return service.getAllNotifications();
     }
 
+    @GetMapping("/page")
+    public Page<NotificationEntity> getAllPageable(
+        @ParameterObject
+        @Parameter(
+            description = "Pagination information",
+            schema = @Schema(
+                defaultValue = "{\"page\":0,\"size\":2,\"sort\":[\"id,desc\"]}"
+            )
+        )
+        @PageableDefault(size = 20) Pageable pageable
+    ) {
+        return service.getAllNotifications(pageable);
+    }
+
     @GetMapping("/{userId}")
     @Operation(summary = "Get notifications by user ID",
-            description = "Fetches all notifications for a specific user based on their user ID.")
-    public ResponseEntity<?> getByUserId(@PathVariable String userId) {
-        List<NotificationPort.NotificationRes> notifications = service.getNotificationByUserId(userId);
+        description = "Fetches all notifications for a specific user based on their user ID.")
+    public ResponseEntity<?> getByUserId(
+        @PathVariable @Schema(defaultValue = "3f77c248-042e-4824-9d8f-c8b9ee17db17") String userId) {
+        List<NotificationPort.NotificationRes> notifications = service.getNotificationByUserId(
+            userId);
         return ResponseEntity.ok(notifications);
     }
 

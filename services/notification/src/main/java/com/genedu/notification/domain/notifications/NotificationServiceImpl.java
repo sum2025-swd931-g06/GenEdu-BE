@@ -1,12 +1,14 @@
-package com.genedu.notification;
+package com.genedu.notification.domain.notifications;
 
-import com.genedu.notification.NotificationPort.NotificationRes;
+import com.genedu.notification.domain.notifications.NotificationPort.NotificationRes;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +20,11 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public List<NotificationEntity> getAllNotifications() {
         return repository.findAll();
+    }
+
+    @Override
+    public Page<NotificationEntity> getAllNotifications(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Override
@@ -68,17 +75,17 @@ public class NotificationServiceImpl implements NotificationService {
 
         var existingUserId = "3f77c248-042e-4824-9d8f-c8b9ee17db17";
 
-        var newNotification = NotificationEntity.builder()
-            .title(notification.getTitle())
-            .type(notification.getType())
-            .description(notification.getDescription())
-            .time(LocalDateTime.now())
-            .userId(existingUserId)
-            .iconName(notification.getIconName())
-            .iconColorHex(notification.getIconColorHex())
-            .build();
-
-        repository.save(newNotification);
+//        var newNotification = NotificationEntity.builder()
+//            .title(notification.getTitle())
+//            .type(notification.getType())
+//            .description(notification.getDescription())
+//            .time(LocalDateTime.now())
+//            .userId(existingUserId)
+//            .iconName(notification.getIconName())
+//            .iconColorHex(notification.getIconColorHex())
+//            .build();
+//
+//        repository.save(newNotification);
 
         String response = FirebaseMessaging.getInstance().send(message);
         System.out.println("Sent! Response: " + response);
