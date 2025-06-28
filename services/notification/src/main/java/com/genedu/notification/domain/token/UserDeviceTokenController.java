@@ -1,6 +1,7 @@
 package com.genedu.notification.domain.token;
 
 import com.genedu.notification.domain.token.FcmTokenPort.*;
+import com.genedu.notification.utils.NotificationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/user-device-tokens")
@@ -33,8 +36,23 @@ public class UserDeviceTokenController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDeviceTokenDto> create(@RequestBody CreateUserDeviceTokenReq req) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(req));
+    public ResponseEntity<UserDeviceTokenDto> createOrUpdate(@RequestBody CreateUserDeviceTokenReq req) {
+        // If no userId provided in request, use authenticated user
+        String userId = req.userId() != null ? req.userId() : NotificationUtils.getCurrentUserId();
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        CreateUserDeviceTokenReq updatedReq = new CreateUserDeviceTokenReq(
+                userId,
+                req.deviceId(),
+                req.fcmToken(),
+                req.deviceName(),
+                req.platform()
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createOrUpdate(updatedReq));
     }
 
     @PatchMapping("/{id}")
@@ -42,4 +60,17 @@ public class UserDeviceTokenController {
         return service.update(id, req);
     }
 
+    @GetMapping("/user/{userId}/tokens")
+    public List<String> getFcmTokensByUserId(@PathVariable String userId) {
+        return service.getFcmTokensByUserId(userId);
+    }
+
+    @GetMapping("/my-tokens")
+    public ResponseEntity<List<String>> getMyFcmTokens() {
+        String userId = NotificationUtils.getCurrentUserId();
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(service.getFcmTokensByUserId(userId));
+    }
 }

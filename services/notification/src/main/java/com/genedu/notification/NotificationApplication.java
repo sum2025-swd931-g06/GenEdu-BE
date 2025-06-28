@@ -1,19 +1,24 @@
-package com.genedu.notification.domain.notifications;
+package com.genedu.notification;
 
+import com.genedu.notification.domain.notifications.NotificationEntity;
 import com.genedu.notification.domain.notifications.NotificationEntity.NotificationColor;
 import com.genedu.notification.domain.notifications.NotificationEntity.NotificationIcon;
 import com.genedu.notification.domain.notifications.NotificationEntity.NotificationType;
+import com.genedu.notification.repositories.NotificationRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @RequiredArgsConstructor
 @ComponentScan(basePackages = {"com.genedu.notification", "com.genedu.commonlibrary"})
+@EnableJpaRepositories(basePackages = "com.genedu.notification.repositories")
 public class NotificationApplication implements CommandLineRunner {
 
     private final NotificationRepository notificationRepository;

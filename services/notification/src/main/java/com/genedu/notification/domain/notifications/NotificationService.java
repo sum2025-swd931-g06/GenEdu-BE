@@ -12,5 +12,10 @@ public interface NotificationService{
      void addNotification(NotificationEntity notificationEntity);
      void markAsRead(Long id);
      void sendNotification(String token) throws Exception;
-
+     void sendNotificationToUser(String userId, String title, String body, 
+                               NotificationEntity.NotificationType type) throws Exception;
+     NotificationEntity saveNotificationForUser(String userId, String title, String description,
+                                               NotificationEntity.NotificationType type,
+                                               NotificationEntity.NotificationIcon icon,
+                                               NotificationEntity.NotificationColor color);
 }

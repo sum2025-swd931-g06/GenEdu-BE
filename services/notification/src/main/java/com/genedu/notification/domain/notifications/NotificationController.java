@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -79,5 +80,18 @@ public class NotificationController {
         String token = "fHbU6NCiTkWw-JqPNWI5Y7:APA91bH4zrWYQrm0xXzputlOCx-2OI8DoA8EntQ9haXGu8aIpBKDpfyoMPRRR7hmjuzU8lFHhDoz_P68KwqgChvD3Hwwyn3A2lde18MnUBgn28SBqTVrGVU"; // 👈 Replace this with your real device token
         service.sendNotification(token);
         return ResponseEntity.ok("Sent!");
+    }
+
+    @PostMapping("/send-to-user")
+    @Operation(summary = "Send notification to all user devices", 
+               description = "Send push notification to all registered devices of a user and save to database")
+    public ResponseEntity<?> sendToUser(
+        @RequestParam @Schema(defaultValue = "3f77c248-042e-4824-9d8f-c8b9ee17db17") String userId,
+        @RequestParam @Schema(defaultValue = "Test Notification") String title,
+        @RequestParam @Schema(defaultValue = "This is a test notification sent to all your devices") String body,
+        @RequestParam(defaultValue = "INFO") NotificationEntity.NotificationType type
+    ) throws Exception {
+        service.sendNotificationToUser(userId, title, body, type);
+        return ResponseEntity.ok("Notification sent to all devices for user: " + userId);
     }
 }
