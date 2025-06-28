@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Streaming Slides (AI Word-by-Word)</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .slide { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-left: 5px solid #007acc; background: #f9f9f9; }
+        .slide h2 { margin: 0; }
+        .slide-content { white-space: pre-wrap; margin-top: 5px; }
+    </style>
+</head>
+<body>
+<h1>Live Slide Streaming</h1>
+<div id="output"></div>
+
+<script>
+    const token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPTE15ZmFUYnZxU0J4NGpmRkdXbHRrRjlDT2FaYXh6R0NHbnZzVmptQTBNIn0.eyJleHAiOjE3NTA5NTk0NzYsImlhdCI6MTc1MDk1OTE3NiwianRpIjoiNTcyNzBiOTctMDkzOC00NDU4LWFjNjAtNDljNWVmY2FkMGI2IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo5MDk5L3JlYWxtcy9HZW5FZHUiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNWNkN2MwN2MtY2ZjOS00Y2RmLWE3ZWUtNjhiOTRiMjcyMjQyIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiZ2VuZWR1LWJlIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyJodHRwOi8vbG9jYWxob3N0OjgwOTAiLCJodHRwOi8vbG9jYWxob3N0OjgyMjIiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImdlbmVkdS11c2VyIiwiZGVmYXVsdC1yb2xlcy1nZW5lZHUiLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiZ2VuZWR1LWJlIjp7InJvbGVzIjpbInVtYV9wcm90ZWN0aW9uIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudEhvc3QiOiIxNzIuMTguMC4xIiwicm9sZXMiOlsiZ2VuZWR1LXVzZXIiLCJkZWZhdWx0LXJvbGVzLWdlbmVkdSIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXSwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LWdlbmVkdS1iZSIsImNsaWVudEFkZHJlc3MiOiIxNzIuMTguMC4xIiwiY2xpZW50X2lkIjoiZ2VuZWR1LWJlIn0.j5wHYfB0wM-iyFNZdZcPEgv2DRZ89GpHXWG6KdkXz7iI0Y-2055Sg_dowBEx4jwJItRdws9VsoiM4aTjrGArs2mFETfqWxP_rALtwT2A37_wg3s0DIZwtPQqT36gqiwI75p0SMZx6jaQVihdJUwx3y7QnocBzG5Z-tO8vTr-1Hyjt92RLyppJo8rLZCfLCa5J4L9JJab-hjFiS6u6DPuwil_2OGQXC5L03yL2lQkF2dVqWjQq36P4Vcvvuj0wGG_-lXVi7KiAG-eao7fie6ibtrwPQnxyN7RKt-uTPS2EEoDLTfhWkt-fTAnejNoIsQLyXow20sMJSFISuQjuqkkNQ";
+    const output = document.getElementById("output");
+
+    const slideMap = {}; // slideId -> { type, words: [] }
+
+    function appendWordToSlide(slideId, slideType, word) {
+        if (!slideMap[slideId]) {
+            slideMap[slideId] = { type: slideType, words: [] };
+        }
+        if (word && word.trim() !== "") {
+            slideMap[slideId].words.push(word);
+            renderSlides();
+        }
+    }
+
+    function renderSlides() {
+        output.innerHTML = '';
+        const sortedIds = Object.keys(slideMap).sort((a, b) => parseInt(a) - parseInt(b));
+        for (const id of sortedIds) {
+            const slide = slideMap[id];
+            const div = document.createElement("div");
+            div.className = "slide";
+            div.innerHTML = `
+          <h2>Slide ${id} (${slide.type})</h2>
+          <div class="slide-content">${slide.words.join(" ")}</div>
+        `;
+            output.appendChild(div);
+        }
+    }
+
+    async function streamSlides() {
+        const response = await fetch("http://localhost:8222/api/v1/projects/stream/slide-content", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "text/event-stream"
+            }
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+
+            const chunks = buffer.split('\n\n');
+            buffer = chunks.pop(); // Keep unfinished
+
+            for (const chunk of chunks) {
+                const lines = chunk.split('\n');
+                let id = null;
+                let eventType = null;
+                let data = '';
+
+                for (const line of lines) {
+                    if (line.startsWith('id:')) {
+                        id = line.slice(3).trim();
+                    } else if (line.startsWith('event:')) {
+                        eventType = line.slice(6).trim();
+                    } else if (line.startsWith('data:')) {
+                        data += line.slice(5).trim();
+                    }
+                }
+
+                if (eventType === 'slide-content' && data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        appendWordToSlide(parsed.slideId, parsed.slideType, parsed.content);
+                    } catch (err) {
+                        console.error("Invalid JSON:", data, err);
+                    }
+                }
+            }
+        }
+    }
+
+    streamSlides();
+</script>
+</body>
+</html>

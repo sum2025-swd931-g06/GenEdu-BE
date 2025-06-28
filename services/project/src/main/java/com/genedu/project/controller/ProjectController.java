@@ -1,7 +1,8 @@
 package com.genedu.project.controller;
 
+import com.genedu.commonlibrary.webclient.dto.LessonPlanFileUploadDTO;
 import com.genedu.project.dto.ProjectResponseDTO;
-import com.genedu.project.dto.client.LectureFileUploadDTO;
+
 import com.genedu.project.dto.ProjectRequestDTO;
 import com.genedu.project.model.Project;
 import com.genedu.project.service.ProjectService;
@@ -19,12 +20,11 @@ import java.util.UUID;
 @RequestMapping("/api/v1/projects")
 @RequiredArgsConstructor
 public class ProjectController {
-
     private final ProjectService projectService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Project> getProjectById(@PathVariable UUID id) {
-        Project project = projectService.getProjectById(id);
+    public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable UUID id) {
+        ProjectResponseDTO project = projectService.getProjectById(id);
         return new ResponseEntity<>(project, HttpStatus.OK);
     }
     
@@ -55,13 +55,14 @@ public class ProjectController {
     }
 
     @PutMapping(
-            value = "/lesson-plan",
+            value = "/{projectId}/lesson-plan",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<ProjectResponseDTO> uploadLectureFile(
-            @ModelAttribute LectureFileUploadDTO projectDTO
+            @ModelAttribute LessonPlanFileUploadDTO lectureFileUploadDTO,
+            @PathVariable UUID projectId
     ) {
-        ProjectResponseDTO updatedProject = projectService.updateLessonPlanFile(projectDTO);
+        ProjectResponseDTO updatedProject = projectService.updateLessonPlanFile(lectureFileUploadDTO, projectId);
         return new ResponseEntity<>(updatedProject, HttpStatus.OK);
     }
 

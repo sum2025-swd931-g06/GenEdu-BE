@@ -14,13 +14,7 @@ spring:
         locator:
           enabled: true
       globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: '*'
-            allowedMethods: '*'
-            allowedHeaders: '*'
-            allowCredentials: false
-  # Route configuration
+        add-to-simple-url-handler-mapping: true
       routes:
         # User Service Routes
         - id: user-service
@@ -82,6 +76,30 @@ spring:
             - Path=/aggregate/lecture-content-service/**
           filters:
             - RewritePath=/aggregate/lecture-content-service(?<segment>/?.*), $\{segment}
+        # Subscription Service Routes
+        - id: subscription-service
+          uri: lb://SUBSCRIPTION-SERVICE
+          predicates:
+            - Path=/api/v1/subscriptions/**
+        # Subscription Service Swagger Route
+        - id: subscription-service-swagger
+          uri: lb://SUBSCRIPTION-SERVICE
+          predicates:
+            - Path=/aggregate/subscription-service/**
+          filters:
+            - RewritePath=/aggregate/subscription-service(?<segment>/?.*), $\{segment}
+        # Notification Service Routes
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/v1/notification/**
+        # Notification Service Swagger Route
+        - id: subscription-service-swagger
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/aggregate/notification-service/**
+          filters:
+            - RewritePath=/aggregate/notification-service(?<segment>/?.*), $\{segment}
 
 # Spring Doc configuration
 springdoc:
@@ -102,6 +120,10 @@ springdoc:
         url: /aggregate/media-service/v3/api-docs
       - name: Lecture Content Service
         url: /aggregate/lecture-content-service/v3/api-docs
+      - name: Subscription service
+        url: /aggregate/subscription-service/v3/api-docs
+      - name: Notification service
+        url: /aggregate/notification-service/v3/api-docs
     oauth:
       client-id: ${KC_GENEDU_GENEDU_BE_CLIENT_ID:genedu-be}
       client-secret: ${KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY:0pQYYepE82DkALnEVhAfZREPeHmtHz3z}

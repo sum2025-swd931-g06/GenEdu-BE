@@ -1,6 +1,7 @@
 package com.genedu.content.repository;
 
 import com.genedu.content.model.Lesson;
+import com.genedu.content.model.LessonContent;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

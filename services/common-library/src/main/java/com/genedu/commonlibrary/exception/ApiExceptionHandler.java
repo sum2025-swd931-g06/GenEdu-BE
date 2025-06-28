@@ -1,6 +1,6 @@
 package com.genedu.commonlibrary.exception;
 
-import com.genedu.commonlibrary.exception.DTO.error.ErrorDTO;
+import com.genedu.commonlibrary.exception.dto.error.ErrorDTO;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -83,6 +83,7 @@ public class ApiExceptionHandler {
 
         return buildErrorResponse(status, INVALID_REQUEST_INFORMATION_MESSAGE, errors, ex, request, 0);
     }
+
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorDTO> handleNotFoundException(NotFoundException ex, WebRequest request) {

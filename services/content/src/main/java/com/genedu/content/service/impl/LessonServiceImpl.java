@@ -1,10 +1,12 @@
 package com.genedu.content.service.impl;
 
+import com.genedu.commonlibrary.enumeration.LessonStatus;
 import com.genedu.commonlibrary.exception.BadRequestException;
 import com.genedu.commonlibrary.exception.DuplicatedException;
 import com.genedu.commonlibrary.exception.InternalServerErrorException;
 import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
+import com.genedu.content.dto.client.LectureContentRequestDTO;
 import com.genedu.content.dto.flatResponse.FlatChapterLessonDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
 import com.genedu.content.dto.lesson.LessonResponseDTO;
@@ -12,9 +14,12 @@ import com.genedu.content.mapper.ChapterMapper;
 import com.genedu.content.mapper.LessonMapper;
 import com.genedu.content.model.Chapter;
 import com.genedu.content.model.Lesson;
+import com.genedu.content.model.LessonContent;
 import com.genedu.content.repository.LessonRepository;
 import com.genedu.content.service.ChapterService;
+import com.genedu.content.service.LessonContentService;
 import com.genedu.content.service.LessonService;
+import com.genedu.content.service.webclient.LectureContentClient;
 import com.genedu.content.utils.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

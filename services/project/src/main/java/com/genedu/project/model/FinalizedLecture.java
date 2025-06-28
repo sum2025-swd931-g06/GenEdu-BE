@@ -13,7 +13,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class FinalizedLecture extends AbstractTimeAuditEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(

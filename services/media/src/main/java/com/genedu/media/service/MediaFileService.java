@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MediaFileService<Request, Response> {
+    void checkValidFormat(Request mediaFile);
     Response saveMediaFile(Request mediaFile) throws IOException;
     String getMediaFileUrlById(Long id);
     void deleteMediaFile(Long id);
@@ -14,4 +15,5 @@ public interface MediaFileService<Request, Response> {
     List<Response> getAllMediaFilesByOwnerId(UUID ownerId);
     List<Response> getMediaFilesByType(FileType type);
     List<Response> getMediaFilesByOwnerIdAndType(UUID ownerId, FileType type);
+    Response readFileContent(Long id);
 }

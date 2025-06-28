@@ -28,6 +28,7 @@
         <url/>
     </scm>
     <properties>
+        <org.apache.poi.version>5.4.1</org.apache.poi.version>
     </properties>
     <dependencies>
         <dependency>
@@ -74,12 +75,15 @@
             <version>25.0.3</version>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${org.apache.poi.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.genedu</groupId>
             <artifactId>common-library</artifactId>
@@ -101,6 +105,10 @@
                 <version>3.4.0</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
             </dependency>
         </dependencies>
     </dependencyManagement>

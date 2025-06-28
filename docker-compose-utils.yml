@@ -1,0 +1,85 @@
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  pgdata_sql:
+  pgdata_vector:
+  pgadmin:
+
+services:
+  postgresql:
+    container_name: ms_pg_sql
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      PGDATA: /data/postgres
+    volumes:
+      - pgdata_sql:/data/postgres
+      - ./postgres_init.sql:/docker-entrypoint-initdb.d/postgres_init.sql
+    hostname: postgresql
+    ports:
+      - "5432:5432"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  pgvector:
+    container_name: ms_pg_vector
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+      PGDATA: /data/postgres-vector
+      DIMENSION: 768
+    labels:
+      - "org.springframework.boot.service-connection=postgres"
+    volumes:
+        - pgdata_vector:/data/postgres-vector
+        - ./postgres_vector_init.sql:/docker-entrypoint-initdb.d/postgres_vector_init.sql
+    ports:
+      - 5434:5432
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: ms_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    hostname: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - microservices-net
+
+  keycloak:
+    container_name: keycloak-ms
+    image: quay.io/keycloak/keycloak:24.0.3
+    command: 'start-dev --import-realm'
+    hostname: keycloak
+    ports:
+      - 9099:8080
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    networks:
+      - microservices-net
+    volumes:
+      - ./identity/realm-export.json:/opt/keycloak/data/import/realm-export.json
