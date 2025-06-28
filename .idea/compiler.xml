@@ -17,26 +17,20 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
+        <module name="notification" />
         <module name="project" />
         <module name="media" />
-        <module name="lecture-content" />
+        <module name="subscription" />
         <module name="common-library" />
         <module name="user" />
         <module name="content" />
       </profile>
-      <profile name="Annotation profile for notification" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
-        </processorPath>
-        <module name="notification" />
-        <module name="subscription" />
-      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="lecture-content" target="17" />
+      <module name="notification (1)" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -49,6 +43,7 @@
       <module name="lecture-content" options="-parameters" />
       <module name="media" options="-parameters" />
       <module name="notification" options="-parameters" />
+      <module name="notification (1)" options="-parameters" />
       <module name="project" options="-parameters" />
       <module name="subscription" options="-parameters" />
       <module name="user" options="-parameters" />

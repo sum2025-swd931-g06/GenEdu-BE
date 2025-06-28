@@ -1,11 +1,7 @@
 package com.genedu.content.controller;
 
-import com.genedu.content.dto.flatResponse.FlatMaterialChapterDTO;
-import com.genedu.content.dto.flatResponse.FlatSchoolClassSubjectDTO;
 import com.genedu.content.dto.flatResponse.FlatSubjectMaterialDTO;
 import com.genedu.content.dto.material.MaterialRequestDTO;
-import com.genedu.content.dto.schoolclass.SchoolClassResponseDTO;
-import com.genedu.content.dto.subject.SubjectRequestDTO;
 import com.genedu.content.dto.subject.SubjectResponseDTO;
 import com.genedu.content.service.MaterialService;
 import io.swagger.v3.oas.annotations.Operation;

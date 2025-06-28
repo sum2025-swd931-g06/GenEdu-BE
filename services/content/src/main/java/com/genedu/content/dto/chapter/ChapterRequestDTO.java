@@ -1,7 +1,5 @@
 package com.genedu.content.dto.chapter;
 
-import com.genedu.content.model.Chapter;
-
 public record ChapterRequestDTO(
         Integer orderNumber,
         String title,

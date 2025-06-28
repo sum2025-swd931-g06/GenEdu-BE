@@ -1,6 +1,5 @@
 package com.genedu.content.repository;
 
-import com.genedu.content.model.Chapter;
 import com.genedu.content.model.LessonContent;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;

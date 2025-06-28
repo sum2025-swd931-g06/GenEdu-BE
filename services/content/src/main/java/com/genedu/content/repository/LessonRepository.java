@@ -1,7 +1,6 @@
 package com.genedu.content.repository;
 
 import com.genedu.content.model.Lesson;
-import com.genedu.content.model.LessonContent;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -12,4 +11,8 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     boolean existsByChapter_IdAndOrderNumberAndIdNot(Long chapterId, Integer orderNumber, Long lessonId);
     Lesson findLessonByChapter_IdAndOrderNumberAndIdNot(Long chapterId, Integer orderNumber, Long lessonId);
     List<Lesson> findByChapterId(Long chapterId);
+
+//    @Query("SELECT new com.genedu.content.dto.flatResponse.LessonMapDTO(l.id, l.title, l.chapter.material.id) " +
+//            "FROM Lesson l WHERE l.deleted = false")
+//    List<LessonMapDTO> findActiveLessons();
 }
