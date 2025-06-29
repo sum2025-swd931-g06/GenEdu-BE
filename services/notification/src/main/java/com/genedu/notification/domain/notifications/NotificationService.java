@@ -8,13 +8,13 @@ public interface NotificationService{
 
      List<NotificationEntity> getAllNotifications();
      Page<NotificationEntity> getAllNotifications(Pageable pageable);
-     List<NotificationPort.NotificationRes> getNotificationByUserId(String userId);
+     List<NotificationPort.NotificationRes> getNotificationByEmail(String email);
      void addNotification(NotificationEntity notificationEntity);
      void markAsRead(Long id);
      void sendNotification(String token) throws Exception;
-     void sendNotificationToUser(String userId, String title, String body, 
+     void sendNotificationToUser(String email, String title, String body,
                                NotificationEntity.NotificationType type) throws Exception;
-     NotificationEntity saveNotificationForUser(String userId, String title, String description,
+     NotificationEntity saveNotificationForUser(String email, String title, String description,
                                                NotificationEntity.NotificationType type,
                                                NotificationEntity.NotificationIcon icon,
                                                NotificationEntity.NotificationColor color);

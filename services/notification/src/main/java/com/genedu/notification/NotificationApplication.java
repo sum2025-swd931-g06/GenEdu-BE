@@ -39,7 +39,7 @@ public class NotificationApplication implements CommandLineRunner {
                 .description("Thank you for joining GenEdu.")
                 .time(LocalDateTime.now())
                 .read(true)
-                .userId("3f77c248-042e-4824-9d8f-c8b9ee17db17")
+                .email("hoangclw@gmail.com")
                 .iconName(NotificationIcon.MESSAGE)
                 .iconColorHex(NotificationColor.BLUE)
                 .build();
@@ -50,7 +50,7 @@ public class NotificationApplication implements CommandLineRunner {
                 .description("You haven’t logged in for 7 days.")
                 .time(LocalDateTime.now().minusDays(1))
                 .read(false)
-                .userId("3f77c248-042e-4824-9d8f-c8b9ee17db17")
+                .email("hoangclw@gmail.com")
                 .iconName(NotificationIcon.ALERT)
                 .iconColorHex(NotificationColor.YELLOW)
                 .build();

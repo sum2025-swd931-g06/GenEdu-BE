@@ -32,7 +32,7 @@ public class FcmTokenServiceImpl implements FcmTokenService {
     @Override
     public UserDeviceTokenDto create(CreateUserDeviceTokenReq req) {
         var entity = UserDeviceTokenEntity.builder()
-            .userId(req.userId())
+            .email(req.email())
             .deviceId(req.deviceId())
             .fcmToken(req.fcmToken())
             .deviceName(req.deviceName())
@@ -56,7 +56,7 @@ public class FcmTokenServiceImpl implements FcmTokenService {
     public UserDeviceTokenDto createOrUpdate(CreateUserDeviceTokenReq req) {
         // Try to find existing token for this user and device
         Optional<UserDeviceTokenEntity> existingToken = 
-            repository.findByUserIdAndDeviceId(req.userId(), req.deviceId());
+            repository.findByEmailAndDeviceId(req.email(), req.deviceId());
         
         if (existingToken.isPresent()) {
             // Update existing token
@@ -72,8 +72,8 @@ public class FcmTokenServiceImpl implements FcmTokenService {
     }
 
     @Override
-    public List<String> getFcmTokensByUserId(String userId) {
-        return repository.findAllByUserId(userId)
+    public List<String> getFcmTokensByEmail(String email) {
+        return repository.findAllByEmail(email)
             .stream()
             .map(UserDeviceTokenEntity::getFcmToken)
             .collect(Collectors.toList());
@@ -82,7 +82,7 @@ public class FcmTokenServiceImpl implements FcmTokenService {
     private UserDeviceTokenDto toDto(UserDeviceTokenEntity entity) {
         return new UserDeviceTokenDto(
             entity.getId(),
-            entity.getUserId(),
+            entity.getEmail(),
             entity.getDeviceId(),
             entity.getFcmToken(),
             entity.getDeviceName(),

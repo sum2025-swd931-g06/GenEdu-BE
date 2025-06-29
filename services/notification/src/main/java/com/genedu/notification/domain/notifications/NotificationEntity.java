@@ -72,7 +72,7 @@ public class NotificationEntity extends AbstractTimeAuditEntity {
     @Enumerated(EnumType.STRING)
     private NotificationColor iconColorHex;
 
-    @Column(name = "userId", nullable = false)
-    private String userId;
+    @Column(name = "email", nullable = false)
+    private String email;
 }
 

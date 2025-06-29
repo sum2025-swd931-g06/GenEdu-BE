@@ -34,9 +34,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<NotificationRes> getNotificationByUserId(String userId) {
-        return repository.findByUserId(userId).stream()
-            .map(NotificationRes::fromWithoutUserId)
+    public List<NotificationRes> getNotificationByEmail(String email) {
+        return repository.findByEmailOrderByTimeDesc(email).stream()
+            .map(NotificationRes::fromWithoutEmail)
             .toList();
     }
 
@@ -50,7 +50,7 @@ public class NotificationServiceImpl implements NotificationService {
             .type(notification.getType())
             .description(notification.getDescription())
             .time(LocalDateTime.now())
-            .userId(existingUserId)
+            .email(existingUserId)
             .iconName(notification.getIconName())
             .iconColorHex(notification.getIconColorHex())
             .build();
@@ -84,13 +84,13 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void sendNotificationToUser(String userId, String title, String body, 
+    public void sendNotificationToUser(String email, String title, String body,
                                      NotificationEntity.NotificationType type) throws Exception {
         // Get all FCM tokens for this user
-        List<String> fcmTokens = fcmTokenService.getFcmTokensByUserId(userId);
+        List<String> fcmTokens = fcmTokenService.getFcmTokensByEmail(email);
         
         if (fcmTokens.isEmpty()) {
-            log.warn("No FCM tokens found for user: {}", userId);
+            log.warn("No FCM tokens found for user: {}", email);
             return;
         }
 
@@ -108,7 +108,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .build();
             
             String response = FirebaseMessaging.getInstance().send(message);
-            log.info("Sent notification to user {} (single device). Response: {}", userId, response);
+            log.info("Sent notification to user {} (single device). Response: {}", email, response);
         } else {
             // Send to multiple devices
             MulticastMessage message = MulticastMessage.builder()
@@ -116,19 +116,21 @@ public class NotificationServiceImpl implements NotificationService {
                 .setNotification(notification)
                 .build();
             
-            var response = FirebaseMessaging.getInstance().sendMulticast(message);
+            var response = FirebaseMessaging.getInstance().sendEachForMulticast(message);
             log.info("Sent notification to user {} ({} devices). Success: {}, Failure: {}", 
-                    userId, fcmTokens.size(), response.getSuccessCount(), response.getFailureCount());
+                    email, fcmTokens.size(), response.getSuccessCount(),
+                     response.getFailureCount());
         }
 
         // Save notification to database for user to view in app
-        saveNotificationForUser(userId, title, body, type, 
+        saveNotificationForUser(email, title, body, type,
                                NotificationEntity.NotificationIcon.MESSAGE, 
                                NotificationEntity.NotificationColor.BLUE);
     }
 
     @Override
-    public NotificationEntity saveNotificationForUser(String userId, String title, String description,
+    public NotificationEntity saveNotificationForUser(String email, String title,
+                                                      String description,
                                                     NotificationEntity.NotificationType type,
                                                     NotificationEntity.NotificationIcon icon,
                                                     NotificationEntity.NotificationColor color) {
@@ -137,7 +139,7 @@ public class NotificationServiceImpl implements NotificationService {
             .type(type)
             .description(description)
             .time(LocalDateTime.now())
-            .userId(userId)
+            .email(email)
             .iconName(icon)
             .iconColorHex(color)
             .read(false)

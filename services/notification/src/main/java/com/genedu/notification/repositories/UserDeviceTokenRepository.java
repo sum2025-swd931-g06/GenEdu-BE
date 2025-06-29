@@ -10,8 +10,8 @@ import org.springframework.data.repository.query.Param;
 public interface UserDeviceTokenRepository extends JpaRepository<UserDeviceTokenEntity, Long> {
     Optional<UserDeviceTokenEntity> findByDeviceId(String deviceId);
     
-    @Query("SELECT u FROM user_device_tokens u WHERE u.userId = :userId")
-    List<UserDeviceTokenEntity> findAllByUserId(@Param("userId") String userId);
+    @Query("SELECT u FROM user_device_tokens u WHERE u.email = :email")
+    List<UserDeviceTokenEntity> findAllByEmail(@Param("email") String email);
     
-    Optional<UserDeviceTokenEntity> findByUserIdAndDeviceId(String userId, String deviceId);
+    Optional<UserDeviceTokenEntity> findByEmailAndDeviceId(String email, String deviceId);
 }

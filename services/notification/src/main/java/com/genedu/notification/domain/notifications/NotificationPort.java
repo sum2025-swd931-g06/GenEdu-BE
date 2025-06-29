@@ -19,7 +19,7 @@ public interface NotificationPort {
         @JsonProperty("isRead") Boolean read,
         NotificationIcon iconName,
         NotificationColor iconColorHex,
-        String userId
+        String email
     ){
         public static NotificationRes from(NotificationEntity notificationEntity) {
             return new NotificationRes(
@@ -31,11 +31,11 @@ public interface NotificationPort {
                 notificationEntity.isRead(),
                 notificationEntity.getIconName(),
                 notificationEntity.getIconColorHex(),
-                notificationEntity.getUserId()
+                notificationEntity.getEmail()
             );
         }
 
-        public static NotificationRes fromWithoutUserId(NotificationEntity notificationEntity) {
+        public static NotificationRes fromWithoutEmail(NotificationEntity notificationEntity) {
             return new NotificationRes(
                 notificationEntity.getId(),
                 notificationEntity.getType(),
@@ -45,7 +45,7 @@ public interface NotificationPort {
                 notificationEntity.isRead(),
                 notificationEntity.getIconName(),
                 notificationEntity.getIconColorHex(),
-                null // explicitly null for userId
+                null // explicitly null for email
             );
         }
 

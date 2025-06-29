@@ -1,7 +1,12 @@
 package com.genedu.notification.domain.token;
 
-import com.genedu.notification.domain.token.FcmTokenPort.*;
+import com.genedu.notification.domain.token.FcmTokenPort.CreateUserDeviceTokenReq;
+import com.genedu.notification.domain.token.FcmTokenPort.UpdateUserDeviceTokenReq;
+import com.genedu.notification.domain.token.FcmTokenPort.UserDeviceTokenDto;
 import com.genedu.notification.utils.NotificationUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,29 +21,40 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/user-device-tokens")
 @RequiredArgsConstructor
+@Tag(name = "user-device-tokens", description = "User Device Token API")
 public class UserDeviceTokenController {
 
     private final FcmTokenServiceImpl service;
 
     @GetMapping
+    @Operation(
+        summary = "Get all user device tokens",
+        description = "Fetches all user device tokens with pagination support."
+    )
     public Page<UserDeviceTokenDto> getAll(@PageableDefault(size = 20) Pageable pageable) {
         return service.getAll(pageable);
     }
 
     @GetMapping("/{id}")
+    @Operation(
+        summary = "Get user device token by ID",
+        description = "Fetches a user device token by its unique ID."
+    )
     public UserDeviceTokenDto getById(@PathVariable Long id) {
         return service.getById(id);
     }
 
     @PostMapping
+    @Operation(
+        summary = "Create or update user device token",
+        description = "Creates a new user device token or updates an existing one based on the provided request."
+    )
     public ResponseEntity<UserDeviceTokenDto> createOrUpdate(@RequestBody CreateUserDeviceTokenReq req) {
         // If no userId provided in request, use authenticated user
-        String userId = req.userId() != null ? req.userId() : NotificationUtils.getCurrentUserId();
+        String userId = req.email() != null ? req.email() : NotificationUtils.getCurrentUserId();
 
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -56,21 +72,33 @@ public class UserDeviceTokenController {
     }
 
     @PatchMapping("/{id}")
+    @Operation(
+        summary = "Update user device token",
+        description = "Updates an existing user device token by its unique ID."
+    )
     public UserDeviceTokenDto update(@PathVariable Long id, @RequestBody UpdateUserDeviceTokenReq req) {
         return service.update(id, req);
     }
 
-    @GetMapping("/user/{userId}/tokens")
-    public List<String> getFcmTokensByUserId(@PathVariable String userId) {
-        return service.getFcmTokensByUserId(userId);
+    @GetMapping("/user/{email}/tokens")
+    @Operation(
+        summary = "Get FCM tokens by user email",
+        description = "Fetches all FCM tokens associated with a specific user email."
+    )
+    public List<String> getFcmTokensByEmail(@PathVariable String email) {
+        return service.getFcmTokensByEmail(email);
     }
 
     @GetMapping("/my-tokens")
+    @Operation(
+        summary = "Get my FCM tokens",
+        description = "Fetches all FCM tokens associated with the currently authenticated user."
+    )
     public ResponseEntity<List<String>> getMyFcmTokens() {
-        String userId = NotificationUtils.getCurrentUserId();
-        if (userId == null) {
+        String email = NotificationUtils.getCurrentUserId();
+        if (email == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(service.getFcmTokensByUserId(userId));
+        return ResponseEntity.ok(service.getFcmTokensByEmail(email));
     }
 }

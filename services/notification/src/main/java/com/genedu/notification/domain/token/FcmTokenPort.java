@@ -4,22 +4,22 @@ public interface FcmTokenPort {
 
     record UserDeviceTokenDto(
         Long id,
-        String userId,
+        String email,
         String deviceId,
         String fcmToken,
         String deviceName,
         String platform
     ) {}
 
-    public record CreateUserDeviceTokenReq(
-        String userId,
+    record CreateUserDeviceTokenReq(
+        String email,
         String deviceId,
         String fcmToken,
         String deviceName,
         String platform
     ) {}
 
-    public record UpdateUserDeviceTokenReq(
+    record UpdateUserDeviceTokenReq(
         String fcmToken,
         String deviceName,
         String platform

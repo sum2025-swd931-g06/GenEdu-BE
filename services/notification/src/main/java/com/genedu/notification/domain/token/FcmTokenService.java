@@ -15,5 +15,5 @@ public interface FcmTokenService {
     UserDeviceTokenDto create(CreateUserDeviceTokenReq req);
     UserDeviceTokenDto update(Long id, UpdateUserDeviceTokenReq req);
     UserDeviceTokenDto createOrUpdate(CreateUserDeviceTokenReq req);
-    List<String> getFcmTokensByUserId(String userId);
+    List<String> getFcmTokensByEmail(String email);
 }

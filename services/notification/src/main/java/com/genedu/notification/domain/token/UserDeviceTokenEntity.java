@@ -24,8 +24,8 @@ public class UserDeviceTokenEntity extends AbstractTimeAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "userId", nullable = false)
-    private String userId;
+    @Column(name = "email", nullable = false)
+    private String email;
 
     @Column(name = "deviceId", nullable = false)
     private String deviceId; // e.g. Android ID, or Firebase Installation ID
