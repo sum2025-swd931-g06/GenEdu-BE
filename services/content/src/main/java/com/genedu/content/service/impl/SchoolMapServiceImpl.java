@@ -32,6 +32,7 @@ public class SchoolMapServiceImpl implements SchoolMapService {
         // School Classes
         Map<Integer, SchoolClassMapDTO> schoolClasses = schoolClassRepository.findAll()
                 .stream()
+                .filter(sc -> !sc.isDeleted())
                 .collect(Collectors.toMap(
                         SchoolClass::getId,
                         sc -> SchoolClassMapDTO.builder()
@@ -43,6 +44,7 @@ public class SchoolMapServiceImpl implements SchoolMapService {
         // Subjects
         Map<Integer, SubjectMapDTO> subjects = subjectRepository.findAll()
                 .stream()
+                .filter(s -> !s.isDeleted())
                 .collect(Collectors.toMap(
                         Subject::getId,
                         s -> SubjectMapDTO.builder()
@@ -53,8 +55,9 @@ public class SchoolMapServiceImpl implements SchoolMapService {
                 ));
 
         // Materials
-                Map<Long, MaterialMapDTO> materials = materialRepository.findAll()
+        Map<Long, MaterialMapDTO> materials = materialRepository.findAll()
                 .stream()
+                .filter(m -> !m.isDeleted())
                 .collect(Collectors.toMap(
                         Material::getId,
                         m -> MaterialMapDTO.builder()
@@ -67,6 +70,7 @@ public class SchoolMapServiceImpl implements SchoolMapService {
         // Lessons
         Map<Long, LessonMapDTO> lessons = lessonRepository.findAll()
                 .stream()
+                .filter(l -> !l.isDeleted())
                 .collect(Collectors.toMap(
                         Lesson::getId,
                         l -> LessonMapDTO.builder()
