@@ -17,41 +17,32 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
+        <module name="notification" />
         <module name="project" />
         <module name="media" />
+        <module name="subscription" />
         <module name="lecture-content" />
         <module name="common-library" />
         <module name="user" />
         <module name="content" />
       </profile>
-      <profile name="Annotation profile for notification" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
-        </processorPath>
-        <module name="notification" />
-        <module name="subscription" />
-      </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="common-library" options="-parameters" />
+      <module name="common-library" options="-parameters -parameters" />
       <module name="config-server" options="-parameters" />
-      <module name="content" options="-parameters" />
+      <module name="content" options="-parameters -parameters" />
       <module name="discovery" options="-parameters" />
       <module name="gateway" options="-parameters" />
-      <module name="genedu" options="-parameters" />
-      <module name="lecture-content" options="-parameters" />
-      <module name="media" options="-parameters" />
-      <module name="notification" options="-parameters" />
-      <module name="project" options="-parameters" />
-      <module name="subscription" options="-parameters" />
-      <module name="user" options="-parameters" />
+      <module name="genedu" options="-parameters -parameters" />
+      <module name="lecture-content" options="-parameters -parameters" />
+      <module name="media" options="-parameters -parameters" />
+      <module name="notification" options="-parameters -parameters" />
+      <module name="project" options="-parameters -parameters" />
+      <module name="subscription" options="-parameters -parameters" />
+      <module name="user" options="-parameters -parameters" />
     </option>
   </component>
 </project>

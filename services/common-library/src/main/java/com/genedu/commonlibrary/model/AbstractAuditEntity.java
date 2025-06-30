@@ -17,7 +17,7 @@ import java.util.UUID;
 @MappedSuperclass
 @Getter
 @Setter
-@EntityListeners(CustomTimeAuditingEntityListener.class)
+@EntityListeners(CustomAuditingEntityListener.class)
 public class AbstractAuditEntity {
     @CreationTimestamp
     private ZonedDateTime createdOn;

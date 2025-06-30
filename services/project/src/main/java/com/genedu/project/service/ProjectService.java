@@ -139,4 +139,13 @@ public ProjectResponseDTO updateProject(UUID id, ProjectRequestDTO projectDetail
                 .map(projectMapper::toDTO)
                 .collect(toList());
     }
+
+    public LessonPlanFileDownloadDTO getLessonPlanTemplate() {
+        LessonPlanFileDownloadDTO lessonPlanTemplate = lectureMediaWebClientService.getLessonPlanTemplate();
+        if (lessonPlanTemplate == null) {
+            throw new NotFoundException(Constants.ErrorCode.LESSON_PLAN_TEMPLATE_NOT_FOUND);
+        }
+
+        return lessonPlanTemplate;
+    }
 }

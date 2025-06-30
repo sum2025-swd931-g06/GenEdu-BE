@@ -12,10 +12,12 @@ import java.util.Map;
 
 @Service
 public class LectureContentVectorService {
-    @Qualifier("pgVectorStore")
     private final VectorStore vectorStore;
 
-    public LectureContentVectorService(VectorStore vectorStore) {
+    public LectureContentVectorService(
+            @Qualifier("pgVectorStore")
+            VectorStore vectorStore
+    ) {
         this.vectorStore = vectorStore;
     }
 

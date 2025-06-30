@@ -1,5 +1,6 @@
 package com.genedu.media.controller;
-
+import com.genedu.commonlibrary.enumeration.FileType;
+import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.commonlibrary.webclient.dto.LessonPlanFileDownloadDTO;
 import com.genedu.commonlibrary.webclient.dto.LessonPlanFileUploadDTO;
 import com.genedu.media.service.MediaFileService;
@@ -15,7 +16,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/medias")
 public class LessonPlanFileController {
-
     private final MediaFileService<LessonPlanFileUploadDTO, LessonPlanFileDownloadDTO> mediaFileService;
 
     @PostMapping(
@@ -28,6 +28,31 @@ public class LessonPlanFileController {
     ) throws IOException {
         LessonPlanFileDownloadDTO uploadedFile = mediaFileService.saveMediaFile(file);
         return ResponseEntity.ok(uploadedFile);
+    }
+
+    @GetMapping("/projects/lesson-plans/template")
+    public ResponseEntity<LessonPlanFileDownloadDTO> getLessonPlanTemplateUrl() {
+        LessonPlanFileDownloadDTO templateFile = mediaFileService.getMediaFileByFileNameAndFileType(
+                "lesson-plan-template.md", FileType.LESSON_PLAN_TEMPLATE
+        );
+        if (templateFile == null) {
+            throw new NotFoundException("Lesson plan template not found");
+        }
+        return new ResponseEntity<>(templateFile, HttpStatus.OK);
+    }
+
+    @GetMapping(
+            path = "/projects/lesson-plans/project/{projectId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<LessonPlanFileDownloadDTO> getLessonPlanFileByProjectId(
+            @PathVariable String projectId
+    ) {
+        LessonPlanFileDownloadDTO lessonPlanFile = mediaFileService.getMediaFileByProjectId(projectId);
+        if (lessonPlanFile == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(lessonPlanFile, HttpStatus.OK);
     }
 
     @GetMapping("/projects/lesson-plans/{fileId}")

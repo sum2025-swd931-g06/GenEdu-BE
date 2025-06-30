@@ -1,12 +1,9 @@
-package com.genedu.media.configuration;
+package com.genedu.lecturecontent.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,11 +13,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -35,6 +29,7 @@ public class SecurityConfig {
             "/aggregate/**",
             "/actuator/**",
             "/webjars/**",
+            "*"
     };
 
     @Bean
@@ -70,20 +65,4 @@ public class SecurityConfig {
 
         return jwtAuthenticationConverter;
     }
-//    private ServletPolicyEnforcerFilter createPolicyEnforcerFilter() {
-//        return new ServletPolicyEnforcerFilter(new ConfigurationResolver() {
-//            @Override
-//            public PolicyEnforcerConfig resolve(HttpRequest request) {
-//                try {
-//                    // Set the base URL for the policy enforcer
-//                    return JsonSerialization.
-//                            readValue(getClass().getResourceAsStream("/policy-enforcer.json"),
-//                                    PolicyEnforcerConfig.class);
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//        });
-//    }
-
 }

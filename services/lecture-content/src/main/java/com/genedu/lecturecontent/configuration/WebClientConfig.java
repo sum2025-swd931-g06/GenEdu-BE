@@ -6,29 +6,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class WebClientConfig {
-//    private static final String lectureMediaServiceUrl = "http://media-service/api/v1";
-//    private static final String projectServiceUrl = "http://project-service/api/v1";
-//    private static final String contentServiceUrl = "http://project-service/api/v1";
-//
-//    @Bean(name = "lectureMediaWebClient")
-//    @LoadBalanced
-//    public WebClient.Builder webClientBuilder() {
-//        return WebClient.builder()
-//                .baseUrl(lectureMediaServiceUrl);
-//    }
-//
-//    @Bean(name = "projectWebClient")
-//    @LoadBalanced
-//    public WebClient.Builder projectWebClientBuilder() {
-//        return WebClient.builder()
-//                .baseUrl(projectServiceUrl);
-//    }
-//
-//    @Bean(name = "contentWebClient")
-//    @LoadBalanced
-//    public WebClient.Builder contentWebClientBuilder() {
-//        return WebClient.builder()
-//                .baseUrl(contentServiceUrl);
-//    }
+public class WebclientConfig {
+    private static final String LECTURE_MEDIA_SERVICE_URL = "http://media-service/api/v1";
+
+    @Bean
+    @LoadBalanced
+    public WebClient.Builder loadBalancedWebClientBuilder() {
+        return WebClient.builder();
+    }
+
+    @Bean("lectureMediaWebClient")
+    public WebClient lectureMediaWebClient(WebClient.Builder builder) {
+        return builder.baseUrl(LECTURE_MEDIA_SERVICE_URL).build();
+    }
 }
