@@ -1,5 +1,6 @@
 package com.genedu.commonlibrary.model;
 
+import com.genedu.commonlibrary.model.listener.CustomAuditingEntityListener;
 import com.genedu.commonlibrary.model.listener.CustomTimeAuditingEntityListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @MappedSuperclass
 @Getter
 @Setter
-@EntityListeners(CustomTimeAuditingEntityListener.class)
+@EntityListeners(CustomAuditingEntityListener.class)
 public class AbstractAuditEntity {
     @CreationTimestamp
     private ZonedDateTime createdOn;
