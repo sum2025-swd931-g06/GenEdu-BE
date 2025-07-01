@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Configuration
 @EnableJpaRepositories("com.genedu.subscription.repository")
@@ -18,13 +19,13 @@ import java.util.Optional;
 public class DatabaseAutoConfig {
 
     @Bean
-    public AuditorAware<String> auditorAware() {
+    public AuditorAware<UUID> auditorAware() {
         return () -> {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null) {
-                return Optional.of("");
+                return Optional.of(UUID.fromString("00000000-0000-0000-0000-000000000000")); // Default UUID for unauthenticated users
             }
-            return Optional.of(auth.getName());
+            return Optional.of(UUID.fromString(auth.getName()));
         };
     }
 }

@@ -27,8 +27,12 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     @Override
     @Transactional
     public SubscriptionPlanResponseDTO createSubscriptionPlan(SubscriptionPlanRequestDTO requestDTO) {
+
+        if (requestDTO.name() == null || requestDTO.name().isEmpty()) {
+            throw new BadRequestException(Constants.ErrorCode.INVALID_SUBSCRIPTION_PLAN_NAME);
+        }
         if(subscriptionPlanRepository.existsByPlanNameAndDeletedIsFalse(requestDTO.name())) {
-            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_SUBSCRIPTION_PLAN_NAME);
+            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_SUBSCRIPTION_PLAN_NAME, requestDTO.name());
         }
         isValidPriceAndDuration(requestDTO);
 
@@ -51,10 +55,10 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     public SubscriptionPlanResponseDTO updateSubscriptionPlan(String planId, SubscriptionPlanRequestDTO requestDTO) {
         UUID planUUID = UUID.fromString(planId);
         if (!subscriptionPlanRepository.existsById(planUUID)) {
-            throw new BadRequestException(Constants.ErrorCode.SUBSCRIPTION_PLAN_NOT_FOUND);
+            throw new BadRequestException(Constants.ErrorCode.SUBSCRIPTION_PLAN_NOT_FOUND, planId);
         }
         if (subscriptionPlanRepository.existsByPlanNameAndDeletedIsFalseAndIdNot(requestDTO.name(), planUUID)) {
-            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_SUBSCRIPTION_PLAN_NAME);
+            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_SUBSCRIPTION_PLAN_NAME, requestDTO.name());
         }
         isValidPriceAndDuration(requestDTO);
         SubscriptionPlan subscriptionPlan = SubscriptionPlanMapper.toEntity(requestDTO);
@@ -75,14 +79,14 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     public SubscriptionPlan getSubscriptionPlanEntity(String planId) {
         UUID planUUID = UUID.fromString(planId);
         return subscriptionPlanRepository.findByIdAndDeletedIsFalse(planUUID)
-                .orElseThrow(() -> new BadRequestException(Constants.ErrorCode.SUBSCRIPTION_PLAN_NOT_FOUND));
+                .orElseThrow(() -> new BadRequestException(Constants.ErrorCode.SUBSCRIPTION_PLAN_NOT_FOUND, planId));
     }
 
     @Override
     public void deleteSubscriptionPlan(String planId) {
         UUID planUUID = UUID.fromString(planId);
         SubscriptionPlan plan = subscriptionPlanRepository.findById(planUUID)
-                .orElseThrow(() -> new BadRequestException(Constants.ErrorCode.SUBSCRIPTION_PLAN_NOT_FOUND));
+                .orElseThrow(() -> new BadRequestException(Constants.ErrorCode.SUBSCRIPTION_PLAN_NOT_FOUND, planId));
         plan.setDeleted(true);
         subscriptionPlanRepository.save(plan);
     }
