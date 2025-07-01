@@ -2,6 +2,7 @@ package com.genedu.commonlibrary.model;
 
 import com.genedu.commonlibrary.model.listener.CustomAuditingEntityListener;
 import com.genedu.commonlibrary.model.listener.CustomTimeAuditingEntityListener;
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -21,5 +22,6 @@ public class AbstractTimeAuditEntity {
     @UpdateTimestamp
     private ZonedDateTime lastModifiedOn;
 
-    private boolean isDeleted = false;
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted = false;
 }
