@@ -49,10 +49,8 @@ public class SlideContentController {
     private final Logger log = org.slf4j.LoggerFactory.getLogger(SlideContentController.class);
 
     public SlideContentController(
-            @Qualifier("pgVectorStore")
-            VectorStore vectorStore,
-            @Qualifier("openAiChatClient")
-            ChatClient openAiChatClient,
+            @Qualifier("pgVectorStore")  VectorStore vectorStore,
+            @Qualifier("openAiChatClient") ChatClient openAiChatClient,
             SlideContentService slideContentService
     ) {
         this.vectorStore = vectorStore;
@@ -91,15 +89,16 @@ public class SlideContentController {
         final java.util.concurrent.atomic.AtomicLong counter = new java.util.concurrent.atomic.AtomicLong();
 
         return Flux.fromIterable(
-                        lessonPlan.activities().stream()
-                                .flatMap(activity -> activity.instructions().stream())
-                                .toList()
+                lessonPlan.activities().stream()
+                        .flatMap(activity -> activity.instructions().stream())
+                        .toList()
                 )
                 .flatMap(instruction ->
                         {
                             // This try-catch is not ideal for reactive code.
                             // A better approach is to use .onErrorResume in the chain.
                             try {
+                                log.info("Generating slide for instruction: {} : {}", instruction.name(), instruction.content());
                                 return generateSlideForInstruction(instruction, slideContentRequest);
                             } catch (JsonMappingException e) {
                                 log.warn("Skipping slide due to JSON mapping error for instruction: {}", instruction.name(), e);
@@ -159,7 +158,7 @@ public class SlideContentController {
                     openAiChatClient.prompt()
                             .messages(promptMessage)
                             .call().chatResponse()).getResult();
-
+            log.info("AI raw response: {}", generation.getOutput().getText());
             Slide slide = outputConverter.convert(generation.getOutput().getText());
             log.info("Finished generation for: {}. Slide: {}", instruction.name(), slide);
             return slide;

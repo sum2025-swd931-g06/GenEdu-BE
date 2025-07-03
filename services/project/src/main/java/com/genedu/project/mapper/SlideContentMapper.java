@@ -3,6 +3,8 @@ package com.genedu.project.mapper;
 import com.genedu.project.dto.SlideContentRequestDTO;
 import com.genedu.project.model.LectureContent;
 import com.genedu.project.model.SlideContent;
+import com.genedu.project.service.LectureContentService;
+import com.genedu.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,24 +14,31 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class SlideContentMapper {
-    SlideContent toEntity(
-            SlideContentRequestDTO slideContentRequestDTO
-    ) {
-        LectureContent lectureContent = LectureContent.builder()
-                .id(UUID.fromString(slideContentRequestDTO.lectureContentId()))
-                .build();
+    LectureContentService lectureContentService;
+    public SlideContent toEntity(SlideContentRequestDTO slideContentRequestDTO) {
+        if (slideContentRequestDTO.lectureContentId() == null || slideContentRequestDTO.lectureContentId().isBlank()) {
+            return SlideContent.builder()
+                    .orderNumber(slideContentRequestDTO.orderNumber())
+                    .slideTitle(slideContentRequestDTO.title())
+                    .mainIdea(slideContentRequestDTO.mainIdea())
+                    .subpoints(slideContentRequestDTO.subpoints())
+                    .build();
+        } else {
+            LectureContent lectureContent = lectureContentService.getLectureContentEntityById(
+                    UUID.fromString(slideContentRequestDTO.lectureContentId())
+            );
 
-        return SlideContent.builder()
-                .lectureContent(lectureContent)
-                .orderNumber(slideContentRequestDTO.orderNumber())
-                .slideTitle(slideContentRequestDTO.title())
-                .mainIdea(slideContentRequestDTO.mainIdea())
-                .subpoints(slideContentRequestDTO.subpoints())
-                .build();
-
+            return SlideContent.builder()
+                    .lectureContent(lectureContent)
+                    .orderNumber(slideContentRequestDTO.orderNumber())
+                    .slideTitle(slideContentRequestDTO.title())
+                    .mainIdea(slideContentRequestDTO.mainIdea())
+                    .subpoints(slideContentRequestDTO.subpoints())
+                    .build();
+        }
     }
 
-    List<SlideContent> toEntities(
+    public List<SlideContent> toEntities(
             List<SlideContentRequestDTO> slideContentRequestDTOs
     ) {
         return slideContentRequestDTOs.stream()
@@ -37,7 +46,7 @@ public class SlideContentMapper {
                 .toList();
     }
 
-    List<SlideContentRequestDTO> toDTOs(
+    public List<SlideContentRequestDTO> toDTOs(
             List<SlideContent> slideContents
     ) {
         return slideContents.stream()

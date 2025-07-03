@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
-    Optional<Project> findByIdAndIsDeletedIsFalse(UUID id);
-    List<Project> findByIsDeletedIsFalse();
-    List<Project> findByUserIdAndIsDeletedIsFalse(UUID userId);
+    Optional<Project> findByIdAndDeletedIsFalse(UUID id);
+    List<Project> findByDeletedIsFalse();
+    List<Project> findByUserIdAndDeletedIsFalse(UUID userId);
 }

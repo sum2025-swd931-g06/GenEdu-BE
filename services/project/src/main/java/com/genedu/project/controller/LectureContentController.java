@@ -23,7 +23,7 @@ public class LectureContentController {
         return ResponseEntity.ok(lectureContentResponseDTO);
     }
 
-    @PostMapping("/lecture-content}")
+    @PostMapping("/lecture-content")
     public ResponseEntity<LectureContentResponseDTO> creatLectureContentByProjectId(
             @RequestBody LectureContentRequestDTO lectureContentRequestDTO
     ) {

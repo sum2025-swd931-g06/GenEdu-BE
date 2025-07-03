@@ -4,27 +4,30 @@ import com.genedu.project.dto.LectureContentRequestDTO;
 import com.genedu.project.dto.LectureContentResponseDTO;
 import com.genedu.project.model.LectureContent;
 import com.genedu.project.model.Project;
+import com.genedu.project.model.SlideContent;
+import com.genedu.project.service.ProjectService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Component
 @AllArgsConstructor
 public class LectureContentMapper {
     SlideContentMapper slideContentMapper;
+    ProjectService projectService;
 
     public LectureContent toEntity(
             LectureContentRequestDTO lectureContentRequestDTO
     ) {
-        Project project = new Project();
-        project.setId(UUID.fromString(lectureContentRequestDTO.projectId()));
-
+        UUID projectId = UUID.fromString(lectureContentRequestDTO.projectId());
+        Project project  = projectService.getProjectEntityById(projectId);
         return LectureContent.builder()
                 .project(project)
                 .title(lectureContentRequestDTO.title())
-                .slideContents(slideContentMapper.toEntities(lectureContentRequestDTO.slideContents()))
                 .build();
     }
 
