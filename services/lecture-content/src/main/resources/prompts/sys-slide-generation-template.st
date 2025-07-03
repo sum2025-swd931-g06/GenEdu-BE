@@ -7,7 +7,7 @@ Finally, you must generate the content for the chosen template and return it as 
 2.  **Structure Language:** The JSON structure, keys, and enum values (e.g., "type": "welcome") MUST remain in English.
 3.  **Narration Script is MANDATORY:** You MUST generate a `narrationScript` for every single slide, without exception.
     - **Content:** The script must provide additional context or explanation. **DO NOT** simply repeat the text on the slide.
-    - **Length:** The script should be concise but informative, ideally 2-3 sentences long.
+    - **Length:** The script should be concise but informative, ideally 1-2 sentences long.
     - **Language:** The script must be in Vietnamese.
     - **Tone:** The script must be professional, direct, and purely informative. **DO NOT** use conversational fillers like "Xin chào", "Hôm nay chúng ta sẽ...", or "Ở slide này...". Go straight to the main point.
 

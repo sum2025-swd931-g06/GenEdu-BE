@@ -104,7 +104,7 @@ public class SlideContentController {
                         .flatMap(activity -> activity.instructions().stream())
                         .toList()
                 )
-                .flatMap(instruction ->
+                .concatMap(instruction ->
                         {
                             // This try-catch is not ideal for reactive code.
                             // A better approach is to use .onErrorResume in the chain.
@@ -168,7 +168,7 @@ public class SlideContentController {
             Generation generation = Objects.requireNonNull(
                     openAiChatClient.prompt()
                             .messages(promptMessage)
-                            .advisors(new MessageChatMemoryAdvisor(openAiChatMemory))
+                            //.advisors(new MessageChatMemoryAdvisor(openAiChatMemory))
                             .call().chatResponse()).getResult();
             log.info("AI raw response: {}", generation.getOutput().getText());
             Slide slide = outputConverter.convert(generation.getOutput().getText());
