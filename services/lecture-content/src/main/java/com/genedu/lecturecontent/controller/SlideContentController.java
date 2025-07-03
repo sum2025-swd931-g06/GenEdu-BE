@@ -9,6 +9,9 @@ import com.genedu.lecturecontent.service.LessonPlanService;
 import com.genedu.lecturecontent.service.SlideContentService;
 import org.slf4j.Logger;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.PromptTemplate;
@@ -45,17 +48,20 @@ public class SlideContentController {
     private final VectorStore vectorStore;
     private final ChatClient openAiChatClient;
     private final SlideContentService slideContentService;
+    private final ChatMemory openAiChatMemory;
 
     private final Logger log = org.slf4j.LoggerFactory.getLogger(SlideContentController.class);
 
     public SlideContentController(
             @Qualifier("pgVectorStore")  VectorStore vectorStore,
             @Qualifier("openAiChatClient") ChatClient openAiChatClient,
-            SlideContentService slideContentService
+            SlideContentService slideContentService,
+            ChatMemory openAiChatMemory
     ) {
         this.vectorStore = vectorStore;
         this.openAiChatClient = openAiChatClient;
         this.slideContentService = slideContentService;
+        this.openAiChatMemory = openAiChatMemory;
     }
 
     @PostMapping(
@@ -87,6 +93,11 @@ public class SlideContentController {
         // 4. Generate slides for each instruction in the lesson plan.
         assert lessonPlan != null;
         final java.util.concurrent.atomic.AtomicLong counter = new java.util.concurrent.atomic.AtomicLong();
+        log.info("Lesson plan structured successfully. Total activities: {}", lessonPlan.activities().size());
+        if (lessonPlan.activities().isEmpty()) {
+            log.warn("No activities found in the lesson plan. Returning empty Flux.");
+            return Flux.empty();
+        }
 
         return Flux.fromIterable(
                 lessonPlan.activities().stream()
@@ -157,6 +168,7 @@ public class SlideContentController {
             Generation generation = Objects.requireNonNull(
                     openAiChatClient.prompt()
                             .messages(promptMessage)
+                            .advisors(new MessageChatMemoryAdvisor(openAiChatMemory))
                             .call().chatResponse()).getResult();
             log.info("AI raw response: {}", generation.getOutput().getText());
             Slide slide = outputConverter.convert(generation.getOutput().getText());

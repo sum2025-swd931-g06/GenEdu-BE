@@ -1,12 +1,16 @@
 package com.genedu.lecturecontent.configuration;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 
 @Configuration
 public class AIModelConfig {
@@ -15,7 +19,14 @@ public class AIModelConfig {
             @Qualifier("openAiChatModel")
             OpenAiChatModel openAiChatModel
     ) {
-        return ChatClient.create(openAiChatModel);
+        return ChatClient.create(
+                openAiChatModel
+        );
+    }
+
+    @Bean("openAiChatMemory")
+    public ChatMemory openAiChatMemory() {
+        return new InMemoryChatMemory();
     }
 
 

@@ -19,9 +19,9 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="notification" />
-        <module name="lecture-content" />
         <module name="media" />
         <module name="subscription" />
+        <module name="lecture-content" />
       </profile>
       <profile name="Annotation profile for common-library" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />

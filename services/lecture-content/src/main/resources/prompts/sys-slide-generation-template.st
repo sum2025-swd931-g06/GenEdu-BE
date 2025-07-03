@@ -5,12 +5,17 @@ Finally, you must generate the content for the chosen template and return it as 
 **CRITICAL RULES - YOU MUST FOLLOW THESE FOR EVERY SLIDE:**
 1.  **Content Language:** All user-facing text (titles, bodies, items, etc.) MUST be in **Vietnamese**.
 2.  **Structure Language:** The JSON structure, keys, and enum values (e.g., "type": "welcome") MUST remain in English.
-3.  **Narration Script is MANDATORY:** You MUST generate a `narration_script` for every single slide, without exception.
-    - **Style:** The script must be professional, engaging, and educational.
+3.  **Narration Script is MANDATORY:** You MUST generate a `narrationScript` for every single slide, without exception.
     - **Content:** The script must provide additional context or explanation. **DO NOT** simply repeat the text on the slide.
+    - **Length:** The script should be concise but informative, ideally 2-3 sentences long.
     - **Language:** The script must be in Vietnamese.
-4.  **First Slide Rule:** If the instruction indicates this is the first slide, you MUST use the **"welcome"** template.
-5.  **Last Slide Rule:** If the instruction indicates this is the last slide, you MUST use the **"thanks"** template.
+    - **Tone:** The script must be professional, direct, and purely informative. **DO NOT** use conversational fillers like "Xin chào", "Hôm nay chúng ta sẽ...", or "Ở slide này...". Go straight to the main point.
+
+**NARRATION SCRIPT CONTINUITY:**
+You are generating slides sequentially. You have access to the conversation history, which includes the previous slides you have created.
+- **Review the history:** Before writing a new `narrationScript`, briefly review the script from the previous slide.
+- **Ensure logical flow:** The new script should be a logical continuation of the previous one. Create a smooth, connected narrative across the entire presentation.
+- **Avoid repetition:** Do not repeat introductory phrases or concepts that were just covered. Assume the audience is following along.
 
 **INSTRUCTION:**
 ---
@@ -37,7 +42,7 @@ Finally, you must generate the content for the chosen template and return it as 
     - Format: `\{"type": "compare", "title": "...", "data": \{"left_header": "...", "left_points": ["..."], "right_header": "...", "right_points": ["..."]\}, "narration_script": "..."\}`
 
 5.  **"thanks"**: Use only for a concluding "Thank You" or "Q&A" slide.
-    - Format: `\{"type": "thanks", "title": "Thank You", "data": \{"message": "Any Questions?"\}, "narration_script": "..."\}`
+    - Format: `\{"type": "thanks", "title": "Thank You", "data": \{"message": "Any Questions?"\}, "narrationScript": "..."\}`
 
 ---
 Based on the instruction and context, choose the best template and provide the output in the required JSON format.
