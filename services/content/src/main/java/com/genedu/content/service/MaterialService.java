@@ -20,5 +20,6 @@ public interface MaterialService {
     SubjectResponseDTO getMaterialsBySubjectId(Integer subjectId);
     FlatSubjectMaterialDTO createMaterial(Integer subjectId, MaterialRequestDTO materialRequestDTO);
     FlatSubjectMaterialDTO updateMaterial(Long materialId, MaterialRequestDTO materialRequestDTO);
+    List<FlatSubjectMaterialDTO> updateMaterials(List<MaterialRequestDTO> materialRequestDTOs);
     void deleteMaterial(Long id);
 }

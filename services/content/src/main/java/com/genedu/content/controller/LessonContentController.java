@@ -118,6 +118,14 @@ public class LessonContentController {
         return ResponseEntity.ok(updatedLessonContent);
     }
 
+    @PutMapping("/lesson-contents/batch")
+    @Operation(summary = "Update multiple chapters", description = "Updates a list of chapters.")
+    public ResponseEntity<List<FlatLessonLessonContentDTO>> updateChapters(
+            @RequestBody List<LessonContentRequestDTO> lessonContentRequestDTOS) {
+        List<FlatLessonLessonContentDTO> updated = lessonContentService.updateLessonContents(lessonContentRequestDTOS);
+        return ResponseEntity.ok(updated);
+    }
+
     @DeleteMapping("/lesson-contents/{lessonContentId}")
     @Operation(summary = "Delete lesson content", description = "Deletes a lesson content by its ID.")
     @ApiResponses(value = {

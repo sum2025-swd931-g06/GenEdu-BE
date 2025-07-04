@@ -93,13 +93,13 @@ public class LessonServiceImpl implements LessonService {
     public FlatChapterLessonDTO updateLesson(Long lessonId, LessonRequestDTO lessonRequestDTO) {
         Lesson existingLesson = getLessonEntityById(lessonId);
 
-        if (lessonRepository.existsByChapter_IdAndOrderNumberAndIdNot(
-                existingLesson.getChapter().getId(),
-                lessonRequestDTO.orderNumber(),
-                lessonId)
-        ) {
-            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_LESSON_ORDER, lessonRequestDTO.orderNumber());
-        }
+//        if (lessonRepository.existsByChapter_IdAndOrderNumberAndIdNot(
+//                existingLesson.getChapter().getId(),
+//                lessonRequestDTO.orderNumber(),
+//                lessonId)
+//        ) {
+//            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_LESSON_ORDER, lessonRequestDTO.orderNumber());
+//        }
 
         try {
             existingLesson.setTitle(lessonRequestDTO.title());
@@ -112,6 +112,13 @@ public class LessonServiceImpl implements LessonService {
             log.error("Error updating lesson", e);
             throw new InternalServerErrorException(Constants.ErrorCode.UPDATE_LESSON_FAILED, e.getMessage());
         }
+    }
+
+    @Override
+    public List<FlatChapterLessonDTO> updateLessons(List<LessonRequestDTO> lessonRequestDTOs) {
+        return lessonRequestDTOs.stream()
+                .map(dto -> updateLesson(dto.lessonId(), dto))
+                .toList();
     }
 
     @Override

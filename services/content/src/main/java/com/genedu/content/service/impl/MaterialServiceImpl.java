@@ -91,9 +91,9 @@ public class MaterialServiceImpl implements MaterialService {
     public FlatSubjectMaterialDTO updateMaterial(Long materialId , MaterialRequestDTO materialRequestDTO) {
         Material existingMaterial = getMaterialEntityById(materialId);
 
-        if(materialRepository.existsByOrderNumberAndSubject_IdAndIdNot(materialRequestDTO.orderNumber(), existingMaterial.getSubject().getId(), materialId)){
-            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_MATERIAL_ORDER, materialRequestDTO.orderNumber());
-        }
+//        if(materialRepository.existsByOrderNumberAndSubject_IdAndIdNot(materialRequestDTO.orderNumber(), existingMaterial.getSubject().getId(), materialId)){
+//            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_MATERIAL_ORDER, materialRequestDTO.orderNumber());
+//        }
 
         existingMaterial.setTitle(materialRequestDTO.title());
         existingMaterial.setOrderNumber(materialRequestDTO.orderNumber());
@@ -105,6 +105,13 @@ public class MaterialServiceImpl implements MaterialService {
             log.error("Error updating material", e);
             throw new InternalServerErrorException(Constants.ErrorCode.UPDATE_MATERIAL_FAILED, e.getMessage());
         }
+    }
+
+    @Override
+    public List<FlatSubjectMaterialDTO> updateMaterials(List<MaterialRequestDTO> materialRequestDTOs) {
+        return materialRequestDTOs.stream()
+                .map(dto -> updateMaterial(dto.id(), dto))
+                .toList();
     }
 
     @Override

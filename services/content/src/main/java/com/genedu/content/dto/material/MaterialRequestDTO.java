@@ -1,6 +1,10 @@
 package com.genedu.content.dto.material;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public record MaterialRequestDTO(
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        Long id,
         String title,
         String description,
         Integer orderNumber

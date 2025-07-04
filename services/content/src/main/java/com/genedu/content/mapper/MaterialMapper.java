@@ -53,6 +53,7 @@ public class MaterialMapper {
                 .title(materialRequestDTO.title())
                 .orderNumber(materialRequestDTO.orderNumber())
                 .description(materialRequestDTO.description())
+                .subject(subject)
                 .build();
     }
 }

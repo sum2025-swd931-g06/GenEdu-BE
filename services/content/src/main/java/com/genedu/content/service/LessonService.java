@@ -15,5 +15,6 @@ public interface LessonService {
 
     FlatChapterLessonDTO createLesson(Long chapterId, LessonRequestDTO lessonRequestDTO);
     FlatChapterLessonDTO updateLesson(Long lessonId, LessonRequestDTO lessonRequestDTO);
+    List<FlatChapterLessonDTO> updateLessons(List<LessonRequestDTO> lessonRequestDTOs);
     void deleteLesson(Long lessonId);
 }

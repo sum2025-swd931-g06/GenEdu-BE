@@ -5,6 +5,7 @@ import com.genedu.content.dto.lessoncontent.LessonContentResponseDTO;
 import com.genedu.content.dto.lessoncontentmediafile.LessonContentMediaFileRequestDTO;
 import com.genedu.content.model.LessonContentMediaFile;
 import com.genedu.content.service.LessonContentMediaFileService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +62,14 @@ public class LessonContentMediaFileController {
         log.info("Updating lesson content media file with ID: {}", id);
         FlatLessonContentLessonContentMediaFile updatedMediaFile = lessonContentMediaFileService.updateLessonContentMediaFile(id, lessonContentMediaFileRequestDTO);
         return ResponseEntity.ok(updatedMediaFile);
+    }
+
+    @PutMapping("/lesson-content-media-files/batch")
+    @Operation(summary = "Update multiple lesson content media file", description = "Updates a list of lesson content media files.")
+    public ResponseEntity<List<FlatLessonContentLessonContentMediaFile>> updateChapters(
+            @RequestBody List<LessonContentMediaFileRequestDTO> requestDTOS) {
+        var updated = lessonContentMediaFileService.updateLessonContentMediaFiles(requestDTOS);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/lesson-content-media-files/{id}")

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SubjectRepository extends JpaRepository<Subject, Integer> {
-    boolean existsByName(String name);
-    boolean existsByNameAndIdNot(String name, Integer id);
+    boolean existsByNameAndSchoolClassId(String name, Integer schoolClassId);
+    boolean existsByNameAndSchoolClassIdAndIdNot(String name, Integer schoolClassId, Integer id);
     List<Subject> findBySchoolClass_Id(Integer schoolClassId);
 }

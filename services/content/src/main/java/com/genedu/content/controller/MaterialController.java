@@ -123,6 +123,14 @@ public class MaterialController {
         return ResponseEntity.ok(updatedMaterial);
     }
 
+    @PutMapping("/materials/batch")
+    @Operation(summary = "Update multiple materials", description = "Updates a list of materials.")
+    public ResponseEntity<List<FlatSubjectMaterialDTO>> updateChapters(
+            @RequestBody List<MaterialRequestDTO> requestDTOS) {
+        List<FlatSubjectMaterialDTO> updated = materialService.updateMaterials(requestDTOS);
+        return ResponseEntity.ok(updated);
+    }
+
     @DeleteMapping("/materials/{id}")
     @Operation(summary = "Delete a material", description = "Deletes a material by its ID.")
     @ApiResponses(value = {

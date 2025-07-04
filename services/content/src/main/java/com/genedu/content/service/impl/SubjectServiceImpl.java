@@ -68,7 +68,7 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public FlatSchoolClassSubjectDTO createSubject(Integer schoolClassId, SubjectRequestDTO subjectRequestDTO) {
-        if (subjectRepository.existsByName(subjectRequestDTO.name())) {
+        if (subjectRepository.existsByNameAndSchoolClassId(subjectRequestDTO.name(), schoolClassId)) {
             throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_SUBJECT_NAME, subjectRequestDTO.name());
         }
         if (schoolClassId == null) {
@@ -91,8 +91,9 @@ public class SubjectServiceImpl implements SubjectService {
     public FlatSchoolClassSubjectDTO updateSubject(Integer id, SubjectRequestDTO subjectRequestDTO) {
         Subject existingSubject = getSubjectEntityById(id);
 
-        if (subjectRepository.existsByNameAndIdNot(
+        if (subjectRepository.existsByNameAndSchoolClassIdAndIdNot(
                 subjectRequestDTO.name(),
+                existingSubject.getSchoolClass().getId(),
                 id)
         ) {
             throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_SUBJECT_NAME, subjectRequestDTO.name());

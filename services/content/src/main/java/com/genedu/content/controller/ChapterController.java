@@ -115,6 +115,14 @@ public class ChapterController {
         return ResponseEntity.ok(updatedChapter);
     }
 
+    @PutMapping("/chapters/batch")
+    @Operation(summary = "Update multiple chapters", description = "Updates a list of chapters.")
+    public ResponseEntity<List<FlatMaterialChapterDTO>> updateChapters(
+            @RequestBody List<ChapterRequestDTO> chapterRequestDTOs) {
+        List<FlatMaterialChapterDTO> updatedChapters = chapterService.updateChapters(chapterRequestDTOs);
+        return ResponseEntity.ok(updatedChapters);
+    }
+
     @DeleteMapping("/chapters/{id}")
     @Operation(summary = "Delete a chapter", description = "Deletes a chapter by its ID.")
     @ApiResponses(value = {

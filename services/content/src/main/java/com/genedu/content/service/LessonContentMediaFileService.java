@@ -16,5 +16,6 @@ public interface LessonContentMediaFileService {
 
     FlatLessonContentLessonContentMediaFile createLessonContentMediaFile(Long lessonContentId, LessonContentMediaFileRequestDTO lessonContentMediaFileRequestDTO);
     FlatLessonContentLessonContentMediaFile updateLessonContentMediaFile(Long id, LessonContentMediaFileRequestDTO lessonContentMediaFileRequestDTO);
+    List<FlatLessonContentLessonContentMediaFile> updateLessonContentMediaFiles(List<LessonContentMediaFileRequestDTO> lessonContentMediaFileRequestDTOs);
     void deleteLessonContentMediaFile(Long id);
 }

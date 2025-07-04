@@ -1,6 +1,10 @@
 package com.genedu.content.dto.lesson;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public record LessonRequestDTO (
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        Long lessonId,
         String title,
         String description,
         Integer orderNumber

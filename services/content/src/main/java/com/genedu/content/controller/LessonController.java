@@ -5,6 +5,7 @@ import com.genedu.content.dto.flatResponse.FlatChapterLessonDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
 import com.genedu.content.service.LessonService;
 import com.genedu.content.service.webclient.LectureContentClient;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +64,14 @@ public class LessonController {
         log.info("Updating lesson with ID: {}", id);
         var updatedLesson = lessonService.updateLesson(id, lessonRequestDTO);
         return ResponseEntity.ok(updatedLesson);
+    }
+
+    @PutMapping("/lessons/batch")
+    @Operation(summary = "Update multiple lessons", description = "Updates a list of lessons.")
+    public ResponseEntity<List<FlatChapterLessonDTO>> updateChapters(
+            @RequestBody List<LessonRequestDTO> requestDTOS) {
+        List<FlatChapterLessonDTO> updated = lessonService.updateLessons(requestDTOS);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/lessons/{id}")

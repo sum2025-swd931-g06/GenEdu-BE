@@ -91,13 +91,13 @@ public class LessonContentMediaFileServiceImpl implements LessonContentMediaFile
     @Override
     public FlatLessonContentLessonContentMediaFile updateLessonContentMediaFile(Long id, LessonContentMediaFileRequestDTO lessonContentMediaFileRequestDTO) {
         LessonContentMediaFile existingMediaFile = getLessonContentMediaFileEntityById(id);
-        if (lessonContentMediaFileRepository.existsByOrderNumberAndLessonContentIdAndIdNot(
-                lessonContentMediaFileRequestDTO.orderNumber(),
-                existingMediaFile.getLessonContent().getId(),
-                id)
-        ) {
-            throw new BadRequestException(Constants.ErrorCode.DUPLICATED_LESSON_CONTENT_MEDIA_FILE_ORDER);
-        }
+//        if (lessonContentMediaFileRepository.existsByOrderNumberAndLessonContentIdAndIdNot(
+//                lessonContentMediaFileRequestDTO.orderNumber(),
+//                existingMediaFile.getLessonContent().getId(),
+//                id)
+//        ) {
+//            throw new BadRequestException(Constants.ErrorCode.DUPLICATED_LESSON_CONTENT_MEDIA_FILE_ORDER);
+//        }
 
         try {
             existingMediaFile.setOrderNumber(lessonContentMediaFileRequestDTO.orderNumber());
@@ -110,6 +110,13 @@ public class LessonContentMediaFileServiceImpl implements LessonContentMediaFile
             log.error("Failed to update Lesson Content Media File: {}", e.getMessage());
             throw new InternalServerErrorException(Constants.ErrorCode.LESSON_CONTENT_MEDIA_FILE_UPDATE_FAILED, e);
         }
+    }
+
+    @Override
+    public List<FlatLessonContentLessonContentMediaFile> updateLessonContentMediaFiles(List<LessonContentMediaFileRequestDTO> lessonContentMediaFileRequestDTOs) {
+        return lessonContentMediaFileRequestDTOs.stream()
+                .map(dto -> updateLessonContentMediaFile(dto.lessonContentMediaFileId(), dto))
+                .toList();
     }
 
     @Override

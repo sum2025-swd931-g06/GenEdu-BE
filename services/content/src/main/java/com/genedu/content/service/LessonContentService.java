@@ -27,6 +27,7 @@ public interface LessonContentService {
     LessonContent getLessonContentEntityByLessonIdAndOrderNumber(Long lessonId, int orderNumber);
     FlatLessonLessonContentDTO createLessonContent(Long lessonId, LessonContentRequestDTO lessonContentRequestDTO);
     FlatLessonLessonContentDTO updateLessonContent(Long id, LessonContentRequestDTO lessonContentRequestDTO);
+    List<FlatLessonLessonContentDTO> updateLessonContents(List<LessonContentRequestDTO> lessonContentRequestDTOs);
     void deleteLessonContent(Long id);
 
     List<LectureContentRequestDTO> getLectureContentsByLessonId(Long lessonId);

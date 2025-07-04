@@ -10,4 +10,5 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
     boolean existsByOrderNumberAndMaterial_IdAndIdNot(int orderNumber, Long materialId, Long id);
     List<Chapter> findByMaterial_Id(Long materialId);
     List<Chapter> findByMaterialIdAndOrderNumber(Long materialId, int orderNumber);
+    boolean existsByOrderNumberAndMaterial_IdAndIdNotIn(int orderNumber, Long materialId, List<Long> excludeIds);
 }

@@ -118,10 +118,10 @@ public class LessonContentServiceImpl implements LessonContentService {
     @Override
     public FlatLessonLessonContentDTO updateLessonContent(Long id, LessonContentRequestDTO lessonContentRequestDTO) {
         var existingLessonContent = getLessonContentEntityById(id);
-        if(lessonContentRepository.existsByOrderNumberAndLessonIdAndIdNot(
-                lessonContentRequestDTO.orderNumber(), existingLessonContent.getLesson().getId(), id)) {
-            throw new BadRequestException(Constants.ErrorCode.DUPLICATED_LESSON_CONTENT_ORDER, lessonContentRequestDTO.orderNumber());
-        }
+//        if(lessonContentRepository.existsByOrderNumberAndLessonIdAndIdNot(
+//                lessonContentRequestDTO.orderNumber(), existingLessonContent.getLesson().getId(), id)) {
+//            throw new BadRequestException(Constants.ErrorCode.DUPLICATED_LESSON_CONTENT_ORDER, lessonContentRequestDTO.orderNumber());
+//        }
 
         try {
             existingLessonContent.setTitle(lessonContentRequestDTO.title());
@@ -134,6 +134,13 @@ public class LessonContentServiceImpl implements LessonContentService {
             log.error("Error updating lesson content: {}", e.getMessage());
             throw new InternalServerErrorException(Constants.ErrorCode.LESSON_CONTENT_CREATION_FAILED, e.getMessage());
         }
+    }
+
+    @Override
+    public List<FlatLessonLessonContentDTO> updateLessonContents(List<LessonContentRequestDTO> lessonContentRequestDTOs) {
+        return lessonContentRequestDTOs.stream()
+                .map(dto -> updateLessonContent(dto.lessonContentId(), dto))
+                .toList();
     }
 
     @Override

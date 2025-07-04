@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -120,13 +120,13 @@ public class ChapterServiceImpl implements ChapterService {
     public FlatMaterialChapterDTO updateChapter(Long id, ChapterRequestDTO chapterRequestDTO) {
         Chapter existingChapter = getChapterEntityById(id);
 
-        if (chapterRepository.existsByOrderNumberAndMaterial_IdAndIdNot(
-                chapterRequestDTO.orderNumber(),
-                existingChapter.getMaterial().getId(),
-                id)
-        ) {
-            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_CHAPTER_ORDER, chapterRequestDTO.orderNumber());
-        }
+//        if (chapterRepository.existsByOrderNumberAndMaterial_IdAndIdNot(
+//                chapterRequestDTO.orderNumber(),
+//                existingChapter.getMaterial().getId(),
+//                id)
+//        ) {
+//            throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_CHAPTER_ORDER, chapterRequestDTO.orderNumber());
+//        }
 
 
 
@@ -142,6 +142,54 @@ public class ChapterServiceImpl implements ChapterService {
             throw new InternalServerErrorException(Constants.ErrorCode.UPDATE_CHAPTER_FAILED, e.getMessage());
         }
     }
+
+    @Override
+    public List<FlatMaterialChapterDTO> updateChapters(List<ChapterRequestDTO> chapterRequestDTOs) {
+        return chapterRequestDTOs.stream()
+                .map(dto -> updateChapter(dto.chapterId(), dto))
+                .toList();
+    }
+
+//    @Override
+//    public List<FlatMaterialChapterDTO> updateChapters(List<Long> ids, List<ChapterRequestDTO> chapterRequestDTOs) {
+//        if (ids.size() != chapterRequestDTOs.size()) {
+//            throw new BadRequestException("Số lượng id và số lượng chapter không khớp");
+//        }
+//
+//        Set<String> uniqueKeys = new HashSet<>();
+//        Set<Long> batchIds = new HashSet<>(ids);
+//        for (int i = 0; i < ids.size(); i++) {
+//            Long id = ids.get(i);
+//            ChapterRequestDTO dto = chapterRequestDTOs.get(i);
+//            Chapter oldChapter = getChapterEntityById(id);
+//            Long materialId = oldChapter.getMaterial().getId();
+//            String key = dto.orderNumber() + "-" + materialId;
+//            if (!uniqueKeys.add(key)) {
+//                throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_CHAPTER_ORDER, dto.orderNumber());
+//            }
+//        }
+//
+//        List<FlatMaterialChapterDTO> result = new ArrayList<>();
+//        for (int i = 0; i < ids.size(); i++) {
+//            Long id = ids.get(i);
+//            ChapterRequestDTO dto = chapterRequestDTOs.get(i);
+//            Chapter oldChapter = getChapterEntityById(id);
+//            Long materialId = oldChapter.getMaterial().getId();
+//            boolean isOrderChanged = !Objects.equals(oldChapter.getOrderNumber(), dto.orderNumber());
+//            if (isOrderChanged) {
+//                boolean exists = chapterRepository.existsByOrderNumberAndMaterial_IdAndIdNotIn(
+//                        dto.orderNumber(),
+//                        materialId,
+//                        ids
+//                );
+//                if (exists) {
+//                    throw new DuplicatedException(Constants.ErrorCode.DUPLICATED_CHAPTER_ORDER, dto.orderNumber());
+//                }
+//            }
+//            result.add(updateChapter(id, dto));
+//        }
+//        return result;
+//    }
 
     @Override
     public void deleteChapter(Long id) {

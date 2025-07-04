@@ -1,9 +1,12 @@
 package com.genedu.content.dto.lessoncontentmediafile;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 
 @Builder
 public record LessonContentMediaFileRequestDTO(
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        Long lessonContentMediaFileId,
         Long mediaFileId,
         Integer orderNumber,
         String description

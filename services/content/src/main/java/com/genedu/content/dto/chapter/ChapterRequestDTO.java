@@ -1,8 +1,11 @@
 package com.genedu.content.dto.chapter;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.genedu.content.model.Chapter;
 
 public record ChapterRequestDTO(
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        Long chapterId,
         Integer orderNumber,
         String title,
         String description

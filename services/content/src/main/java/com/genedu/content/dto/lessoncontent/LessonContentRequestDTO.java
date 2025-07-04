@@ -1,9 +1,12 @@
 package com.genedu.content.dto.lessoncontent;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 
 @Builder
 public record LessonContentRequestDTO(
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        Long lessonContentId,
         String title,
         Integer orderNumber,
         String content
