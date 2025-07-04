@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: subscription-service
+  profiles:
+    active: native
+  config:
+    import: optional:configserver:http://localhost:8888
