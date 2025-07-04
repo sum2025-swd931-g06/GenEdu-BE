@@ -31,7 +31,7 @@ public class ProjectService {
     private final ProjectMapper projectMapper;
 
     public List<ProjectResponseDTO> getAllProjects() {
-        List<Project> projects = projectRepository.findByIsDeletedIsFalse();
+        List<Project> projects = projectRepository.findByDeletedIsFalse();
         List<ProjectResponseDTO> projectResponseDTOs = projects.stream()
                 .map(projectMapper::toDTO)
                 .toList();
@@ -42,12 +42,12 @@ public class ProjectService {
     }
 
     public Project getProjectEntityById(UUID id) {
-        return projectRepository.findByIdAndIsDeletedIsFalse(id)
+        return projectRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND, id));
     }
 
     public List<ProjectResponseDTO> getProjectsByUserId(UUID userId) {
-        List<Project> projects = projectRepository.findByUserIdAndIsDeletedIsFalse(userId);
+        List<Project> projects = projectRepository.findByUserIdAndDeletedIsFalse(userId);
         if (projects.isEmpty()) {
             throw new NotFoundException(Constants.ErrorCode.PROJECT_WITH_USERID_NOT_FOUND, userId);
         }
@@ -58,8 +58,8 @@ public class ProjectService {
     }
 
     public ProjectResponseDTO getProjectById(UUID id) {
-        Optional<Project> project = projectRepository.findByIdAndIsDeletedIsFalse(id);
-        if (project.isEmpty()) {
+        Optional<Project> project = projectRepository.findByIdAndDeletedIsFalse(id);
+        if (project.isPresent()) {
             throw new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND, id);
         }
         return projectMapper.toDTO(project.get());
@@ -130,7 +130,7 @@ public ProjectResponseDTO updateProject(UUID id, ProjectRequestDTO projectDetail
 
     public List<ProjectResponseDTO> getCurrentUserProjects() {
         UUID currentUserId = AuthenticationUtils.getUserId();
-        List<Project> projects = projectRepository.findByUserIdAndIsDeletedIsFalse(currentUserId);
+        List<Project> projects = projectRepository.findByUserIdAndDeletedIsFalse(currentUserId);
         if (projects.isEmpty()) {
             throw new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND);
         }
@@ -138,5 +138,14 @@ public ProjectResponseDTO updateProject(UUID id, ProjectRequestDTO projectDetail
         return projects.stream()
                 .map(projectMapper::toDTO)
                 .collect(toList());
+    }
+
+    public LessonPlanFileDownloadDTO getLessonPlanTemplate() {
+        LessonPlanFileDownloadDTO lessonPlanTemplate = lectureMediaWebClientService.getLessonPlanTemplate();
+        if (lessonPlanTemplate == null) {
+            throw new NotFoundException(Constants.ErrorCode.LESSON_PLAN_TEMPLATE_NOT_FOUND);
+        }
+
+        return lessonPlanTemplate;
     }
 }

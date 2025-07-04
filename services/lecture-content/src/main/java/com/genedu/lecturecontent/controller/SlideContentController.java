@@ -1,120 +1,179 @@
 package com.genedu.lecturecontent.controller;
 
-import com.genedu.lecturecontent.webclient.ProjectWebClientService;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.genedu.lecturecontent.dto.Instruction;
+import com.genedu.lecturecontent.dto.LessonPlan;
+import com.genedu.lecturecontent.dto.Slide;
+import com.genedu.lecturecontent.dto.SlideContentRequestDTO;
+import com.genedu.lecturecontent.service.LessonPlanService;
+import com.genedu.lecturecontent.service.SlideContentService;
+import org.slf4j.Logger;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
-import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-
-import java.util.ArrayList;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import java.util.List;
-import java.util.UUID;
-import java.util.logging.Logger;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 
 @RestController
-@RequestMapping("/api/v1/slide-contents")
-@RequiredArgsConstructor
+@RequestMapping("/api/v1/lecture-contents")
 public class SlideContentController {
-    private final OllamaChatModel chatModel;
-    private final VectorStore vectorStore;
-    private final Logger log = Logger.getLogger(SlideContentController.class.getName());
-
     @Value("classpath:prompts/sys-slide-content-template.st")
     private Resource systemPromptTemplate;
 
-//    @PostMapping(
-//        value = "/projects/{projectId}/stream",
-//        produces = "application/json;charset=UTF-8",
-//        consumes = "application/json;charset=UTF-8"
-//    )public Flux<String> streamSlideContentByProjectId(
-//            @PathVariable UUID projectId
-//    ) {
-//
-//    }
+    @Value("classpath:prompts/sys-plan-generation-template.st")
+    private Resource planGenerationPromptResource;
+
+    @Value("classpath:prompts/sys-slide-generation-template.st")
+    private Resource slideGenerationPromptResource;
+
+    private final VectorStore vectorStore;
+    private final ChatClient openAiChatClient;
+    private final SlideContentService slideContentService;
+    private final ChatMemory openAiChatMemory;
+
+    private final Logger log = org.slf4j.LoggerFactory.getLogger(SlideContentController.class);
+
+    public SlideContentController(
+            @Qualifier("pgVectorStore")  VectorStore vectorStore,
+            @Qualifier("openAiChatClient") ChatClient openAiChatClient,
+            SlideContentService slideContentService,
+            ChatMemory openAiChatMemory
+    ) {
+        this.vectorStore = vectorStore;
+        this.openAiChatClient = openAiChatClient;
+        this.slideContentService = slideContentService;
+        this.openAiChatMemory = openAiChatMemory;
+    }
 
     @PostMapping(
-        value = "/stream",
-        produces = "application/json;charset=UTF-8",
-        consumes = "application/json;charset=UTF-8"
+            path = "/{projectId}/slide-content",
+            produces = "application/json;charset=UTF-8",
+            consumes = "application/json;charset=UTF-8"
     )
-    public Flux<String> streamSlideContent(
-            @RequestBody String prompt
+    public Flux<ServerSentEvent<Slide>> generateSlideByProjectIdAndSlideContentRequest(
+            @PathVariable String projectId,
+            @RequestBody SlideContentRequestDTO slideContentRequest
     ) {
-        record SlideContentRequest(
-            String lessonId,
-            String chapterId,
-            String subjectId,
-            String materialId,
-            String schoolClassId,
-            String lessonContentId
-        ) {}
+        log.info("Structuring lesson plan from provided content.");
+        BeanOutputConverter<LessonPlan> lessonPlanConverter = new BeanOutputConverter<>(LessonPlan.class);
+        String format = lessonPlanConverter.getFormat();
 
-        List<SlideContentRequest> requests = List.of(
-            new SlideContentRequest("2", "1", "1", "1", "1", "1"),
-            new SlideContentRequest("2", "1", "1", "1", "1", "2")
-        );
+        String lessonPlanContent = slideContentService.getLessonPlanContentByProjectId(projectId);
+        PromptTemplate promptTemplate = new PromptTemplate(planGenerationPromptResource);
+        promptTemplate.add("unstructured_content", lessonPlanContent);
+        promptTemplate.add("format", format);
+        Message promptMessage = promptTemplate.createMessage();
 
-        PromptTemplate promptTemplate = new PromptTemplate(systemPromptTemplate);
+        Generation generation = Objects.requireNonNull(
+                openAiChatClient.prompt()
+                        .messages(promptMessage)
+                        .call().chatResponse()).getResult();
 
-        List<QuestionAnswerAdvisor> advisors = new ArrayList<>();
-        List<Document> documents = new ArrayList<>();
+        LessonPlan lessonPlan = lessonPlanConverter.convert(generation.getOutput().getText());
 
-        String query = "Các phong trào tiêu biểu của Phong trào yêu nước chống Pháp cuối thế kỷ XIX là gì?";
+        // 4. Generate slides for each instruction in the lesson plan.
+        assert lessonPlan != null;
+        final java.util.concurrent.atomic.AtomicLong counter = new java.util.concurrent.atomic.AtomicLong();
+        log.info("Lesson plan structured successfully. Total activities: {}", lessonPlan.activities().size());
+        if (lessonPlan.activities().isEmpty()) {
+            log.warn("No activities found in the lesson plan. Returning empty Flux.");
+            return Flux.empty();
+        }
 
-        for (SlideContentRequest request : requests) {
+        return Flux.fromIterable(
+                lessonPlan.activities().stream()
+                        .flatMap(activity -> activity.instructions().stream())
+                        .toList()
+                )
+                .concatMap(instruction ->
+                        {
+                            // This try-catch is not ideal for reactive code.
+                            // A better approach is to use .onErrorResume in the chain.
+                            try {
+                                log.info("Generating slide for instruction: {} : {}", instruction.name(), instruction.content());
+                                return generateSlideForInstruction(instruction, slideContentRequest);
+                            } catch (JsonMappingException e) {
+                                log.warn("Skipping slide due to JSON mapping error for instruction: {}", instruction.name(), e);
+                                return Mono.empty();
+                            }
+                        }
+                )
+                // This is the key change: transform each Slide into a ServerSentEvent.
+                .map(slide -> ServerSentEvent.<Slide>builder()
+                        .id(String.valueOf(counter.incrementAndGet()))
+                        .event("slide-generated") // A descriptive event name for the client
+                        .data(slide)
+                        .build()
+                )
+                .doOnComplete(() -> log.info("All slides generated successfully."));
+    }
+
+    private Mono<Slide> generateSlideForInstruction (
+            Instruction instruction,
+            SlideContentRequestDTO slideContentRequest
+    ) throws JsonMappingException
+    {
+        log.info("Scheduling generation for instruction: '{}'", instruction.name());
+
+        return Mono.fromCallable(() -> {
+            log.info("Executing RAG + Generation for '{}' on a separate thread.", instruction.name());
+
+            String searchQuery = instruction.name() + " - " + instruction.content();
             String requestFilter = String.format(
                     "schoolClassId == \"%s\" && subjectId == \"%s\" && materialId == \"%s\" && lessonId == \"%s\" && chapterId == \"%s\" && lessonContentId == \"%s\"",
-                    request.schoolClassId, request.subjectId, request.materialId, request.lessonId, request.chapterId, request.lessonContentId
+                    slideContentRequest.schoolClassId(), slideContentRequest.subjectId(), slideContentRequest.materialId(), slideContentRequest.lessonId(), slideContentRequest.lessonContentId(), slideContentRequest.chapterId()
             );
-            log.info("Adding advisor for filter: " + requestFilter);
-            QuestionAnswerAdvisor advisor = QuestionAnswerAdvisor.builder(vectorStore)
-                    .searchRequest(
-                            SearchRequest.builder()
-                                    .query(query)
-                                    .filterExpression(requestFilter)
-                                    .build()
-                    ).build();
-            advisors.add(advisor);
-            List<Document> docs = vectorStore.similaritySearch(
+
+            List<Document> similarDocuments = vectorStore.similaritySearch(
                     SearchRequest.builder()
-                            .query(query)
-                            .topK(3)
+                            .query(searchQuery)
+                            .topK(5)
                             .filterExpression(requestFilter)
                             .build()
             );
-            if (docs != null && !docs.isEmpty()) {
-                documents.addAll(docs);
-            } else {
-                log.warning("No documents found for filter: " + requestFilter);
-            }
-        }
 
-        for (Document doc : documents) {
-            log.info("Found document: " + doc.getFormattedContent());
-            log.info("Metadata: " + doc.getMetadata());
-        }
+            String context = similarDocuments.stream()
+                    .map(Document::getFormattedContent)
+                    .collect(Collectors.joining("\n\n"));
 
-        promptTemplate.add("question", prompt);
-        Prompt chatPrompt = promptTemplate.create();
+            BeanOutputConverter<Slide> outputConverter = new BeanOutputConverter<>(Slide.class);
+            PromptTemplate promptTemplate = new PromptTemplate(slideGenerationPromptResource);
+            Message promptMessage = promptTemplate.createMessage(
+                    Map.of(
+                            "instruction", instruction.name() + ": " + instruction.content(),
+                            "context", context,
+                            "format", outputConverter.getFormat()
+                    )
+            );
 
-        return ChatClient.builder(chatModel)
-                .build()
-                .prompt()
-                .user(prompt)
-                .advisors(
-                        advisors.toArray(new QuestionAnswerAdvisor[0])
-                )
-                .system(chatPrompt.getContents())
-                .stream()
-                .content();
+            Generation generation = Objects.requireNonNull(
+                    openAiChatClient.prompt()
+                            .messages(promptMessage)
+                            //.advisors(new MessageChatMemoryAdvisor(openAiChatMemory))
+                            .call().chatResponse()).getResult();
+            log.info("AI raw response: {}", generation.getOutput().getText());
+            Slide slide = outputConverter.convert(generation.getOutput().getText());
+            log.info("Finished generation for: {}. Slide: {}", instruction.name(), slide);
+            return slide;
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 }

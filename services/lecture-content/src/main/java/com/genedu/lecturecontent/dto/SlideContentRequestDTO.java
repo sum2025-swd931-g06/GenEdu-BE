@@ -6,6 +6,7 @@ public record SlideContentRequestDTO (
         String subjectId,
         String materialId,
         String schoolClassId,
-        String lessonContentId
+        String lessonContentId,
+        String CustomInstructions
 ){
 }

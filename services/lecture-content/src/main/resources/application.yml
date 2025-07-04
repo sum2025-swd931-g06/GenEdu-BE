@@ -16,9 +16,6 @@ spring:
   ai:
     ollama:
       base-url: http://localhost:7869
-      init:
-        pull-model-strategy: when_missing
-        timeout: 5m
       embedding:
         options:
           model: nomic-embed-text:v1.5
@@ -26,16 +23,18 @@ spring:
       chat:
         options:
           model: llama3.2:latest
-    vectorstore:
-      pgvector:
-        initialize-schema: true
-        index-type: hnsw
-        dimensions: 768
-        table-name: lecture_content_embeddings
-  #  main:
-#    allow-bean-definition-overriding: true
-  webflux:
-    base-path: /api
+        enabled: false
+    openai:
+      api-key: AIzaSyB8Njl9vYU89SM9JLBGN_8WZUtRbStxO3I
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        options:
+          model: gemini-2.5-flash
+        completions-path: /v1beta/openai/chat/completions
+        enabled: true
+        api-key: AIzaSyB8Njl9vYU89SM9JLBGN_8WZUtRbStxO3I
+      embedding:
+        enabled: false
 
   config:
       import: optional:configserver:http://localhost:8888

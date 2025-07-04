@@ -2,6 +2,7 @@ package com.genedu.commonlibrary.model;
 
 import com.genedu.commonlibrary.model.listener.CustomAuditingEntityListener;
 import com.genedu.commonlibrary.model.listener.CustomTimeAuditingEntityListener;
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @MappedSuperclass
 @Getter
 @Setter
-@EntityListeners(CustomTimeAuditingEntityListener.class)
+@EntityListeners(CustomAuditingEntityListener.class)
 public class AbstractAuditEntity {
     @CreationTimestamp
     private ZonedDateTime createdOn;
@@ -30,6 +31,7 @@ public class AbstractAuditEntity {
 
     @LastModifiedBy
     private UUID lastModifiedBy;
-    
-    private boolean isDeleted = false;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted = false;
 }

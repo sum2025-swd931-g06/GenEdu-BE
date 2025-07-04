@@ -1,5 +1,6 @@
 package com.genedu.project.controller;
 
+import com.genedu.commonlibrary.webclient.dto.LessonPlanFileDownloadDTO;
 import com.genedu.commonlibrary.webclient.dto.LessonPlanFileUploadDTO;
 import com.genedu.project.dto.ProjectResponseDTO;
 
@@ -52,6 +53,12 @@ public class ProjectController {
     ) {
         ProjectResponseDTO createdProject = projectService.createProject(projectDTO);
         return new ResponseEntity<>(createdProject, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/lesson-plan-template")
+    public ResponseEntity<LessonPlanFileDownloadDTO> getLessonPlanTemplate() {
+        LessonPlanFileDownloadDTO lessonPlanTemplate = projectService.getLessonPlanTemplate();
+        return new ResponseEntity<>(lessonPlanTemplate, HttpStatus.OK);
     }
 
     @PutMapping(

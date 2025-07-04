@@ -1,0 +1,20 @@
+package com.genedu.commonlibrary.exception;
+
+import com.genedu.commonlibrary.utils.MessagesUtils;
+
+public class InvalidLessonPlanFormatException extends RuntimeException {
+    private final String message;
+
+    public InvalidLessonPlanFormatException(String message) {
+        this.message = MessagesUtils.getMessage(message);
+    }
+
+    public InvalidLessonPlanFormatException(String errorCode, Object... var2) {
+        this.message = MessagesUtils.getMessage(errorCode, var2);
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+}

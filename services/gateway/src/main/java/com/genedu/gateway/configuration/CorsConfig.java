@@ -14,7 +14,8 @@ public class CorsConfig extends CorsConfiguration {
     private static final String[] ALLOWED_ORIGINS = {
             "http://localhost:63342",
             "http://localhost:5173",
-            "https://localhost:8443"
+            "https://localhost:8443",
+            "http://localhost:4000",
     };
 
     private static final String[] ALLOWED_METHODS = {
