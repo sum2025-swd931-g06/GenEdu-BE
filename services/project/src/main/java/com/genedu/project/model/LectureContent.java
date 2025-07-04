@@ -3,9 +3,7 @@ package com.genedu.project.model;
 import com.genedu.commonlibrary.model.AbstractTimeAuditEntity;
 import com.genedu.project.model.enumeration.LectureStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +12,9 @@ import java.util.UUID;
 @Table(name = "lecture_contents")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class LectureContent extends AbstractTimeAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

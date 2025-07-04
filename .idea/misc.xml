@@ -18,10 +18,12 @@
         <option value="$PROJECT_DIR$/services/media/pom.xml" />
         <option value="$PROJECT_DIR$/lecture-content/pom.xml" />
         <option value="$PROJECT_DIR$/services/lecture-content/pom.xml" />
+        <option value="$PROJECT_DIR$/services/subscription/pom.xml" />
+        <option value="$PROJECT_DIR$/services/notification/pom.xml" />
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="17" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

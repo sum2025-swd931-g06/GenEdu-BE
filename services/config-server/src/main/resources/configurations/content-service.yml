@@ -1,13 +1,11 @@
 server:
   port: ${CONTENT_SERVICE_PORT:8091}
-
 spring:
   # Database configuration
   datasource:
     url: ${POSTGRES_CONTENT_DB_URL}
     username: ${POSTGRES_USER:admin}
     password: ${POSTGRES_PASSWORD:admin}
-
   # JPA and Hibernate configuration
   jpa:
     hibernate:

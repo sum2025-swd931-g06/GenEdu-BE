@@ -4,6 +4,8 @@ spring:
   cloud:
     compatibility-verifier:
       enabled: false
+  jpa:
+    show-sql: true
   profiles:
     active: native
   config:

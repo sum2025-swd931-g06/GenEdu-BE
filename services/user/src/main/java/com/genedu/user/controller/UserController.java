@@ -35,4 +35,11 @@ public class UserController {
         UserResponseDTO userResponseDTO = userService.getUserProfile(userId);
         return ResponseEntity.ok(userResponseDTO);
     }
+
+    @GetMapping("/is-exist")
+    ResponseEntity<Boolean> isUserExist(@RequestParam String userId) {
+        boolean exists = userService.isUserExists(userId);
+        return ResponseEntity.ok(exists);
+    }
+
 }
