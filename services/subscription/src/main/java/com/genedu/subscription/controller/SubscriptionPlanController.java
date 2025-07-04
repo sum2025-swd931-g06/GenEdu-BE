@@ -14,36 +14,20 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/subscriptions")
+@RequestMapping("/api/v1/subscriptions/subscription-plans")
 @Tag(name = "Subscription Plan", description = "Subscription Plan API")
 public class SubscriptionPlanController {
     private final SubscriptionPlanService subscriptionPlanService;
 
-    @PostMapping
-    public ResponseEntity<SubscriptionPlanResponseDTO> create(@RequestBody SubscriptionPlanRequestDTO requestDTO) {
-        return ResponseEntity.ok(subscriptionPlanService.createSubscriptionPlan(requestDTO));
-    }
-
-    @PutMapping("/subscription-plans/{planId}")
-    public ResponseEntity<SubscriptionPlanResponseDTO> update(@PathVariable String planId, @RequestBody SubscriptionPlanRequestDTO requestDTO) {
-        return ResponseEntity.ok(subscriptionPlanService.updateSubscriptionPlan(planId, requestDTO));
-    }
-
-    @GetMapping("/subscription-plans/{planId}")
+    @GetMapping("/{planId}")
     public ResponseEntity<SubscriptionPlanResponseDTO> get(@PathVariable String planId) {
         return subscriptionPlanService.getSubscriptionPlan(planId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/subscription-plans")
+    @GetMapping()
     public ResponseEntity<List<SubscriptionPlanResponseDTO>> getAll() {
         return ResponseEntity.ok(subscriptionPlanService.getAllSubscriptionPlans());
-    }
-
-    @DeleteMapping("/subscription-plans/{planId}")
-    public ResponseEntity<Void> delete(@PathVariable String planId) {
-        subscriptionPlanService.deleteSubscriptionPlan(planId);
-        return ResponseEntity.noContent().build();
     }
 }

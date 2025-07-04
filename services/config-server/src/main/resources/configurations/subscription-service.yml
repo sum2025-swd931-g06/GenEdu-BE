@@ -44,3 +44,10 @@ springdoc:
       client-secret: ${KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY:0pQYYepE82DkALnEVhAfZREPeHmtHz3z}
     csrf:
       enabled: false
+
+# Stripe payment configuration
+stripe:
+  secret:
+    key: ${STRIPE_SECRET_KEY:sk_test_51RetFgC4VPxDeMTHqlgqwXfhq88J31tyEYuaEk8y2JZBefMzaFm18ALRS2xkxZ7yONrZKXwRjetP000zjqg5FiPF00mjAH1clJ}
+  public:
+    key: ${STRIPE_PUBLIC_KEY:pk_test_51RetFgC4VPxDeMTHfPpc7O4bVzgG27vmT0m0UjkN3TnPUutoAiIzFwxS51L4FiSsI7vBi5RxpnpRf8oZvj1lAR3u00QbwpglKm}

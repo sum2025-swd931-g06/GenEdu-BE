@@ -38,6 +38,14 @@ public class SubscriptionPlan extends AbstractAuditEntity{
     @Column(name = "duration")
     private Integer duration;
 
+    @NotNull
+    @Column(name = "stripe_product_id", nullable = false, unique = true, length = 255)
+    private String stripeProductId;
+
+    @NotNull
+    @Column(name = "stripe_price_id", nullable = false, unique = true, length = 255)
+    private String stripePriceId;
+
 //    @Column(name = "created_on")
 //    private Instant createdOn;
 //
