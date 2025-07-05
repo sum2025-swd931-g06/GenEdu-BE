@@ -47,7 +47,7 @@ public class LessonContentController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "ID of the lesson content to retrieve", required = true
             )
-            Long lessonContentId
+            @PathVariable Long lessonContentId
     ) {
         log.info("Fetching lesson content with ID: {}", lessonContentId);
         var lessonContent = lessonContentService.getLessonContentById(lessonContentId);
@@ -65,7 +65,7 @@ public class LessonContentController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "ID of the lesson to retrieve contents for", required = true
             )
-            Long lessonId
+            @PathVariable Long lessonId
     ) {
         log.info("Fetching all lesson contents for lesson with ID: {}", lessonId);
         var lessonContents = lessonContentService.getLessonContentsByLessonId(lessonId);
