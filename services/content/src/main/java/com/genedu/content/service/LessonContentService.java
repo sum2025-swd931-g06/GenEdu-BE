@@ -30,5 +30,7 @@ public interface LessonContentService {
     void deleteLessonContent(Long id);
 
     List<LectureContentRequestDTO> getLectureContentsByLessonId(Long lessonId);
+
+
 }
 

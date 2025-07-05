@@ -1,10 +1,7 @@
 package com.genedu.lecturecontent.controller;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.genedu.lecturecontent.dto.Instruction;
-import com.genedu.lecturecontent.dto.LessonPlan;
-import com.genedu.lecturecontent.dto.Slide;
-import com.genedu.lecturecontent.dto.SlideContentRequestDTO;
+import com.genedu.lecturecontent.dto.*;
 import com.genedu.lecturecontent.service.LessonPlanService;
 import com.genedu.lecturecontent.service.SlideContentService;
 import org.slf4j.Logger;
@@ -133,7 +130,6 @@ public class SlideContentController {
     ) throws JsonMappingException
     {
         log.info("Scheduling generation for instruction: '{}'", instruction.name());
-
         return Mono.fromCallable(() -> {
             log.info("Executing RAG + Generation for '{}' on a separate thread.", instruction.name());
 

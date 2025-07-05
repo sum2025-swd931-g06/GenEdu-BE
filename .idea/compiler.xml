@@ -19,6 +19,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="notification" />
+        <module name="notificationEntity" />
         <module name="media" />
         <module name="subscription" />
         <module name="lecture-content" />
@@ -64,6 +65,9 @@
         <module name="user" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="notification" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -76,6 +80,7 @@
       <module name="lecture-content" options="-parameters -parameters" />
       <module name="media" options="-parameters -parameters" />
       <module name="notification" options="-parameters -parameters" />
+      <module name="notificationEntity" options="-parameters -parameters" />
       <module name="project" options="-parameters -parameters" />
       <module name="subscription" options="-parameters -parameters" />
       <module name="user" options="-parameters -parameters" />

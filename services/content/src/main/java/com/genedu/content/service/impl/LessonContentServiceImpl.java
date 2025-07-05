@@ -5,6 +5,7 @@ import com.genedu.commonlibrary.exception.InternalServerErrorException;
 import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.content.dto.client.LectureContentRequestDTO;
 import com.genedu.content.dto.flatResponse.FlatLessonLessonContentDTO;
+import com.genedu.content.dto.lesson.LessonEntityResponseDTO;
 import com.genedu.content.dto.lesson.LessonResponseDTO;
 import com.genedu.content.dto.lessoncontent.LessonContentRequestDTO;
 import com.genedu.content.dto.lessoncontent.LessonContentResponseDTO;
