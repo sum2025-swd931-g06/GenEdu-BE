@@ -4,9 +4,13 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import javax.sql.DataSource;
+
 import static org.springframework.ai.vectorstore.pgvector.PgVectorStore.PgDistanceType.COSINE_DISTANCE;
 import static org.springframework.ai.vectorstore.pgvector.PgVectorStore.PgIndexType.HNSW;
 
@@ -15,8 +19,9 @@ public class PgVectorConfig {
 
     @Bean("pgVectorStore")
     public VectorStore vectorStore(
+
             JdbcTemplate jdbcTemplate,
-            @Qualifier("ollamaEmbeddingModel")
+            @Qualifier("openAiEmbeddingModel")
             EmbeddingModel embeddingModel
     )
     {
@@ -24,10 +29,29 @@ public class PgVectorConfig {
                 .distanceType(COSINE_DISTANCE)       // Optional: defaults to COSINE_DISTANCE
                 .indexType(HNSW)                     // Optional: defaults to HNSW
                 .initializeSchema(true)              // Optional: defaults to false
-                .dimensions(768)                     // Optional: defaults to 768
                 .schemaName("public")                // Optional: defaults to "public"
                 .maxDocumentBatchSize(10000)         // Optional: defaults to 10000
+                .dimensions(1536)
                 .vectorTableName("lecture_content_embeddings") // Optional: defaults to "vectors"
+                .build();
+    }
+
+    @Bean("jdbcTemplatePgVector")
+
+    public JdbcTemplate jdbcTemplatePgVector(
+            @Qualifier("pgVectorDataSource")
+            javax.sql.DataSource pgVectorDataSource
+    ) {
+        return new JdbcTemplate(pgVectorDataSource);
+    }
+
+    @Bean("pgVectorDataSource")
+    public javax.sql.DataSource pgVectorDataSource() {
+        return DataSourceBuilder.create()
+                .url("jdbc:postgresql://localhost:5434/postgres")
+                .username("admin")
+                .password("admin")
+                .driverClassName("org.postgresql.Driver")
                 .build();
     }
 }

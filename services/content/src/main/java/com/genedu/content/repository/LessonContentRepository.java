@@ -23,4 +23,5 @@ public interface LessonContentRepository extends JpaRepository<LessonContent, Lo
             }
     )
     List<LessonContent> findAllByLessonId(Long lessonId);
+
 }
