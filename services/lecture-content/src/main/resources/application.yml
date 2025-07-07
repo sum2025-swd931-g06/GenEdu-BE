@@ -1,22 +1,6 @@
 spring:
   application:
     name: lecture-content-service
-  datasource:
-    url: jdbc:postgresql://localhost:5434/postgres
-    username: admin
-    password: admin
-  ai:
-    openai:
-      api-key: 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
-      chat:
-        base-url: https://generativelanguage.googleapis.com
-        options:
-          model: gemini-2.5-flash
-        completions-path: /v1beta/openai/chat/completions
-        enabled: true
-        api-key: AIzaSyB8Njl9vYU89SM9JLBGN_8WZUtRbStxO3I
-      embedding:
-        enabled: false
 
   config:
       import: optional:configserver:http://localhost:8888

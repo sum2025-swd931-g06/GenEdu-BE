@@ -13,7 +13,13 @@ spring:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:http://localhost:9099/realms/GenEdu}
           jwk-set-uri: ${JWT_SET_JWKS_URI:http://localhost:9099/realms/GenEdu/protocol/openid-connect/certs}
-
+  datasource:
+    url: jdbc:postgresql://localhost:5434/postgres
+    username: admin
+    password: admin
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
 # Spring Doc configuration
 springdoc:
   api-docs:
