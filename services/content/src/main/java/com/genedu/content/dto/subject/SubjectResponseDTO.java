@@ -1,7 +1,6 @@
 package com.genedu.content.dto.subject;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.genedu.content.dto.chapter.ChapterResponseDTO;
 import com.genedu.content.dto.material.MaterialResponseDTO;
 import lombok.Builder;
 

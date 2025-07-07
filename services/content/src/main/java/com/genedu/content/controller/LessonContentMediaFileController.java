@@ -3,7 +3,6 @@ package com.genedu.content.controller;
 import com.genedu.content.dto.flatResponse.FlatLessonContentLessonContentMediaFile;
 import com.genedu.content.dto.lessoncontent.LessonContentResponseDTO;
 import com.genedu.content.dto.lessoncontentmediafile.LessonContentMediaFileRequestDTO;
-import com.genedu.content.model.LessonContentMediaFile;
 import com.genedu.content.service.LessonContentMediaFileService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

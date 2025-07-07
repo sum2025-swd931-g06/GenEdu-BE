@@ -1,4 +1,4 @@
-package com.genedu.project.service;
+package com.genedu.project.webclient;
 
 
 import com.genedu.commonlibrary.exception.BadRequestException;

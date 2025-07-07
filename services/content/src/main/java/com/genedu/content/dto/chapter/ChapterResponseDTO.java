@@ -1,6 +1,5 @@
 package com.genedu.content.dto.chapter;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.genedu.content.dto.lesson.LessonResponseDTO;
 import lombok.Builder;

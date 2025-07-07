@@ -1,9 +1,8 @@
 package com.genedu.project.mapper;
 
-import com.genedu.project.dto.ProjectRequestDTO;
 import com.genedu.project.dto.ProjectResponseDTO;
 import com.genedu.project.model.Project;
-import com.genedu.project.service.LectureMediaWebClientService;
+import com.genedu.project.webclient.LectureMediaWebClientService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

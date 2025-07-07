@@ -2,7 +2,7 @@ package com.genedu.project.controller;
 
 import com.genedu.project.dto.LectureContentRequestDTO;
 import com.genedu.project.dto.LectureContentResponseDTO;
-import com.genedu.project.service.LectureContentService;
+import com.genedu.project.service.LectureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,13 +13,13 @@ import java.util.UUID;
 @RequestMapping("/api/v1/projects")
 @RequiredArgsConstructor
 public class LectureContentController {
-    private final LectureContentService lectureContentService;
+    private final LectureService lectureService;
 
     @GetMapping("/lecture-content/{project_id}")
     public ResponseEntity<LectureContentResponseDTO> getLectureContentByProjectId(
             @PathVariable("project_id") UUID projectId
     ) {
-        LectureContentResponseDTO lectureContentResponseDTO = lectureContentService.getLectureContentByProjectId(projectId);
+        LectureContentResponseDTO lectureContentResponseDTO = lectureService.getLectureContentByProjectId(projectId);
         return ResponseEntity.ok(lectureContentResponseDTO);
     }
 
@@ -27,7 +27,7 @@ public class LectureContentController {
     public ResponseEntity<LectureContentResponseDTO> creatLectureContentByProjectId(
             @RequestBody LectureContentRequestDTO lectureContentRequestDTO
     ) {
-        LectureContentResponseDTO lectureContentResponseDTO = lectureContentService.createLectureContent(lectureContentRequestDTO);
+        LectureContentResponseDTO lectureContentResponseDTO = lectureService.createLectureContent(lectureContentRequestDTO);
         return ResponseEntity.ok(lectureContentResponseDTO);
     }
 
@@ -36,7 +36,7 @@ public class LectureContentController {
             @PathVariable("lesson_content_id") UUID lessonContentId,
             @RequestBody LectureContentRequestDTO lectureContentRequestDTO
     ) {
-        LectureContentResponseDTO lectureContentResponseDTO = lectureContentService.updateLectureContent(lessonContentId, lectureContentRequestDTO);
+        LectureContentResponseDTO lectureContentResponseDTO = lectureService.updateLectureContent(lessonContentId, lectureContentRequestDTO);
         return ResponseEntity.ok(lectureContentResponseDTO);
     }
 }

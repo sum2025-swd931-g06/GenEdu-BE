@@ -4,13 +4,11 @@ import com.genedu.project.dto.LectureContentRequestDTO;
 import com.genedu.project.dto.LectureContentResponseDTO;
 import com.genedu.project.model.LectureContent;
 import com.genedu.project.model.Project;
-import com.genedu.project.model.SlideContent;
 import com.genedu.project.service.ProjectService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j

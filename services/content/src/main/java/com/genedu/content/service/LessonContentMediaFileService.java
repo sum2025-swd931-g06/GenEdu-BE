@@ -3,7 +3,6 @@ package com.genedu.content.service;
 import com.genedu.content.dto.flatResponse.FlatLessonContentLessonContentMediaFile;
 import com.genedu.content.dto.lessoncontent.LessonContentResponseDTO;
 import com.genedu.content.dto.lessoncontentmediafile.LessonContentMediaFileRequestDTO;
-import com.genedu.content.model.LessonContent;
 import com.genedu.content.model.LessonContentMediaFile;
 
 import java.util.List;

@@ -4,23 +4,17 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/services/config-server/pom.xml" />
-        <option value="$PROJECT_DIR$/services/discovery/pom.xml" />
         <option value="$PROJECT_DIR$/customer/pom.xml" />
         <option value="$PROJECT_DIR$/services/customer/pom.xml" />
-        <option value="$PROJECT_DIR$/services/gateway/pom.xml" />
-        <option value="$PROJECT_DIR$/services/user/pom.xml" />
         <option value="$PROJECT_DIR$/services/curriculum/pom.xml" />
-        <option value="$PROJECT_DIR$/services/content/pom.xml" />
-        <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/services/common-library/pom.xml" />
-        <option value="$PROJECT_DIR$/services/project/pom.xml" />
-        <option value="$PROJECT_DIR$/services/media/pom.xml" />
         <option value="$PROJECT_DIR$/lecture-content/pom.xml" />
-        <option value="$PROJECT_DIR$/services/lecture-content/pom.xml" />
-        <option value="$PROJECT_DIR$/services/subscription/pom.xml" />
-        <option value="$PROJECT_DIR$/services/notification/pom.xml" />
+        <option value="$PROJECT_DIR$/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/services/lecture-content/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="17" project-jdk-type="JavaSDK">

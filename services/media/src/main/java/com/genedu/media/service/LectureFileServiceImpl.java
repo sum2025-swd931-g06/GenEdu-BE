@@ -12,6 +12,7 @@ import com.genedu.commonlibrary.enumeration.FileType;
 import com.genedu.media.repository.MediaFileRepository;
 import com.genedu.media.repository.S3StorageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,8 +33,11 @@ public class LectureFileServiceImpl implements MediaFileService<LessonPlanFileUp
     private final MediaFileRepository mediaFileRepository;
     private final BucketName bucketName;
     private static final String LECTURE_FOLDER = "projects";
-    private static final String S3Host = "http://localhost:4566";
-    private static final UUID SYSTEM_USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
+    @Value("${aws.s3.endpoint}")
+    private String S3Host;
+
+    private final UUID SYSTEM_USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     @Override
     @Transactional
@@ -88,7 +93,7 @@ public class LectureFileServiceImpl implements MediaFileService<LessonPlanFileUp
         newMediaFile.setFileType(fileType);
         newMediaFile.setFileUrl(fileUrl);
         newMediaFile.setUploadedBy(uploadedBy);
-        newMediaFile.setUploadedOn(java.time.LocalDateTime.now());
+        newMediaFile.setUploadedOn(LocalDateTime.now());
         newMediaFile.setDeleted(false); // Explicitly set as not deleted
         MediaFile savedMediaFile = mediaFileRepository.save(newMediaFile);
 

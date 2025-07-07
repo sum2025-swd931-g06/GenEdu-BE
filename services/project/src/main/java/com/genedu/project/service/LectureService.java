@@ -23,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LectureContentService {
+public class LectureService {
 
     private final LectureContentRepository lectureContentRepository;
     private final SlideContentRepository slideContentRepository;
@@ -64,9 +64,10 @@ public class LectureContentService {
                         SlideContent slide = SlideContent.builder()
                                 .orderNumber(slideDTO.orderNumber())
                                 .slideTitle(slideDTO.title())
-                                .mainIdea(slideDTO.mainIdea())
+                                .mainIdea(slideDTO.slideType())
                                 .subpoints(slideDTO.subpoints())
                                 .lectureContent(finalSavedLectureContent) // Associate with the saved lecture content
+                                .narrationScript(slideDTO.narrationScript())
                                 .build();
                         return slide;
                     })
