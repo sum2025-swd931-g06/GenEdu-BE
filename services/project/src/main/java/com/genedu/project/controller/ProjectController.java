@@ -7,6 +7,8 @@ import com.genedu.project.dto.ProjectResponseDTO;
 import com.genedu.project.dto.ProjectRequestDTO;
 import com.genedu.project.model.Project;
 import com.genedu.project.service.ProjectService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/projects")
 @RequiredArgsConstructor
+@Tag(name = "projects", description = "Project related API")
 public class ProjectController {
     private final ProjectService projectService;
 
@@ -36,6 +39,8 @@ public class ProjectController {
     }
 
     @GetMapping("/user/{userId}")
+    @Deprecated
+    @Operation(summary = "Get All Project of user using userId")
     public ResponseEntity<List<ProjectResponseDTO>> getProjectsByUserId(@PathVariable UUID userId) {
         List<ProjectResponseDTO> projects = projectService.getProjectsByUserId(userId);
         return new ResponseEntity<>(projects, HttpStatus.OK);
@@ -64,6 +69,9 @@ public class ProjectController {
     @PutMapping(
             value = "/{projectId}/lesson-plan",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @Operation(
+        summary = "Upload file attach with project id"
     )
     public ResponseEntity<ProjectResponseDTO> uploadLectureFile(
             @ModelAttribute LessonPlanFileUploadDTO lectureFileUploadDTO
