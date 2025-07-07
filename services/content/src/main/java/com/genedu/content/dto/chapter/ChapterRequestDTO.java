@@ -13,4 +13,5 @@ public record ChapterRequestDTO(
             throw new IllegalArgumentException("Title cannot be null or blank.");
         }
     }
+
 }

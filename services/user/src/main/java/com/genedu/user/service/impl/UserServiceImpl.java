@@ -5,11 +5,8 @@ import com.genedu.commonlibrary.exception.ForbiddenException;
 import com.genedu.user.dto.customer.UserAdminDTO;
 import com.genedu.user.dto.customer.UserListResponseDTO;
 import com.genedu.user.dto.customer.UserResponseDTO;
-import com.genedu.user.exception.UserNotFoundException;
-import com.genedu.user.model.User;
 import com.genedu.user.service.UserService;
 import com.genedu.user.configuration.KeycloakPropsConfig;
-import com.sun.tools.xjc.reader.xmlschema.bindinfo.BIConversion;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
@@ -59,6 +56,25 @@ public class UserServiceImpl implements UserService {
                     String.format(ERROR_FORMAT, exception.getMessage(), keycloakPropsConfig.getClientId())
             );
         }
+    }
+
+    @Override
+    public boolean isUserExists(String userId) {
+
+        try {
+            return keycloak.realm(keycloakPropsConfig.getRealm())
+                    .users()
+                    .get(userId)
+                    .toRepresentation() != null;
+        } catch (ForbiddenException exception) {
+            throw new AccessDeniedException(
+                    String.format(ERROR_FORMAT, exception.getMessage(), keycloakPropsConfig.getClientId())
+            );
+        } catch (Exception e) {
+            log.error("Error checking if user exists: {}", e.getMessage());
+            return false;
+        }
+
     }
 
     @Override

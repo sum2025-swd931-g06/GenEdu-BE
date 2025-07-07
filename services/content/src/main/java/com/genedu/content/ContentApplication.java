@@ -3,13 +3,14 @@ package com.genedu.content;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@SpringBootApplication
+@SpringBootApplication()
 @EnableDiscoveryClient
+@ComponentScan(basePackages = {"com.genedu.content", "com.genedu.commonlibrary"})
 public class ContentApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(ContentApplication.class, args);
 	}
-
 }

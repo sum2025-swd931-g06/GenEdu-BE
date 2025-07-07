@@ -1,10 +1,13 @@
 package com.genedu.content.mapper;
 
-import com.genedu.content.dto.flatResponse.FlatSubjectChapterLessonDTO;
+import com.genedu.content.dto.flatResponse.FlatChapterLessonDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
 import com.genedu.content.dto.lesson.LessonResponseDTO;
+import com.genedu.content.dto.lessoncontent.LessonContentResponseDTO;
 import com.genedu.content.model.Chapter;
 import com.genedu.content.model.Lesson;
+
+import java.util.List;
 
 public class LessonMapper {
     public static LessonResponseDTO toDTO(Lesson lesson) {
@@ -13,18 +16,36 @@ public class LessonMapper {
                 .title(lesson.getTitle())
                 .description(lesson.getDescription())
                 .orderNumber(lesson.getOrderNumber())
+
+                .createdOn(lesson.getCreatedOn())
+                .createdBy(lesson.getCreatedBy())
+                .lastModifiedOn(lesson.getLastModifiedOn())
+                .lastModifiedBy(lesson.getLastModifiedBy())
                 .build();
     }
 
-    public static FlatSubjectChapterLessonDTO toDTOWithChapter(Lesson lesson) {
-        return FlatSubjectChapterLessonDTO.builder()
-                .subjectId(lesson.getChapter().getSubject().getId())
-                .subjectName(lesson.getChapter().getSubject().getName())
-                .subjectDescription(lesson.getChapter().getSubject().getDescription())
+    public static LessonResponseDTO toDTOWithLessonContent(Lesson lesson, List<LessonContentResponseDTO> lessonContents) {
+        return LessonResponseDTO.builder()
+                .id(lesson.getId())
+                .title(lesson.getTitle())
+                .orderNumber(lesson.getOrderNumber())
+                .description(lesson.getDescription())
+                .lessonContents(lessonContents)
+
+                .createdOn(lesson.getCreatedOn())
+                .createdBy(lesson.getCreatedBy())
+                .lastModifiedOn(lesson.getLastModifiedOn())
+                .lastModifiedBy(lesson.getLastModifiedBy())
+                .build();
+    }
+
+    public static FlatChapterLessonDTO toFlatDTO(Lesson lesson) {
+        return FlatChapterLessonDTO.builder()
                 .chapterId(lesson.getChapter().getId())
                 .chapterTitle(lesson.getChapter().getTitle())
                 .chapterOrderNumber(lesson.getChapter().getOrderNumber())
                 .chapterDescription(lesson.getChapter().getDescription())
+
                 .lessonId(lesson.getId())
                 .lessonTitle(lesson.getTitle())
                 .lessonOrderNumber(lesson.getOrderNumber())

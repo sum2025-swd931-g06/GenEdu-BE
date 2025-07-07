@@ -1,12 +1,13 @@
 server:
-  port: 8090
+  port: ${USER_SERVICE_PORT:8090}
 
 spring:
   # Database configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/userdb
-    username: admin
-    password: admin
+    url: ${POSTGRES_USER_DB_URL:jdbc:postgresql://localhost:5432/userdb}
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:admin}
+
   # JPA and Hibernate configuration
   jpa:
     hibernate:
@@ -21,8 +22,8 @@ spring:
     flyway:
       enabled: true
       baseline-on-migrate: true
-      user: admin
-      password: admin
+      user: ${POSTGRES_USER:admin}
+      password: ${POSTGRES_PASSWORD:admin}
       baseline-description: "Baseline init for user service"
       baseline-version: 0
 # Security configuration
@@ -47,10 +48,10 @@ springdoc:
 
 # Keycloak configuration
 keycloak:
-  server-url: http://localhost:9099
-  realm: GenEdu
+  server-url: ${KEYCLOAK_URL:http://localhost:9099}
+  realm: ${KEYCLOAK_REALM_NAME:GenEdu}
   client-id: ${KC_GENEDU_ADMIN_CLI_CLIENT_ID:admin-cli}
   grant-type: password
-  password: genedu-admin
-  username: genedu-admin
-  client-secret: ${KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY:wEli51b7nULXyzcNAao2jqu1HEAEJgNw}
+  password: ${KC_GENEDU_ADMIN_CLI_ADMIN_PASSWORD:genedu-admin}
+  username: ${KC_GENEDU_ADMIN_CLI_ADMIN_USERNAME:genedu-admin}
+  client-secret: ${KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY:QV9FBc2zHp5QvDorHKMo6sVd7PRg1Bpu}

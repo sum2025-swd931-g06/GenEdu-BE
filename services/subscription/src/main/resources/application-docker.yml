@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: subscription-service
+  config:
+    import: optional:configserver:http://config-server:8888
+    activate:
+      on-profile: docker
+

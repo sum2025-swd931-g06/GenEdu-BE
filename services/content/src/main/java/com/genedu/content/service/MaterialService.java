@@ -1,0 +1,19 @@
+package com.genedu.content.service;
+
+import com.genedu.content.dto.flatResponse.FlatSubjectMaterialDTO;
+import com.genedu.content.dto.material.MaterialRequestDTO;
+import com.genedu.content.dto.subject.SubjectResponseDTO;
+import com.genedu.content.model.Material;
+
+import java.util.List;
+
+
+public interface MaterialService {
+    List<FlatSubjectMaterialDTO> getAllMaterials();
+    Material getMaterialEntityById(Long id);
+    FlatSubjectMaterialDTO getMaterialById(Long id);
+    SubjectResponseDTO getMaterialsBySubjectId(Integer subjectId);
+    FlatSubjectMaterialDTO createMaterial(Integer subjectId, MaterialRequestDTO materialRequestDTO);
+    FlatSubjectMaterialDTO updateMaterial(Long materialId, MaterialRequestDTO materialRequestDTO);
+    void deleteMaterial(Long id);
+}

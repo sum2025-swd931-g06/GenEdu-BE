@@ -2,8 +2,10 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/postgres_init.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/services/content/src/main/resources/db/migration/V1__Init_Table.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/services/content/src/main/resources/db/migration/V2__Add_Sample_Data.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/services/content/src/main/resources/db/migration/V3__Add_Auditing_Lesson_Part_Table.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/postgres_vector_init.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/services/content/src/main/resources/db/migration/V1__Init__Tables.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/services/content/src/main/resources/db/migration/V2__Add__SampleData.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/services/user/src/main/resources/db/migration/V1__Init_Setup.sql" dialect="PostgreSQL" />
+    <file url="PROJECT" dialect="PostgreSQL" />
   </component>
 </project>

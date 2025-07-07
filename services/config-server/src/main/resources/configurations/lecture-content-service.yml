@@ -1,0 +1,34 @@
+server:
+  port: ${LECTURE_CONTENT_SERVICE_PORT:8096}
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+spring:
+  # Security configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:9099/realms/GenEdu}
+          jwk-set-uri: ${JWT_SET_JWKS_URI:http://localhost:9099/realms/GenEdu/protocol/openid-connect/certs}
+  datasource:
+    url: jdbc:postgresql://localhost:5434/postgres
+    username: admin
+    password: admin
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+# Spring Doc configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    oauth:
+      client-id: ${KC_GENEDU_GENEDU_BE_CLIENT_ID:genedu-be}
+      client-secret: ${KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY:0pQYYepE82DkALnEVhAfZREPeHmtHz3z}
+    csrf:
+      enabled: false

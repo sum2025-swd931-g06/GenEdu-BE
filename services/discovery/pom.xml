@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.0</version>
+        <version>3.3.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.genedu</groupId>
@@ -28,7 +28,7 @@
     </scm>
     <properties>
         <java.version>17</java.version>
-        <spring-cloud.version>2025.0.0-RC1</spring-cloud.version>
+        <spring-cloud.version>2023.0.3</spring-cloud.version>
     </properties>
     <dependencies>
         <dependency>
@@ -39,11 +39,22 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.zipkin.reporter2</groupId>
+            <artifactId>zipkin-reporter-brave</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
         </dependency>
     </dependencies>
     <dependencyManagement>
@@ -57,7 +68,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <build>
         <plugins>
             <plugin>
@@ -76,23 +86,4 @@
             </snapshots>
         </repository>
     </repositories>
-
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <spring.profiles.active>dev</spring.profiles.active>
-                <env.CONFIG_SERVER_PORT>8888</env.CONFIG_SERVER_PORT>
-                <env.CONFIG_SERVER_HOST>8888</env.CONFIG_SERVER_HOST>
-            </properties>
-        </profile>
-        <profile>
-            <id>docker</id>
-            <properties>
-                <spring.profiles.active>docker</spring.profiles.active>
-                <env.CONFIG_SERVER_PORT>8888</env.CONFIG_SERVER_PORT>
-                <env.CONFIG_SERVER_HOST>8888</env.CONFIG_SERVER_HOST>
-            </properties>
-        </profile>
-    </profiles>
 </project>

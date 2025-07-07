@@ -1,11 +1,6 @@
 package com.genedu.content.configuration;
 
 import lombok.extern.slf4j.Slf4j;
-import org.keycloak.adapters.authorization.integration.jakarta.ServletPolicyEnforcerFilter;
-import org.keycloak.adapters.authorization.spi.ConfigurationResolver;
-import org.keycloak.adapters.authorization.spi.HttpRequest;
-import org.keycloak.representations.adapters.config.PolicyEnforcerConfig;
-import org.keycloak.util.JsonSerialization;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -17,10 +12,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,7 +30,7 @@ public class SecurityConfig {
             "/actuator/**",
             "/webjars/**",
     };
-//
+
     @Bean
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable); // Disable CSRF protection for stateless APIs
