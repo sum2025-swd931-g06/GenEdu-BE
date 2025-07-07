@@ -54,4 +54,4 @@ keycloak:
   grant-type: password
   password: ${KC_GENEDU_ADMIN_CLI_ADMIN_PASSWORD:genedu-admin}
   username: ${KC_GENEDU_ADMIN_CLI_ADMIN_USERNAME:genedu-admin}
-  client-secret: ${KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY:wEli51b7nULXyzcNAao2jqu1HEAEJgNw}
+  client-secret: ${KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY:QV9FBc2zHp5QvDorHKMo6sVd7PRg1Bpu}

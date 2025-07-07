@@ -1,4 +1,4 @@
-package com.genedu.project.service;
+package com.genedu.project.webclient;
 
 
 import com.genedu.commonlibrary.exception.BadRequestException;
@@ -25,6 +25,8 @@ public class LectureMediaWebClientService {
     private final WebClient webClient;
     private static final String GET_LESSON_PLAN_FILE_URI = "/medias/projects/lesson-plans/{fileId}/url";
     private static final String UPLOAD_LESSON_PLAN_FILE_URI = "/medias/projects/lesson-plans/upload";
+    private static final String GET_LESSON_PLAN_FILE_TEMPLATE_URI = "/medias/projects/lesson-plans/template";
+
 
 
     public LectureMediaWebClientService(WebClient.Builder builder) {
@@ -67,6 +69,25 @@ public class LectureMediaWebClientService {
                         clientResponse -> clientResponse.bodyToMono(ErrorDTO.class)
                                 .flatMap(errorDto -> Mono.error(new RuntimeException(errorDto.title() + ": " + errorDto.detail())))
                 )
+                .bodyToMono(LessonPlanFileDownloadDTO.class)
+                .block();
+    }
+
+    public LessonPlanFileDownloadDTO getLessonPlanTemplate() {
+        return webClient.get()
+                .uri(GET_LESSON_PLAN_FILE_TEMPLATE_URI)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AuthenticationUtils.extractJwt())
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::is4xxClientError,
+                        clientResponse -> clientResponse.bodyToMono(ErrorDTO.class)
+                                .flatMap(errorDto -> Mono.error(new BadRequestException(errorDto.title(), errorDto.detail())))
+                )
+//                .onStatus(
+//                        HttpStatusCode::is5xxServerError,
+//                        clientResponse -> clientResponse.bodyToMono(ErrorDTO.class)
+//                                .flatMap(errorDto -> Mono.error(new RuntimeException(errorDto.title() + ": " + errorDto.detail())))
+//                )
                 .bodyToMono(LessonPlanFileDownloadDTO.class)
                 .block();
     }
