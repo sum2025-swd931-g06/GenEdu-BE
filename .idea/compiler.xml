@@ -19,6 +19,8 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="notification" />
+        <module name="project" />
+        <module name="subscription" />
         <module name="notificationEntity" />
         <module name="lecture-content" />
         <module name="media" />
@@ -31,6 +33,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
+
         <module name="common-library" />
       </profile>
       <profile name="Annotation profile for content" enabled="true">
@@ -43,6 +46,11 @@
         </processorPath>
         <module name="content" />
       </profile>
+
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="lecture-content" target="17" />
+      <module name="notification (1)" target="17" />
       <profile name="Annotation profile for project" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -85,14 +93,15 @@
       <module name="content" options="-parameters -parameters" />
       <module name="discovery" options="-parameters" />
       <module name="gateway" options="-parameters" />
+
       <module name="genedu" options="-parameters -parameters" />
       <module name="lecture-content" options="-parameters -parameters" />
       <module name="media" options="-parameters -parameters" />
       <module name="notification" options="-parameters -parameters" />
-      <module name="notificationEntity" options="-parameters -parameters" />
       <module name="project" options="-parameters -parameters" />
       <module name="subscription" options="-parameters -parameters" />
       <module name="user" options="-parameters -parameters" />
+
     </option>
   </component>
 </project>
