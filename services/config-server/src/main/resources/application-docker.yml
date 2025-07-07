@@ -10,5 +10,5 @@ spring:
         git:
           uri: https://github.com/sum2025-swd931-g06/GenEdu-BE-Config-Server
           username: sum2025-swd931-g06
-          password: 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
+          password: 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
           search-paths: configurations-docker
