@@ -12,6 +12,7 @@ import com.genedu.project.model.Project;
 import com.genedu.project.model.enumeration.ProjectStatus;
 import com.genedu.project.repository.ProjectRepository;
 import com.genedu.project.utils.Constants;
+import com.genedu.project.webclient.LectureMediaWebClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +60,7 @@ public class ProjectService {
 
     public ProjectResponseDTO getProjectById(UUID id) {
         Optional<Project> project = projectRepository.findByIdAndDeletedIsFalse(id);
-        if (project.isPresent()) {
+        if (project.isEmpty()) {
             throw new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND, id);
         }
         return projectMapper.toDTO(project.get());
@@ -111,7 +112,8 @@ public ProjectResponseDTO updateProject(UUID id, ProjectRequestDTO projectDetail
     }
 
     @Transactional
-    public ProjectResponseDTO updateLessonPlanFile(LessonPlanFileUploadDTO lessonPlanFileUploadDTO, UUID projectId) {
+    public ProjectResponseDTO updateLessonPlanFile(LessonPlanFileUploadDTO lessonPlanFileUploadDTO) {
+        UUID projectId = UUID.fromString(lessonPlanFileUploadDTO.getProjectId());
         Project project = getProjectEntityById(projectId);
 
         MultipartFile mediaFile = lessonPlanFileUploadDTO.getMediaFile();

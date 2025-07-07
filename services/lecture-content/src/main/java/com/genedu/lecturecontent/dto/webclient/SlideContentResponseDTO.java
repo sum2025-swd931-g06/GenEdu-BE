@@ -1,11 +1,11 @@
-package com.genedu.project.dto;
+package com.genedu.lecturecontent.dto.webclient;
 
 import java.util.Map;
 
-public record SlideContentRequestDTO(
+public record SlideContentResponseDTO(
         String lectureContentId,
         String title,
-        String slideType,
+        String mainIdea,
         Integer orderNumber,
         Map<String, Object> subpoints,
         String narrationScript

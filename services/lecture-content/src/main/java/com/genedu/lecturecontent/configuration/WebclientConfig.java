@@ -7,8 +7,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class WebclientConfig {
-    private static final String CONTENT_SERVICE_URL = "http://content/api/v1";
+    private static final String CONTENT_SERVICE_URL = "http://content-service/api/v1";
     private static final String LECTURE_MEDIA_SERVICE_URL = "http://media-service/api/v1";
+    private static final String PROJECT_SERVICE_URL = "http://project-service/api/v1";
 
     @Bean
     @LoadBalanced
@@ -24,5 +25,10 @@ public class WebclientConfig {
     @Bean("contentWebClient")
     public WebClient contentWebClient(WebClient.Builder builder) {
         return builder.baseUrl(CONTENT_SERVICE_URL).build();
+    }
+
+    @Bean("projectWebClient")
+    public WebClient projectWebClient(WebClient.Builder builder) {
+        return builder.baseUrl(PROJECT_SERVICE_URL).build();
     }
 }

@@ -23,9 +23,9 @@ import java.util.UUID;
 public class ProjectController {
     private final ProjectService projectService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable UUID id) {
-        ProjectResponseDTO project = projectService.getProjectById(id);
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable UUID projectId) {
+        ProjectResponseDTO project = projectService.getProjectById(projectId);
         return new ResponseEntity<>(project, HttpStatus.OK);
     }
     
@@ -66,10 +66,9 @@ public class ProjectController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<ProjectResponseDTO> uploadLectureFile(
-            @ModelAttribute LessonPlanFileUploadDTO lectureFileUploadDTO,
-            @PathVariable UUID projectId
+            @ModelAttribute LessonPlanFileUploadDTO lectureFileUploadDTO
     ) {
-        ProjectResponseDTO updatedProject = projectService.updateLessonPlanFile(lectureFileUploadDTO, projectId);
+        ProjectResponseDTO updatedProject = projectService.updateLessonPlanFile(lectureFileUploadDTO);
         return new ResponseEntity<>(updatedProject, HttpStatus.OK);
     }
 

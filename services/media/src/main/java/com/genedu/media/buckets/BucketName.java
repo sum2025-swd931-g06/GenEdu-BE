@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Configuration
 @PropertySource(value = "classpath:buckets.properties")
 public class BucketName {
-    @Value("${lecture-bucket}")
+    @Value("${genedu-bucket}")
     private String lectureBucket;
 
 }

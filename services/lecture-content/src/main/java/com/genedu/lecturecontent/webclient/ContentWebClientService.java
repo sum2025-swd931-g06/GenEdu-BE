@@ -1,7 +1,6 @@
 package com.genedu.lecturecontent.webclient;
 
 import com.genedu.commonlibrary.utils.AuthenticationUtils;
-import com.genedu.commonlibrary.webclient.dto.LessonPlanFileDownloadDTO;
 import com.genedu.lecturecontent.dto.LessonEntityResponseDTO;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
@@ -32,5 +31,4 @@ public class ContentWebClientService {
                 .bodyToMono(LessonEntityResponseDTO.class)
                 .block();
     }
-
 }

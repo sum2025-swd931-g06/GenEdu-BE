@@ -1,11 +1,9 @@
 package com.genedu.lecturecontent.service;
-
 import com.genedu.lecturecontent.dto.LectureContentRequestDTO;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

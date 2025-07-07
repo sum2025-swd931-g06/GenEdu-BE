@@ -2,13 +2,9 @@ package com.genedu.lecturecontent.controller;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.genedu.lecturecontent.dto.*;
-import com.genedu.lecturecontent.service.LessonPlanService;
 import com.genedu.lecturecontent.service.SlideContentService;
 import org.slf4j.Logger;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.PromptTemplate;
@@ -24,10 +20,10 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+
+import java.util.*;
 import java.util.stream.Collectors;
+import com.genedu.lecturecontent.dto.webclient.LectureContentRequestDTO;
 
 
 @RestController
@@ -45,41 +41,59 @@ public class SlideContentController {
     private final VectorStore vectorStore;
     private final ChatClient openAiChatClient;
     private final SlideContentService slideContentService;
-    private final ChatMemory openAiChatMemory;
 
     private final Logger log = org.slf4j.LoggerFactory.getLogger(SlideContentController.class);
 
     public SlideContentController(
             @Qualifier("pgVectorStore")  VectorStore vectorStore,
             @Qualifier("openAiChatClient") ChatClient openAiChatClient,
-            SlideContentService slideContentService,
-            ChatMemory openAiChatMemory
+            SlideContentService slideContentService
     ) {
         this.vectorStore = vectorStore;
         this.openAiChatClient = openAiChatClient;
         this.slideContentService = slideContentService;
-        this.openAiChatMemory = openAiChatMemory;
     }
 
     @PostMapping(
-            path = "/{projectId}/slide-content",
-            produces = "application/json;charset=UTF-8",
-            consumes = "application/json;charset=UTF-8"
+            path = "/{projectId}/slide-content"
     )
     public Flux<ServerSentEvent<Slide>> generateSlideByProjectIdAndSlideContentRequest(
-            @PathVariable String projectId,
-            @RequestBody SlideContentRequestDTO slideContentRequest
+            @PathVariable String projectId
     ) {
         log.info("Structuring lesson plan from provided content.");
         BeanOutputConverter<LessonPlan> lessonPlanConverter = new BeanOutputConverter<>(LessonPlan.class);
         String format = lessonPlanConverter.getFormat();
-
+        // 1. Get the uploaded lesson plan content by project ID.
         String lessonPlanContent = slideContentService.getLessonPlanContentByProjectId(projectId);
         PromptTemplate promptTemplate = new PromptTemplate(planGenerationPromptResource);
         promptTemplate.add("unstructured_content", lessonPlanContent);
         promptTemplate.add("format", format);
         Message promptMessage = promptTemplate.createMessage();
 
+        ProjectResponseDTO projectResponseDTO = slideContentService.getProjectByProjectId(UUID.fromString(projectId));
+        if (projectResponseDTO == null) {
+            log.error("Project with ID {} not found.", projectId);
+            return Flux.error(new IllegalArgumentException("Project not found"));
+        }
+        log.info("Project found: {}", projectResponseDTO);
+        LessonEntityResponseDTO lessonEntityResponseDTO = slideContentService.getLessonByLessonId(projectResponseDTO.lessonId());
+
+        if (lessonEntityResponseDTO == null) {
+            log.error("Lesson with ID {} not found.", projectResponseDTO.lessonId());
+            return Flux.error(new IllegalArgumentException("Lesson not found"));
+        }
+        log.info("Lesson found: {}", lessonEntityResponseDTO);
+        SlideContentRequestDTO slideContentRequest = new SlideContentRequestDTO(
+                lessonEntityResponseDTO.lessonId(),
+                lessonEntityResponseDTO.chapterId(),
+                lessonEntityResponseDTO.subjectId(),
+                lessonEntityResponseDTO.materialId(),
+                lessonEntityResponseDTO.schoolClassId(),
+                "",
+                projectResponseDTO.customInstructions()
+        );
+
+        // 2. Generate a structured lesson plan from the unstructured content.
         Generation generation = Objects.requireNonNull(
                 openAiChatClient.prompt()
                         .messages(promptMessage)
@@ -87,15 +101,23 @@ public class SlideContentController {
 
         LessonPlan lessonPlan = lessonPlanConverter.convert(generation.getOutput().getText());
 
-        // 4. Generate slides for each instruction in the lesson plan.
+        // 3. Validate the lesson plan structure.
         assert lessonPlan != null;
         final java.util.concurrent.atomic.AtomicLong counter = new java.util.concurrent.atomic.AtomicLong();
         log.info("Lesson plan structured successfully. Total activities: {}", lessonPlan.activities().size());
+
+        for (Activity activity : lessonPlan.activities()) {
+            log.info("Activity: {}", activity.name());
+            for (Instruction instruction : activity.instructions()) {
+                log.info("Instruction: {} - {}", instruction.name(), instruction.content());
+            }
+        }
+
         if (lessonPlan.activities().isEmpty()) {
             log.warn("No activities found in the lesson plan. Returning empty Flux.");
             return Flux.empty();
         }
-
+        // 4. Generate slides for each instruction in the lesson plan.
         return Flux.fromIterable(
                 lessonPlan.activities().stream()
                         .flatMap(activity -> activity.instructions().stream())
@@ -121,7 +143,9 @@ public class SlideContentController {
                         .data(slide)
                         .build()
                 )
-                .doOnComplete(() -> log.info("All slides generated successfully."));
+                .doOnComplete(
+                        () -> log.info("All slides generated successfully.")
+                );
     }
 
     private Mono<Slide> generateSlideForInstruction (
@@ -135,8 +159,8 @@ public class SlideContentController {
 
             String searchQuery = instruction.name() + " - " + instruction.content();
             String requestFilter = String.format(
-                    "schoolClassId == \"%s\" && subjectId == \"%s\" && materialId == \"%s\" && lessonId == \"%s\" && chapterId == \"%s\" && lessonContentId == \"%s\"",
-                    slideContentRequest.schoolClassId(), slideContentRequest.subjectId(), slideContentRequest.materialId(), slideContentRequest.lessonId(), slideContentRequest.lessonContentId(), slideContentRequest.chapterId()
+                    "schoolClassId == \"%s\" && subjectId == \"%s\" && materialId == \"%s\" && lessonId == \"%s\" && chapterId == \"%s\"",
+                    slideContentRequest.schoolClassId(), slideContentRequest.subjectId(), slideContentRequest.materialId(), slideContentRequest.lessonId(), slideContentRequest.chapterId()
             );
 
             List<Document> similarDocuments = vectorStore.similaritySearch(
@@ -150,6 +174,8 @@ public class SlideContentController {
             String context = similarDocuments.stream()
                     .map(Document::getFormattedContent)
                     .collect(Collectors.joining("\n\n"));
+
+            log.info("Found {} similar documents for instruction '{}'. Context: {}", similarDocuments.size(), instruction.name(), context);
 
             BeanOutputConverter<Slide> outputConverter = new BeanOutputConverter<>(Slide.class);
             PromptTemplate promptTemplate = new PromptTemplate(slideGenerationPromptResource);
