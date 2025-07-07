@@ -1,3 +1,10 @@
+server:
+  port: ${LECTURE_CONTENT_SERVICE_PORT:8096}
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
 spring:
   # Security configuration
   security:
