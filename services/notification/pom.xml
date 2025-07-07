@@ -9,10 +9,10 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>notificationEntity</artifactId>
+    <artifactId>notification</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>notificationEntity</name>
-    <description>notificationEntity</description>
+    <name>notification</name>
+    <description>notification</description>
 
     <url/>
     <licenses>
