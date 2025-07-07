@@ -92,7 +92,7 @@ spring:
         - id: notification-service
           uri: lb://NOTIFICATION-SERVICE
           predicates:
-            - Path=/api/v1/notification/**
+            - Path=/api/v1/notifications/**
         # Notification Service Swagger Route
         - id: subscription-service-swagger
           uri: lb://NOTIFICATION-SERVICE

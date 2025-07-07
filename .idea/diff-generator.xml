@@ -3,8 +3,8 @@
   <component name="DiffGenerationConfig">
     <option name="snapshotDb" value="false" />
     <option name="snapshotDbValue" value="41846be3-749f-45e9-bdfe-7176d2290c91__contentdb_public" />
-    <option name="snapshotModelValue" value="subscription:subscription" />
-    <option name="sourceModelValue" value="subscription:subscription" />
-    <option name="targetDbValue" value="980ffedf-4c60-4104-8d03-27045dc21739__subscriptiondb_public" />
+    <option name="snapshotModelValue" value="notification:notification" />
+    <option name="sourceModelValue" value="content:content" />
+    <option name="targetDbValue" value="41846be3-749f-45e9-bdfe-7176d2290c91" />
   </component>
 </project>
