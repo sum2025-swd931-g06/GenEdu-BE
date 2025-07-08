@@ -1,6 +1,6 @@
 ARG DEPENDENCY=extracted
 
-FROM amazoncorretto:17-alpine-jdk AS builder
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
 ARG DEPENDENCY
 WORKDIR ${DEPENDENCY}
 ARG JAR_FILE=target/*.jar
@@ -14,5 +14,5 @@ COPY --from=builder ${DEPENDENCY}/dependencies/ ./
 COPY --from=builder ${DEPENDENCY}/spring-boot-loader/ ./
 COPY --from=builder ${DEPENDENCY}/snapshot-dependencies/ ./
 COPY --from=builder ${DEPENDENCY}/application/ ./
-EXPOSE 8086
+EXPOSE 8096
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
