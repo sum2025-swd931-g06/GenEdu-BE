@@ -1,22 +1,21 @@
 package com.genedu.gateway.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class CorsConfig extends CorsConfiguration {
-
-    private static final String[] ALLOWED_ORIGINS = {
-            "http://localhost:63342",
-            "http://localhost:5173",
-            "https://localhost:8443",
-            "http://localhost:4000",
-    };
+    @Autowired
+    CorsAllowedOrg corsAllowedOrg;
 
     private static final String[] ALLOWED_METHODS = {
             "GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"
@@ -30,7 +29,7 @@ public class CorsConfig extends CorsConfiguration {
     public CorsWebFilter corsFilter() {
         org.springframework.web.cors.CorsConfiguration corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedOrigins(Arrays.asList(ALLOWED_ORIGINS));
+        corsConfiguration.setAllowedOrigins(corsAllowedOrg.corsAllowedOrigins());
         corsConfiguration.setAllowedMethods(Arrays.asList(ALLOWED_METHODS));
         corsConfiguration.setAllowedHeaders(Arrays.asList(ALLOWED_HEADERS));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -1,6 +1,6 @@
 ARG DEPENDENCY=extracted
 
-FROM amazoncorretto:17-alpine-jdk AS builder
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
 ARG DEPENDENCY
 WORKDIR ${DEPENDENCY}
 ARG JAR_FILE=target/*.jar

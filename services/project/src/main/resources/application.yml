@@ -1,15 +1,7 @@
-webclient:
-  gateway:
-    base-url: ${GATEWAY_SERVICE_URL:http://localhost:8222}
 spring:
   application:
     name: project-service
-  profiles:
-    active: native
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+#  profiles:
+#    active: native
   config:
       import: optional:configserver:http://localhost:8888
