@@ -24,7 +24,9 @@
         <module>services/content</module>
         <module>services/media</module>
         <module>services/project</module>
+        <module>services/lecture-content</module>
         <module>services/subscription</module>
+        <module>services/notification</module>
     </modules>
 
     <properties>
@@ -104,6 +106,7 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -119,6 +122,14 @@
                             <version>1.18.36</version>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

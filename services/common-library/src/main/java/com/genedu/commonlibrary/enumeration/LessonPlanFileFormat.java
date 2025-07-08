@@ -3,7 +3,8 @@ package com.genedu.commonlibrary.enumeration;
 public enum LessonPlanFileFormat {
     DOCX("docx"),
     PDF("doc"),
-    TXT("txt");
+    TXT("txt"),
+    MD("md");
 
     private final String extension;
 

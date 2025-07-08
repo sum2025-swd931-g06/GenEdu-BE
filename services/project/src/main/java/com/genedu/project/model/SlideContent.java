@@ -2,8 +2,7 @@ package com.genedu.project.model;
 
 import com.genedu.commonlibrary.model.AbstractTimeAuditEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -14,6 +13,9 @@ import java.util.UUID;
 @Table(name = "slide_contents")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class SlideContent extends AbstractTimeAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

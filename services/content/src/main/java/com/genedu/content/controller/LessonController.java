@@ -1,8 +1,12 @@
 package com.genedu.content.controller;
 
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
+import com.genedu.content.dto.client.LectureContentRequestDTO;
 import com.genedu.content.dto.flatResponse.FlatChapterLessonDTO;
+import com.genedu.content.dto.lesson.LessonEntityResponseDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
+import com.genedu.content.model.Lesson;
+import com.genedu.content.service.LessonContentService;
 import com.genedu.content.service.LessonService;
 import com.genedu.content.service.webclient.LectureContentClient;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +26,7 @@ import java.util.List;
 @Tag(name = "Lesson", description = "Manage lessons in the system")
 public class LessonController {
     private final LessonService lessonService;
+    private final LessonContentService lessonContentService;
     private final LectureContentClient lectureContentClient;
 
     @GetMapping("/lessons")
@@ -83,5 +88,14 @@ public class LessonController {
         return ResponseEntity
                 .noContent()
                 .build();
+    }
+
+    @GetMapping("/lessons/{lessonId}/full-entity")
+    public ResponseEntity<LessonEntityResponseDTO> getLessonByIdForLectureContent(
+            @PathVariable Long lessonId
+    ) {
+        log.info("Fetching lesson with ID: {}", lessonId);
+        LessonEntityResponseDTO lessonEntityResponseDTO = lessonService.getFlatLessonEntityById(lessonId);
+        return ResponseEntity.ok(lessonEntityResponseDTO);
     }
 }

@@ -1,42 +1,7 @@
-server:
-  port: 8094
-  servlet:
-    encoding:
-      charset: UTF-8
-      force: true
-      enabled: true
-
 spring:
   application:
     name: lecture-content-service
-  datasource:
-    url: jdbc:postgresql://localhost:5434/postgres
-    username: admin
-    password: admin
-  ai:
-    ollama:
-      base-url: http://localhost:7869
-      init:
-        pull-model-strategy: when_missing
-        timeout: 5m
-      embedding:
-        options:
-          model: nomic-embed-text:v1.5
-        enabled: true
-      chat:
-        options:
-          model: llama3.2:latest
-    vectorstore:
-      pgvector:
-        initialize-schema: true
-        index-type: hnsw
-        dimensions: 768
-        table-name: lecture_content_embeddings
-  #  main:
-#    allow-bean-definition-overriding: true
-  webflux:
-    base-path: /api
-
+#  profiles:
+#    active: native
   config:
       import: optional:configserver:http://localhost:8888
-

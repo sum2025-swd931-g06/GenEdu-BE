@@ -1,11 +1,9 @@
 package com.genedu.content.mapper;
 
-import com.genedu.content.dto.chapter.ChapterResponseDTO;
 import com.genedu.content.dto.flatResponse.FlatSchoolClassSubjectDTO;
 import com.genedu.content.dto.material.MaterialResponseDTO;
 import com.genedu.content.dto.subject.SubjectRequestDTO;
 import com.genedu.content.dto.subject.SubjectResponseDTO;
-import com.genedu.content.model.Material;
 import com.genedu.content.model.SchoolClass;
 import com.genedu.content.model.Subject;
 

@@ -25,8 +25,8 @@ variable "account_id" {
 }
 
 # S3 bucket
-resource "aws_s3_bucket" "lecture_bucket" {
-    bucket        = "lecture-bucket-${random_pet.random_name.id}"
+resource "aws_s3_bucket" "genedu-bucket" {
+    bucket        = "genedu-bucket-project-files"
     tags = {
         Name = "Lecture Bucket"
         Environment = "Development"
@@ -40,9 +40,9 @@ resource "aws_s3_bucket" "lecture_bucket" {
 # save generated bucket name to properties file
 resource "local_file" "properties_file" {
   content = <<-EOT
-    lecture_bucket=${aws_s3_bucket.lecture_bucket.bucket}
+    lecture_bucket=${aws_s3_bucket.genedu-bucket.bucket}
   EOT
-  depends_on = [aws_s3_bucket.lecture_bucket]
+  depends_on = [aws_s3_bucket.genedu-bucket]
 
   filename = "../services/media/src/main/resources/buckets.properties"
 }

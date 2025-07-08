@@ -1,10 +1,7 @@
 spring:
   application:
       name: media-service
-  cloud:
-    compatibility-verifier:
-      enabled: false
-  profiles:
-    active: native
+#  profiles:
+#    active: native
   config:
     import: optional:configserver:http://localhost:8888

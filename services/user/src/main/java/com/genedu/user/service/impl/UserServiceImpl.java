@@ -59,6 +59,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean isUserExists(String userId) {
+
+        try {
+            return keycloak.realm(keycloakPropsConfig.getRealm())
+                    .users()
+                    .get(userId)
+                    .toRepresentation() != null;
+        } catch (ForbiddenException exception) {
+            throw new AccessDeniedException(
+                    String.format(ERROR_FORMAT, exception.getMessage(), keycloakPropsConfig.getClientId())
+            );
+        } catch (Exception e) {
+            log.error("Error checking if user exists: {}", e.getMessage());
+            return false;
+        }
+
+    }
+
+    @Override
     public void clearUserSession(String userId) {
         try {
             keycloak.realm(keycloakPropsConfig.getRealm())
