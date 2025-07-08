@@ -129,3 +129,7 @@ springdoc:
       client-secret: ${KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY:0pQYYepE82DkALnEVhAfZREPeHmtHz3z}
     csrf:
       enabled: false
+
+# Custom configuration for Gateway Service
+custom-cors:
+  allowed-origins: "*"
