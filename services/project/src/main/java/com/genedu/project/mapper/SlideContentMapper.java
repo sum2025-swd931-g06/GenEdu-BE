@@ -1,9 +1,10 @@
 package com.genedu.project.mapper;
 
 import com.genedu.project.dto.SlideContentRequestDTO;
+import com.genedu.project.dto.SlideContentResponseDTO;
 import com.genedu.project.model.LectureContent;
 import com.genedu.project.model.SlideContent;
-import com.genedu.project.service.LectureService;
+import com.genedu.project.service.impl.LectureContentServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,18 +14,18 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class SlideContentMapper {
-    LectureService lectureService;
+    LectureContentServiceImpl lectureContentServiceImpl;
     public SlideContent toEntity(SlideContentRequestDTO slideContentRequestDTO) {
         if (slideContentRequestDTO.lectureContentId() == null || slideContentRequestDTO.lectureContentId().isBlank()) {
             return SlideContent.builder()
                     .orderNumber(slideContentRequestDTO.orderNumber())
                     .slideTitle(slideContentRequestDTO.title())
-                    .mainIdea(slideContentRequestDTO.slideType())
+                    .slideType(slideContentRequestDTO.slideType())
                     .subpoints(slideContentRequestDTO.subpoints())
                     .narrationScript(slideContentRequestDTO.narrationScript())
                     .build();
         } else {
-            LectureContent lectureContent = lectureService.getLectureContentEntityById(
+            LectureContent lectureContent = lectureContentServiceImpl.getLectureContentEntityById(
                     UUID.fromString(slideContentRequestDTO.lectureContentId())
             );
 
@@ -32,7 +33,7 @@ public class SlideContentMapper {
                     .lectureContent(lectureContent)
                     .orderNumber(slideContentRequestDTO.orderNumber())
                     .slideTitle(slideContentRequestDTO.title())
-                    .mainIdea(slideContentRequestDTO.slideType())
+                    .slideType(slideContentRequestDTO.slideType())
                     .subpoints(slideContentRequestDTO.subpoints())
                     .narrationScript(slideContentRequestDTO.narrationScript())
                     .build();
@@ -47,14 +48,14 @@ public class SlideContentMapper {
                 .toList();
     }
 
-    public List<SlideContentRequestDTO> toDTOs(
+    public List<SlideContentResponseDTO> toDTOs(
             List<SlideContent> slideContents
     ) {
         return slideContents.stream()
-                .map(slideContent -> new SlideContentRequestDTO(
+                .map(slideContent -> new SlideContentResponseDTO(
                         slideContent.getLectureContent().getId().toString(),
                         slideContent.getSlideTitle(),
-                        slideContent.getMainIdea(),
+                        slideContent.getSlideType(),
                         slideContent.getOrderNumber(),
                         slideContent.getSubpoints(),
                         slideContent.getNarrationScript()

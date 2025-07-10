@@ -4,7 +4,7 @@ import com.genedu.commonlibrary.webclient.dto.LessonPlanFileDownloadDTO;
 import com.genedu.commonlibrary.webclient.dto.LessonPlanFileUploadDTO;
 import com.genedu.project.dto.ProjectResponseDTO;
 import com.genedu.project.dto.ProjectRequestDTO;
-import com.genedu.project.service.ProjectService;
+import com.genedu.project.service.impl.ProjectServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -24,7 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "Project Management", description = "APIs for creating, managing, and retrieving projects")
 public class ProjectController {
-    private final ProjectService projectService;
+    private final ProjectServiceImpl projectServiceImpl;
 
     @Operation(summary = "Get a project by its ID", description = "Retrieves the details of a single project.")
     @ApiResponses(value = {
@@ -33,7 +33,7 @@ public class ProjectController {
     })
     @GetMapping("/{projectId}")
     public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable UUID projectId) {
-        ProjectResponseDTO project = projectService.getProjectById(projectId);
+        ProjectResponseDTO project = projectServiceImpl.getProjectById(projectId);
         return new ResponseEntity<>(project, HttpStatus.OK);
     }
 
@@ -43,7 +43,7 @@ public class ProjectController {
     })
     @GetMapping
     public ResponseEntity<List<ProjectResponseDTO>> getAllProjects() {
-        List<ProjectResponseDTO> projects = projectService.getAllProjects();
+        List<ProjectResponseDTO> projects = projectServiceImpl.getAllProjects();
         return new ResponseEntity<>(projects, HttpStatus.OK);
     }
 
@@ -53,7 +53,7 @@ public class ProjectController {
     })
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ProjectResponseDTO>> getProjectsByUserId(@PathVariable UUID userId) {
-        List<ProjectResponseDTO> projects = projectService.getProjectsByUserId(userId);
+        List<ProjectResponseDTO> projects = projectServiceImpl.getProjectsByUserId(userId);
         return new ResponseEntity<>(projects, HttpStatus.OK);
     }
 
@@ -64,7 +64,7 @@ public class ProjectController {
     })
     @GetMapping("/my-projects")
     public ResponseEntity<List<ProjectResponseDTO>> getCurrentUserProjects() {
-        List<ProjectResponseDTO> projects = projectService.getCurrentUserProjects();
+        List<ProjectResponseDTO> projects = projectServiceImpl.getCurrentUserProjects();
         return new ResponseEntity<>(projects, HttpStatus.OK);
     }
 
@@ -77,7 +77,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDTO> createProject(
             @Valid @RequestBody ProjectRequestDTO projectDTO
     ) {
-        ProjectResponseDTO createdProject = projectService.createProject(projectDTO);
+        ProjectResponseDTO createdProject = projectServiceImpl.createProject(projectDTO);
         return new ResponseEntity<>(createdProject, HttpStatus.CREATED);
     }
 
@@ -88,7 +88,7 @@ public class ProjectController {
     })
     @GetMapping("/lesson-plan-template")
     public ResponseEntity<LessonPlanFileDownloadDTO> getLessonPlanTemplate() {
-        LessonPlanFileDownloadDTO lessonPlanTemplate = projectService.getLessonPlanTemplate();
+        LessonPlanFileDownloadDTO lessonPlanTemplate = projectServiceImpl.getLessonPlanTemplate();
         return new ResponseEntity<>(lessonPlanTemplate, HttpStatus.OK);
     }
 
@@ -99,13 +99,13 @@ public class ProjectController {
             @ApiResponse(responseCode = "404", description = "Project not found")
     })
     @PutMapping(
-            value = "/{projectId}/lesson-plan",
+            value = "/lesson-plan",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<ProjectResponseDTO> uploadLectureFile(
             @ModelAttribute LessonPlanFileUploadDTO lectureFileUploadDTO
     ) {
-        ProjectResponseDTO updatedProject = projectService.updateLessonPlanFile(lectureFileUploadDTO);
+        ProjectResponseDTO updatedProject = projectServiceImpl.updateLessonPlanFile(lectureFileUploadDTO);
         return new ResponseEntity<>(updatedProject, HttpStatus.OK);
     }
 
@@ -119,7 +119,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDTO> updateProject(
             @PathVariable UUID id,
             @Valid @RequestBody ProjectRequestDTO projectDetails) {
-        ProjectResponseDTO updatedProject = projectService.updateProject(id, projectDetails);
+        ProjectResponseDTO updatedProject = projectServiceImpl.updateProject(id, projectDetails);
         return new ResponseEntity<>(updatedProject, HttpStatus.OK);
     }
 
@@ -130,7 +130,7 @@ public class ProjectController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable UUID id) {
-        projectService.deleteProject(id);
+        projectServiceImpl.deleteProject(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

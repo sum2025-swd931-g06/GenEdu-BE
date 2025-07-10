@@ -100,7 +100,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     env_file:
-      - .env
+      - docker.env
     networks:
       - microservices-net
 
@@ -124,7 +124,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     env_file:
-      - .env
+      - docker.env
     networks:
       - microservices-net
 
@@ -145,7 +145,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     env_file:
-      - .env
+      - docker.env
     depends_on:
       config-server:
         condition: service_healthy
@@ -173,7 +173,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     env_file:
-      - .env
+      - docker.env
     depends_on:
       config-server:
         condition: service_healthy
@@ -205,7 +205,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     env_file:
-      - .env
+      - docker.env
     depends_on:
       keycloak:
         condition: service_started
@@ -239,7 +239,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     env_file:
-      - .env
+      - docker.env
     depends_on:
       keycloak:
         condition: service_started
@@ -275,7 +275,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     env_file:
-      - .env
+      - docker.env
     depends_on:
       keycloak:
         condition: service_started

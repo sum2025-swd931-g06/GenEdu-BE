@@ -1,7 +1,7 @@
 spring:
   application:
-      name: gateway-service
-  profiles:
-    active: native
+    name: gateway-service
+#  profiles:
+#    active: native
   config:
     import: optional:configserver:http://localhost:8888

@@ -34,6 +34,5 @@ public class CustomAuditingEntityListener extends AuditingEntityListener {
     @PreUpdate
     public void touchForUpdate(Object target) {
         super.touchForUpdate(target);
-
     }
 }
