@@ -1,15 +1,21 @@
-package com.genedu.project.service;
+package com.genedu.project.service.impl;
 
 import com.genedu.commonlibrary.exception.NotFoundException;
+import com.genedu.commonlibrary.webclient.dto.SlideFileDownloadDTO;
+import com.genedu.commonlibrary.webclient.dto.SlideFileUploadDTO;
+import com.genedu.project.dto.FinalizedLectureCreateRequestDTO;
 import com.genedu.project.dto.LectureContentRequestDTO;
 import com.genedu.project.dto.LectureContentResponseDTO;
 import com.genedu.project.mapper.LectureContentMapper;
-import com.genedu.project.mapper.SlideContentMapper;
+import com.genedu.project.model.FinalizedLecture;
 import com.genedu.project.model.LectureContent;
 import com.genedu.project.model.SlideContent;
 import com.genedu.project.model.enumeration.LectureStatus;
 import com.genedu.project.repository.LectureContentRepository;
 import com.genedu.project.repository.SlideContentRepository;
+import com.genedu.project.service.FinalizedLectureService;
+import com.genedu.project.service.LectureContentService;
+import com.genedu.project.webclient.ProjectMediaWebClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,19 +29,18 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LectureService {
-
+public class LectureContentServiceImpl implements LectureContentService {
+    private final ProjectMediaWebClientService projectMediaWebClientService;
     private final LectureContentRepository lectureContentRepository;
     private final SlideContentRepository slideContentRepository;
     private final LectureContentMapper lectureContentMapper;
-    private final SlideContentMapper slideContentMapper;
 
-    public LectureContentResponseDTO getLectureContentByProjectId(UUID projectId) {
-        LectureContent lectureContent = lectureContentRepository.findLastByProjectIdAndDeletedIsFalseOrderByCreatedOnDesc(projectId);
-        if (lectureContent == null) {
+    public List<LectureContentResponseDTO> getLectureContentByProjectId(UUID projectId) {
+        List<LectureContent> lectureContents = lectureContentRepository.findByProjectIdAndDeletedIsFalse(projectId);
+        if (lectureContents.isEmpty()) {
             throw new NotFoundException("Lecture content not found for project ID: " + projectId);
         }
-        return lectureContentMapper.toDTO(lectureContent);
+        return lectureContentMapper.toDTOs(lectureContents);
     }
 
     public LectureContentResponseDTO getLectureContentById(UUID lectureContentId) {
@@ -55,6 +60,7 @@ public class LectureService {
         LectureContent lectureContent = lectureContentMapper.toEntity(lectureContentRequest);
         lectureContent.setStatus(LectureStatus.DRAFT);
         LectureContent savedLectureContent = lectureContentRepository.save(lectureContent);
+        savedLectureContent.setCreatedOn(savedLectureContent.getCreatedOn());
         List<SlideContent> slideContents = new ArrayList<>();
         // Create and associate the slides before the first save
         if (lectureContentRequest.slideContents() != null && !lectureContentRequest.slideContents().isEmpty()) {
@@ -64,7 +70,7 @@ public class LectureService {
                         SlideContent slide = SlideContent.builder()
                                 .orderNumber(slideDTO.orderNumber())
                                 .slideTitle(slideDTO.title())
-                                .mainIdea(slideDTO.slideType())
+                                .slideType(slideDTO.slideType())
                                 .subpoints(slideDTO.subpoints())
                                 .lectureContent(finalSavedLectureContent) // Associate with the saved lecture content
                                 .narrationScript(slideDTO.narrationScript())
@@ -87,9 +93,22 @@ public class LectureService {
         // 1. Fetch the existing, managed entity from the database.
         LectureContent existingLectureContent = lectureContentRepository.findById(lectureContentId)
                 .orElseThrow(() -> new NotFoundException("Lecture content not found for ID: " + lectureContentId));
-        //TODO: Apply update logic for other fields if needed
-        // 2. Update the title and version
         return null;
+    }
+
+    @Transactional
+    public SlideFileDownloadDTO uploadSlideFile(SlideFileUploadDTO fileUploadDTO) {
+        UUID lectureContentId = UUID.fromString(fileUploadDTO.getLectureContentId());
+        LectureContent existingLectureContent = lectureContentRepository.findById(lectureContentId)
+                .orElseThrow(() -> new NotFoundException("Lecture content not found for ID: " + fileUploadDTO.getLectureContentId()));
+        // Ensure the project ID matches the lecture content's project ID
+        SlideFileDownloadDTO slideFileDownloadDTO = projectMediaWebClientService.uploadSlideFile(fileUploadDTO);
+
+        // Check if the upload was successful
+        if (slideFileDownloadDTO == null) {
+            throw new NotFoundException("Failed to upload slide file");
+        }
+        return slideFileDownloadDTO;
     }
 }
 

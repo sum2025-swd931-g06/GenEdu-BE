@@ -25,7 +25,7 @@ public class S3StorageService {
 
     public String upload(String path, String fileName, MultipartFile multipartFile) throws IOException {
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucketName.getLectureBucket())
+                .bucket(bucketName.getGeneduBucket())
                 .key(path + "/" + fileName)
                 .contentType(multipartFile.getContentType())
                 .contentLength(multipartFile.getSize())
@@ -43,7 +43,7 @@ public class S3StorageService {
 
     public byte[] download(String key) throws IOException {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName.getLectureBucket())
+                .bucket(bucketName.getGeneduBucket())
                 .key(key)
                 .build();
         try {
@@ -60,13 +60,13 @@ public class S3StorageService {
     public void delete(String folderPrefix) {
         List<ObjectIdentifier> keysToDelete = new ArrayList<>();
 
-        s3Client.listObjectsV2Paginator(builder -> builder.bucket(bucketName.getLectureBucket())
+        s3Client.listObjectsV2Paginator(builder -> builder.bucket(bucketName.getGeneduBucket())
                 .prefix(folderPrefix))
                 .contents()
                 .forEach(s3Object -> keysToDelete.add(ObjectIdentifier.builder().key(s3Object.key()).build()));
 
         DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
-                .bucket(bucketName.getLectureBucket())
+                .bucket(bucketName.getGeneduBucket())
                 .delete(Delete.builder().objects(keysToDelete).build())
                 .build();
 

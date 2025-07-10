@@ -4,11 +4,12 @@ import com.genedu.project.dto.LectureContentRequestDTO;
 import com.genedu.project.dto.LectureContentResponseDTO;
 import com.genedu.project.model.LectureContent;
 import com.genedu.project.model.Project;
-import com.genedu.project.service.ProjectService;
+import com.genedu.project.service.impl.ProjectServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -16,13 +17,13 @@ import java.util.UUID;
 @AllArgsConstructor
 public class LectureContentMapper {
     SlideContentMapper slideContentMapper;
-    ProjectService projectService;
+    ProjectServiceImpl projectServiceImpl;
 
     public LectureContent toEntity(
             LectureContentRequestDTO lectureContentRequestDTO
     ) {
         UUID projectId = UUID.fromString(lectureContentRequestDTO.projectId());
-        Project project  = projectService.getProjectEntityById(projectId);
+        Project project  = projectServiceImpl.getProjectEntityById(projectId);
         return LectureContent.builder()
                 .project(project)
                 .title(lectureContentRequestDTO.title())
@@ -33,11 +34,19 @@ public class LectureContentMapper {
             LectureContent lectureContent
     ) {
         return new LectureContentResponseDTO(
-                lectureContent.getId().toString(),
-                lectureContent.getProject().getId().toString(),
+                lectureContent.getId(),
+                lectureContent.getProject().getId(),
                 lectureContent.getTitle(),
+                lectureContent.getStatus().toString(),
                 slideContentMapper.toDTOs(lectureContent.getSlideContents())
         );
     }
 
+    public List<LectureContentResponseDTO> toDTOs(
+            List<LectureContent> lectureContents
+    ) {
+        return lectureContents.stream()
+                .map(this::toDTO)
+                .toList();
+    }
 }

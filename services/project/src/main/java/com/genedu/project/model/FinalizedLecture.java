@@ -3,8 +3,7 @@ package com.genedu.project.model;
 import com.genedu.commonlibrary.model.AbstractTimeAuditEntity;
 import com.genedu.project.model.enumeration.PublishedStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -12,6 +11,9 @@ import java.util.UUID;
 @Table(name = "finalized_lectures")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class FinalizedLecture extends AbstractTimeAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,27 +31,27 @@ public class FinalizedLecture extends AbstractTimeAuditEntity {
 
     @Column(
             name = "audio_file_id",
-            columnDefinition = "uuid"
+            columnDefinition = "bigint"
     )
-    private UUID audioFileId;
+    private Long audioFileId;
 
     @Column(
             name = "presentation_file_id",
-            columnDefinition = "uuid"
+            columnDefinition = "bigint"
     )
-    private UUID presentationFileId;
+    private Long presentationFileId;
 
     @Column(
             name = "video_file_id",
-            columnDefinition = "uuid"
+            columnDefinition = "bigint"
     )
-    private UUID videoFileId;
+    private Long videoFileId;
 
     @Column(
             name = "thumbnail_file_id",
-            columnDefinition = "uuid"
+            columnDefinition = "bigint"
     )
-    private UUID thumbnailFileId;
+    private Long thumbnailFileId;
 
     @Enumerated(EnumType.STRING)
     @Column(

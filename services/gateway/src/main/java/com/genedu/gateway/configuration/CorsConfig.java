@@ -27,9 +27,10 @@ public class CorsConfig extends CorsConfiguration {
 
     @Bean
     public CorsWebFilter corsFilter() {
+        System.out.println("Allowed Origins: " + corsAllowedOrg.allowedOrigins());
         org.springframework.web.cors.CorsConfiguration corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedOrigins(corsAllowedOrg.corsAllowedOrigins());
+        corsConfiguration.setAllowedOrigins(corsAllowedOrg.allowedOrigins());
         corsConfiguration.setAllowedMethods(Arrays.asList(ALLOWED_METHODS));
         corsConfiguration.setAllowedHeaders(Arrays.asList(ALLOWED_HEADERS));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

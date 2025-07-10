@@ -5,7 +5,7 @@ public enum FileType {
     VIDEO("Video"),
     IMAGE("Image"),
     DOCUMENT("Document"),
-    PRESENTATION("Presentation"),
+    SLIDE("Slide"),
     LESSON_PLAN("LESSON_PLAN"),
     LESSON_PLAN_TEMPLATE("LESSON_PLAN_TEMPLATE")
     ;
