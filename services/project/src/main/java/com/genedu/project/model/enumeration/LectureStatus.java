@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum LectureStatus {
-    DRAFT("Draft"),
-    FINALIZED("Finalized"),
-    FAILED("Failed");
+    DRAFT("DRAFT"),
+    FINALIZED("FINALIZED"),
+    FAILED("FAILED");
 
     private final String name;
 

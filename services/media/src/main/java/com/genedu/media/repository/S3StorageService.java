@@ -3,6 +3,7 @@ package com.genedu.media.repository;
 import com.genedu.media.buckets.BucketName;
 import com.genedu.media.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -13,14 +14,15 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class S3StorageService {
     private final S3Client s3Client;
-    private static final Logger LOGGER = LoggerFactory.getLogger(S3StorageService.class);
     private final BucketName bucketName;
 
     public String upload(String path, String fileName, MultipartFile multipartFile) throws IOException {
@@ -31,14 +33,34 @@ public class S3StorageService {
                 .contentLength(multipartFile.getSize())
                 .build();
 
-        try {
-            s3Client.putObject(putObjectRequest, RequestBody.fromFile(FileUtil.convertMultipartFileToFile(multipartFile)));
-            LOGGER.info("File {} saved to S3 at {}", fileName, path);
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, multipartFile.getSize()));
+            log.info("File {} saved to S3 at {}", fileName, path);
         } catch (SdkException e) {
-            LOGGER.error("Failed to save file to S3: {}", e.getMessage());
+            log.error("Failed to save file to S3: {}", e.getMessage());
             throw new IOException("Failed to save file to S3", e);
         }
         return path + "/" + fileName; // Return the full path of the uploaded file
+    }
+
+    public String upload(String path, String fileName, String contentType, byte[] content) throws IOException {
+        String fullS3Key = path + "/" + fileName;
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName.getGeneduBucket())
+                .key(fullS3Key)
+                .contentType(contentType)
+                .contentLength((long) content.length)
+                .build();
+
+        try {
+            // BEST PRACTICE: Use fromBytes for direct, efficient byte array uploads.
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
+            log.info("Successfully uploaded byte array as file '{}' to S3 key '{}'", fileName, fullS3Key);
+        } catch (SdkException e) {
+            log.error("Failed to upload byte array to S3. Key: '{}', Error: {}", fullS3Key, e.getMessage(), e);
+            throw new IOException("Failed to save byte array to S3", e);
+        }
+        return fullS3Key;
     }
 
     public byte[] download(String key) throws IOException {
@@ -49,10 +71,10 @@ public class S3StorageService {
         try {
             return s3Client.getObject(getObjectRequest).readAllBytes();
         } catch (NoSuchKeyException e) {
-            LOGGER.warn("Could not find object: {}", key);
+            log.warn("Could not find object: {}", key);
             return new byte[0]; // Return empty byte array when object is not found
         } catch (SdkException e) {
-            LOGGER.error("Failed to download file from S3: {}", e.getMessage());
+            log.error("Failed to download file from S3: {}", e.getMessage());
             throw new IOException("Failed to download file from S3", e);
         }
     }
@@ -74,17 +96,17 @@ public class S3StorageService {
             DeleteObjectsResponse deleteResponse = s3Client.deleteObjects(deleteObjectsRequest);
             handleDeleteErrors(deleteResponse.errors());
         } catch (SdkException e) {
-            LOGGER.error("Failed to delete objects from S3: {}", e.getMessage());
+            log.error("Failed to delete objects from S3: {}", e.getMessage());
         }
     }
 
     private void handleDeleteErrors(List<S3Error> errors) {
         if (!errors.isEmpty()) {
-            LOGGER.error("Errors occurred while deleting objects:");
-            errors.forEach(error -> LOGGER.error("Object: {}, Error Code: {}, Error Message: {}",
+            log.error("Errors occurred while deleting objects:");
+            errors.forEach(error -> log.error("Object: {}, Error Code: {}, Error Message: {}",
                     error.key(), error.code(), error.message()));
         } else {
-            LOGGER.info("Objects deleted successfully.");
+            log.info("Objects deleted successfully.");
         }
     }
 }

@@ -22,7 +22,6 @@ import java.util.UUID;
 public class ProjectMediaWebClientService {
     @Qualifier("mediaWebClient")
     private final WebClient webClient;
-
     private static final String UPLOAD_LESSON_SLIDE_FILE_URI = "/medias/projects/slides/upload";
     private static final String GET_SLIDE_FILE_URL = "/medias/projects/slides/{fileId}/url";
 

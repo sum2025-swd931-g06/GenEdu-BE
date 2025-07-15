@@ -4,8 +4,10 @@ import com.genedu.project.model.SlideContent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
 public interface SlideContentRepository extends JpaRepository<SlideContent, UUID> {
+    List<SlideContent> findByLectureContentId(UUID lectureContentId);
 }

@@ -26,11 +26,22 @@ public class LectureMediaWebClientService {
     private static final String GET_LESSON_PLAN_FILE_URI = "/medias/projects/lesson-plans/{fileId}/url";
     private static final String UPLOAD_LESSON_PLAN_FILE_URI = "/medias/projects/lesson-plans/upload";
     private static final String GET_LESSON_PLAN_FILE_TEMPLATE_URI = "/medias/projects/lesson-plans/template";
-
-
+    private static final String GET_SLIDE_NARRATION_AUDIO_FILE_URI = "/medias/projects/slides/narration-audios/{fileId}/url";
 
     public LectureMediaWebClientService(WebClient.Builder builder) {
         this.webClient = builder.build();
+    }
+
+    public String getSlideNarrationAudioFileUrlByFileId(Long fileId) {
+        if (fileId == null) {
+            return null;
+        }
+        return webClient.get()
+                .uri(GET_SLIDE_NARRATION_AUDIO_FILE_URI, fileId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AuthenticationUtils.extractJwt())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
     }
 
     public String getLessonPlanFileUrlByLessonPlanId(Long fileId) {
@@ -83,11 +94,6 @@ public class LectureMediaWebClientService {
                         clientResponse -> clientResponse.bodyToMono(ErrorDTO.class)
                                 .flatMap(errorDto -> Mono.error(new BadRequestException(errorDto.title(), errorDto.detail())))
                 )
-//                .onStatus(
-//                        HttpStatusCode::is5xxServerError,
-//                        clientResponse -> clientResponse.bodyToMono(ErrorDTO.class)
-//                                .flatMap(errorDto -> Mono.error(new RuntimeException(errorDto.title() + ": " + errorDto.detail())))
-//                )
                 .bodyToMono(LessonPlanFileDownloadDTO.class)
                 .block();
     }

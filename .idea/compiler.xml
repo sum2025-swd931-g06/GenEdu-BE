@@ -12,9 +12,9 @@
         </processorPath>
         <module name="notificationEntity" />
         <module name="project" />
-        <module name="lecture-content" />
         <module name="media" />
         <module name="subscription" />
+        <module name="lecture-content" />
         <module name="common-library" />
         <module name="user" />
         <module name="content" />

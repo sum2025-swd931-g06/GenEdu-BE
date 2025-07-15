@@ -29,4 +29,8 @@ public interface LectureContentService {
     public LectureContentResponseDTO updateLectureContent(UUID lectureContentId, LectureContentRequestDTO lectureContentRequest);
 
     public SlideFileDownloadDTO uploadSlideFile(SlideFileUploadDTO fileUploadDTO) ;
+
+    void generateNarrationForLectureContent(UUID lectureContentId);
+
+    void updateNarrationAudioForLectureContent(UUID lectureContentId, Long audioFileId);
 }
