@@ -6,7 +6,9 @@ public enum FileType {
     IMAGE("Image"),
     DOCUMENT("Document"),
     PRESENTATION("Presentation"),
-    LECTURE("Lecture"),;
+    LESSON_PLAN("LESSON_PLAN"),
+    LESSON_PLAN_TEMPLATE("LESSON_PLAN_TEMPLATE")
+    ;
 
     private final String name;
 

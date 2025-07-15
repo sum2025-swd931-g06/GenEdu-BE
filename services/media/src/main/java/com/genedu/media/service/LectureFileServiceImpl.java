@@ -12,14 +12,18 @@ import com.genedu.commonlibrary.enumeration.FileType;
 import com.genedu.media.repository.MediaFileRepository;
 import com.genedu.media.repository.S3StorageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -29,7 +33,84 @@ public class LectureFileServiceImpl implements MediaFileService<LessonPlanFileUp
     private final MediaFileRepository mediaFileRepository;
     private final BucketName bucketName;
     private static final String LECTURE_FOLDER = "projects";
-    private static final String S3Host = "http://localhost:4566";
+
+    @Value("${aws.s3.endpoint}")
+    private String S3Host;
+
+    private final UUID SYSTEM_USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
+    @Override
+    @Transactional
+    public LessonPlanFileDownloadDTO saveMediaFile(LessonPlanFileUploadDTO mediaFile) throws IOException {
+        UUID userId = Optional.ofNullable(AuthenticationUtils.getUserId())
+                .orElseThrow(() -> new BadRequestException("User ID could not be determined from security context."));
+        return saveFileInternal(mediaFile, FileType.LESSON_PLAN, userId);
+    }
+
+    @Override
+    @Transactional
+    public LessonPlanFileDownloadDTO systematicSaveMediaFile(LessonPlanFileUploadDTO mediaFile) throws IOException {
+        return saveFileInternal(mediaFile, FileType.LESSON_PLAN_TEMPLATE, SYSTEM_USER_ID);
+    }
+
+    @Override
+    public LessonPlanFileDownloadDTO getMediaFileByFileNameAndFileType(String fileName, FileType fileType) {
+        return mediaFileRepository.findFirstByFileNameAndFileTypeAndDeletedIsFalseOrderByUploadedOnDesc(fileName, fileType)
+                .map(this::mapToDto)
+                .orElseThrow(() -> new BadRequestException("Media file not found with name: " + fileName + " and type: " + fileType));
+    }
+
+    private LessonPlanFileDownloadDTO saveFileInternal(LessonPlanFileUploadDTO uploadDTO, FileType fileType, UUID uploadedBy) throws IOException {
+        checkValidFormat(uploadDTO);
+
+        MultipartFile file = uploadDTO.getMediaFile();
+        String projectId = uploadDTO.getProjectId();
+        String fileName = file.getOriginalFilename();
+
+        if (fileName == null || fileName.isEmpty()) {
+            throw new BadRequestException("File name cannot be null or empty");
+        }
+
+        String filePath = String.join("/", LECTURE_FOLDER, projectId, "lesson_plans");
+        String fullS3Key = String.join("/", filePath, fileName);
+
+        // Find an existing file at the same path and mark it as deleted.
+        mediaFileRepository.findFirstByFileUrlAndDeletedIsFalseOrderByUploadedOnDesc(fullS3Key)
+                .ifPresent(existingFile -> {
+                    // 1. Delete the old file from the S3 bucket
+                    s3StorageService.delete(existingFile.getFileUrl());
+
+                    // 2. Mark the old database record as deleted
+                    existingFile.setDeleted(true);
+                    mediaFileRepository.save(existingFile);
+                });
+        // Upload the new file to S3
+        String fileUrl = s3StorageService.upload(filePath, fileName, file);
+
+        // Create and save the new file's metadata
+        MediaFile newMediaFile = new MediaFile();
+        newMediaFile.setFileName(fileName);
+        newMediaFile.setFileType(fileType);
+        newMediaFile.setFileUrl(fileUrl);
+        newMediaFile.setUploadedBy(uploadedBy);
+        newMediaFile.setUploadedOn(LocalDateTime.now());
+        newMediaFile.setDeleted(false); // Explicitly set as not deleted
+        MediaFile savedMediaFile = mediaFileRepository.save(newMediaFile);
+
+        return mapToDto(savedMediaFile);
+    }
+
+    private LessonPlanFileDownloadDTO mapToDto(MediaFile mediaFile) {
+        String fileUrl = String.format("%s/%s/%s",S3Host, bucketName.getLectureBucket(), mediaFile.getFileUrl());
+        return LessonPlanFileDownloadDTO.builder()
+                .id(mediaFile.getId())
+                .fileName(mediaFile.getFileName())
+                .fileType(mediaFile.getFileType())
+                .fileUrl(fileUrl)
+                .uploadedBy(mediaFile.getUploadedBy())
+                .uploadedOn(mediaFile.getUploadedOn()) // Assuming readFileContent returns content
+                .build();
+    }
 
     @Override
     public void checkValidFormat(LessonPlanFileUploadDTO mediaFile) {
@@ -42,46 +123,13 @@ public class LectureFileServiceImpl implements MediaFileService<LessonPlanFileUp
         List<String> validExtensions = List.of(
                 LessonPlanFileFormat.DOCX.getExtension(),
                 LessonPlanFileFormat.PDF.getExtension(),
-                LessonPlanFileFormat.TXT.getExtension()
+                LessonPlanFileFormat.TXT.getExtension(),
+                LessonPlanFileFormat.MD.getExtension()
         );
 
         if (!validExtensions.contains(fileExtension.toLowerCase())) {
             throw new BadRequestException("Invalid file format. Supported formats are: " + validExtensions);
         }
-    }
-
-
-    @Override
-    public LessonPlanFileDownloadDTO saveMediaFile(LessonPlanFileUploadDTO mediaFile) throws IOException {
-        checkValidFormat(mediaFile);
-
-        MultipartFile file = mediaFile.getMediaFile();
-        String projectId = mediaFile.getProjectId();
-
-        String fileName = file.getOriginalFilename();
-
-        String filePath = LECTURE_FOLDER + "/" + projectId + "/lesson_plans";
-        if (fileName == null || fileName.isEmpty()) {
-            throw new IllegalArgumentException("File name cannot be null or empty");
-        }
-        String fileUrl = s3StorageService.upload(filePath, fileName, file);
-
-        MediaFile newMediaFile = new MediaFile();
-        newMediaFile.setFileName(fileName);
-        newMediaFile.setFileType(FileType.LECTURE);
-        newMediaFile.setFileUrl(fileUrl);
-        newMediaFile.setUploadedBy(AuthenticationUtils.getUserId()); // Replace with actual user ID
-        newMediaFile.setUploadedOn(java.time.LocalDateTime.now());
-        MediaFile savedMediaFile = mediaFileRepository.save(newMediaFile);
-
-        return LessonPlanFileDownloadDTO.builder()
-                .id(savedMediaFile.getId())
-                .fileName(savedMediaFile.getFileName())
-                .fileType(savedMediaFile.getFileType())
-                .fileUrl(savedMediaFile.getFileUrl())
-                .uploadedBy(savedMediaFile.getUploadedBy())
-                .uploadedOn(savedMediaFile.getUploadedOn())
-                .build();
     }
 
     @Override
@@ -150,7 +198,19 @@ public class LectureFileServiceImpl implements MediaFileService<LessonPlanFileUp
         return lessonPlanFileDownloadDTO;
     }
 
-   private String readWordFileContent(byte[] fileContent) throws IOException {
+    @Override
+    public LessonPlanFileDownloadDTO getMediaFileByProjectId(String projectId) {
+        String fileUrlPrefix = String.format("%s/%s/%s/", LECTURE_FOLDER, projectId, "lesson_plans");
+        Optional<MediaFile> mediaFile = mediaFileRepository.findFirstByFileUrlStartingWithAndFileTypeAndDeletedIsFalseOrderByUploadedOnDesc(fileUrlPrefix, FileType.LESSON_PLAN);
+        if (mediaFile.isEmpty()) {
+            throw new IllegalArgumentException("Media file not found for project ID: " + projectId);
+        }
+        LessonPlanFileDownloadDTO lessonPlanFileDownloadDTO = mapToDto(mediaFile.get());
+        lessonPlanFileDownloadDTO.setContent(readFileContent(mediaFile.get().getId()).getContent());
+        return lessonPlanFileDownloadDTO;
+    }
+
+    private String readWordFileContent(byte[] fileContent) throws IOException {
         try (
             InputStream inputStream = new ByteArrayInputStream(fileContent);
             XWPFDocument document = new XWPFDocument(inputStream)

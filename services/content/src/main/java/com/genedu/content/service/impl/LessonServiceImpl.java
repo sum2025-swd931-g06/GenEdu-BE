@@ -6,11 +6,13 @@ import com.genedu.commonlibrary.exception.InternalServerErrorException;
 import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.content.dto.chapter.ChapterResponseDTO;
 import com.genedu.content.dto.flatResponse.FlatChapterLessonDTO;
+import com.genedu.content.dto.lesson.LessonEntityResponseDTO;
 import com.genedu.content.dto.lesson.LessonRequestDTO;
 import com.genedu.content.mapper.ChapterMapper;
 import com.genedu.content.mapper.LessonMapper;
 import com.genedu.content.model.Chapter;
 import com.genedu.content.model.Lesson;
+import com.genedu.content.model.*;
 import com.genedu.content.repository.LessonRepository;
 import com.genedu.content.service.ChapterService;
 import com.genedu.content.service.LessonService;
@@ -121,6 +123,32 @@ public class LessonServiceImpl implements LessonService {
             log.error("Error deleting lesson", e);
             throw new InternalServerErrorException(Constants.ErrorCode.DELETE_LESSON_FAILED, e.getMessage());
         }
+    }
+
+    @Override
+    public LessonEntityResponseDTO getFlatLessonEntityById(Long lessonId) {
+        if (lessonId == null) {
+            throw new BadRequestException(Constants.ErrorCode.LESSON_ID_REQUIRED);
+        }
+        Lesson lesson = lessonRepository.findLessonById(lessonId);
+        Chapter chapter = lesson.getChapter();
+        Material material = chapter.getMaterial();
+        Subject subject = material.getSubject();
+        SchoolClass schoolClass = subject.getSchoolClass();
+
+        String schoolClassId = String.valueOf(schoolClass.getId());
+        String subjectId = String.valueOf(subject.getId());
+        String materialId = String.valueOf(material.getId());
+        String chapterId = String.valueOf(chapter.getId());
+        String lessonIdStr = String.valueOf(lesson.getId());
+
+        return new LessonEntityResponseDTO(
+                schoolClassId,
+                subjectId,
+                materialId,
+                chapterId,
+                lessonIdStr
+        );
     }
 
     // --- Private helpers ---

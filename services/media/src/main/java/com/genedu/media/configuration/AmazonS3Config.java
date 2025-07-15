@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
 
 import java.net.URI;
 
@@ -16,9 +17,14 @@ public class AmazonS3Config extends AWSClientConfig {
     @Bean
     public S3Client s3() {
         return S3Client.builder()
+                .endpointOverride(URI.create(awsS3EndPoint))
                 .region(Region.of(awsRegion))
                 .credentialsProvider(amazonAWSCredentialsProvider())
-                .endpointOverride(URI.create(awsS3EndPoint))
+                .serviceConfiguration(
+                        S3Configuration.builder()
+                                .pathStyleAccessEnabled(true)
+                                .build()
+                )
                 .build();
     }
 }
