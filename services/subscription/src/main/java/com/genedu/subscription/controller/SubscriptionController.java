@@ -25,7 +25,6 @@ import java.util.UUID;
 @Tag(name = "Subscription", description = "Subscription API")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
-    private final SubscriptionRepository subscriptionRepository;
 
     @Operation(summary = "Create a session url to start a subscription")
     @PostMapping("/start")

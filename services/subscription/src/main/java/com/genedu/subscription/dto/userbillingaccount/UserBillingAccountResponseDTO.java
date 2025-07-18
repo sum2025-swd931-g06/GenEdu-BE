@@ -6,6 +6,7 @@ import java.util.UUID;
 
 @Builder
 public record UserBillingAccountResponseDTO(
+        UUID id,
         UUID customerId,
         UUID userId,
         String paymentGatewayCustomerId,

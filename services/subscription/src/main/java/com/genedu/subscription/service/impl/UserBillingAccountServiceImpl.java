@@ -8,17 +8,21 @@ import com.genedu.subscription.model.UserBillingAccount;
 import com.genedu.subscription.repository.UserBillingAccountRepository;
 import com.genedu.subscription.service.UserBillingAccountService;
 import com.genedu.subscription.utils.Constants;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
+import com.stripe.param.CustomerCreateParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserTransactionServiceImpl implements UserBillingAccountService {
+public class UserBillingAccountServiceImpl implements UserBillingAccountService {
     private final UserBillingAccountRepository userBillingAccountRepository;
 
     @Override
@@ -91,5 +95,20 @@ public class UserTransactionServiceImpl implements UserBillingAccountService {
             log.error("Error when updateSubscriptionStatus for userId {}", userId, e);
             throw new InternalServerErrorException(Constants.ErrorCode.UPDATE_FAILED, "UserBillingAccount", userId);
         }
+    }
+
+    @Override
+    public UserBillingAccountResponseDTO ensureStripeCustomer(String userId, String country) throws StripeException {
+        var billingAccount = getOrCreateUserBillingAccount(userId);
+        if (billingAccount.paymentGatewayCustomerId() == null || billingAccount.paymentGatewayCustomerId().isBlank()) {
+            var stripeCustomer = Customer.create(CustomerCreateParams.builder()
+                    .setAddress(CustomerCreateParams.Address.builder().setCountry(country).build())
+                    .setMetadata(Map.of("userId", userId))
+                    .build());
+            updatePaymentGatewayCustomerId(billingAccount.id().toString(), stripeCustomer.getId());
+            // Reload updated billing account
+            billingAccount = getOrCreateUserBillingAccount(userId);
+        }
+        return billingAccount;
     }
 }

@@ -2,6 +2,7 @@ package com.genedu.subscription.service;
 
 import com.genedu.subscription.dto.userbillingaccount.UserBillingAccountResponseDTO;
 import com.genedu.subscription.model.UserBillingAccount;
+import com.stripe.exception.StripeException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -12,4 +13,5 @@ public interface UserBillingAccountService {
 //    Optional<UserBillingAccountResponseDTO> findByPaymentGatewayCustomerId(String userId);
     void updatePaymentGatewayCustomerId(String userId, String customerId);
     void updateSubscriptionStatus(String userId, Boolean status);
+    UserBillingAccountResponseDTO ensureStripeCustomer(String userId, String country) throws StripeException;
 }

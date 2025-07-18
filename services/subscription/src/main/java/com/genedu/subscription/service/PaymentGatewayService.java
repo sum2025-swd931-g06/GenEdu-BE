@@ -15,5 +15,4 @@ public interface PaymentGatewayService {
     void cancelSubscription(String gatewaySubscriptionId);
     void handleWebhookEvent(WebhookRequest webhookRequest);
     boolean isWebhookSignatureValid(WebhookRequest webhookRequest);
-
 }
