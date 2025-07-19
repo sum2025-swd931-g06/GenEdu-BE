@@ -127,7 +127,7 @@ public class StripeService implements PaymentGatewayService {
                 )
         );
 
-        SubscriptionServiceImpl
+//        SubscriptionServiceImpl
 
 
         log.info("✅ Invoice paid. Transaction recorded for subscription: {}", subscriptionId);
@@ -191,16 +191,17 @@ public class StripeService implements PaymentGatewayService {
      * Helper để lấy Subscription ID từ Invoice trong trường hợp Stripe SDK không expose trực tiếp.
      */
     private String getSubscriptionIdFromInvoice(Invoice invoice) {
-        try {
-            return invoice.getSubscription(); // nếu IDE nhận được thì dùng
-        } catch (Exception e) {
-            // fallback nếu SDK không hỗ trợ getter
-            try {
-                return invoice.getRawJsonObject().get("subscription").getAsString();
-            } catch (Exception ex) {
-                log.error("❌ Failed to extract subscription ID from invoice", ex);
-                return null;
-            }
-        }
+//        try {
+//            return invoice.getSubscription(); // nếu IDE nhận được thì dùng
+//        } catch (Exception e) {
+//            // fallback nếu SDK không hỗ trợ getter
+//            try {
+//                return invoice.getRawJsonObject().get("subscription").getAsString();
+//            } catch (Exception ex) {
+//                log.error("❌ Failed to extract subscription ID from invoice", ex);
+//                return null;
+//            }
+//        }
+        return "";
     }
 }

@@ -28,29 +28,30 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public String startSubscription(SubscriptionRequestDTO requestDTO) {
-        // Validate request
-        if (requestDTO == null || requestDTO.accountId() == null || requestDTO.planId() == null) {
-            throw new IllegalArgumentException("Invalid subscription request");
-        }
-
-        // Create or retrieve billing account
-        var billingAccount = billingRepo.findByPaymentGatewayCustomerId(requestDTO.accountId())
-                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.CUSTOMER_NOT_FOUND, requestDTO.accountId()));
-
-        // Create subscription in Stripe
-        String subscriptionId = stripeService.createSubscription(billingAccount, requestDTO.getPlanId());
-
-        // Save subscription details in the repository
-        SubscriptionResponseDTO subscriptionResponse = new SubscriptionResponseDTO();
-        subscriptionResponse.setUserId(requestDTO.getUserId());
-        subscriptionResponse.setSubscriptionId(subscriptionId);
-        subscriptionResponse.setPlanId(requestDTO.getPlanId());
-        subscriptionRepo.save(subscriptionResponse);
-
-        // Send confirmation email
-        emailService.sendSubscriptionConfirmationEmail(requestDTO.getUserId(), subscriptionResponse);
-
-        return subscriptionId;
+//        // Validate request
+//        if (requestDTO == null || requestDTO.accountId() == null || requestDTO.planId() == null) {
+//            throw new IllegalArgumentException("Invalid subscription request");
+//        }
+//
+//        // Create or retrieve billing account
+//        var billingAccount = billingRepo.findByPaymentGatewayCustomerId(requestDTO.accountId())
+//                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.CUSTOMER_NOT_FOUND, requestDTO.accountId()));
+//
+//        // Create subscription in Stripe
+//        String subscriptionId = stripeService.createSubscription(billingAccount, requestDTO.getPlanId());
+//
+//        // Save subscription details in the repository
+//        SubscriptionResponseDTO subscriptionResponse = new SubscriptionResponseDTO();
+//        subscriptionResponse.setUserId(requestDTO.getUserId());
+//        subscriptionResponse.setSubscriptionId(subscriptionId);
+//        subscriptionResponse.setPlanId(requestDTO.getPlanId());
+//        subscriptionRepo.save(subscriptionResponse);
+//
+//        // Send confirmation email
+//        emailService.sendSubscriptionConfirmationEmail(requestDTO.getUserId(), subscriptionResponse);
+//
+//        return subscriptionId;
+        return null;
     }
 
     @Override
