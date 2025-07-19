@@ -71,10 +71,10 @@ public class UserBillingAccountServiceImpl implements UserBillingAccountService 
 
     @Override
     public void updatePaymentGatewayCustomerId(String userId, String customerId) {
+        UUID userUUID = UUID.fromString(userId);
+        UserBillingAccount account = userBillingAccountRepository.findById(userUUID)
+                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.USER_BILLING_ACCOUNT_NOT_FOUND, userId));
         try {
-            UUID userUUID = UUID.fromString(userId);
-            UserBillingAccount account = userBillingAccountRepository.findByUserId(userUUID)
-                    .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.USER_BILLING_ACCOUNT_NOT_FOUND, userId));
             account.setPaymentGatewayCustomerId(customerId);
             userBillingAccountRepository.save(account);
         } catch (Exception e) {
@@ -110,5 +110,16 @@ public class UserBillingAccountServiceImpl implements UserBillingAccountService 
             billingAccount = getOrCreateUserBillingAccount(userId);
         }
         return billingAccount;
+    }
+
+    @Override
+    public UserBillingAccount findByStripeCustomerId(String customerId) {
+        try {
+            return userBillingAccountRepository.findByPaymentGatewayCustomerId(customerId)
+                    .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.USER_BILLING_ACCOUNT_NOT_FOUND, customerId));
+        } catch (Exception e) {
+            log.error("Error when findByStripeCustomerId for customerId {}", customerId, e);
+            throw new InternalServerErrorException(Constants.ErrorCode.INTERNAL_SERVER_ERROR);
+        }
     }
 }

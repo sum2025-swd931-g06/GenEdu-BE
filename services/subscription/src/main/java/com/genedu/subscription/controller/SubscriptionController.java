@@ -33,12 +33,6 @@ public class SubscriptionController {
         return ResponseEntity.ok(Map.of("url", sessionUrl));
     }
 
-    @Operation(summary = "Handle Stripe webhook events")
-    @PostMapping("/webhook")
-    public ResponseEntity<String> handleWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String signature) {
-        return subscriptionService.handleWebhook(payload, signature);
-    }
-
     @Operation(summary = "Cancel auto-renewal for a subscription")
     @PostMapping("/cancel-auto-renew")
     public ResponseEntity<String> cancelAutoRenew(@RequestParam Object request) {

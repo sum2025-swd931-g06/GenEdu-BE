@@ -14,4 +14,5 @@ public interface UserBillingAccountService {
     void updatePaymentGatewayCustomerId(String userId, String customerId);
     void updateSubscriptionStatus(String userId, Boolean status);
     UserBillingAccountResponseDTO ensureStripeCustomer(String userId, String country) throws StripeException;
+    UserBillingAccount findByStripeCustomerId(String customerId);
 }

@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface UserBillingAccountRepository extends JpaRepository<UserBillingAccount, UUID> {
     Optional<UserBillingAccount> findByUserId(UUID userId);
+    Optional<UserBillingAccount> findByPaymentGatewayCustomerId(String customerId);
 }

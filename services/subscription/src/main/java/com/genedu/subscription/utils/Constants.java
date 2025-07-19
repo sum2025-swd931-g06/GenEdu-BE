@@ -14,10 +14,12 @@ public final class Constants {
         // User Billing Account
         public static final String USER_BILLING_ACCOUNT_NOT_FOUND = "USER_BILLING_ACCOUNT_NOT_FOUND";
         public static final String USER_BILLING_ACCOUNT_CREATION_FAILED = "USER_BILLING_ACCOUNT_CREATION_FAILED";
+        public static final String CUSTOMER_NOT_FOUND = "CUSTOMER_NOT_FOUND";
 
         public static final String CREATE_FAILED = "CREATE_FAILED";
         public static final String UPDATE_FAILED = "UPDATE_FAILED";
         public static final String DELETE_FAILED = "DELETE_FAILED";
         public static final String UNAUTHENTICATED = "UNAUTHENTICATED";
+        public static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
     }
 }

@@ -3,6 +3,7 @@ package com.genedu.subscription.controller;
 import com.genedu.commonlibrary.exception.AccessDeniedException;
 import com.genedu.commonlibrary.exception.BadRequestException;
 import com.genedu.commonlibrary.utils.AuthenticationUtils;
+import com.genedu.subscription.dto.WebhookRequest;
 import com.genedu.subscription.dto.userbillingaccount.UserBillingAccountResponseDTO;
 import com.genedu.subscription.model.UserBillingAccount;
 import com.genedu.subscription.service.PaymentGatewayService;
@@ -12,14 +13,15 @@ import com.genedu.subscription.utils.Constants;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.param.CustomerCreateParams;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/subscriptions/payment")
@@ -48,4 +50,23 @@ public class PaymentController {
         var result = paymentGatewayService.createCheckoutSession(billingAccount, subscriptionPlan);
         return ResponseEntity.ok(result).getBody();
     }
+
+    @Operation(summary = "Handle Stripe webhook events")
+    @PostMapping("/webhook")
+    public ResponseEntity<Void> handleWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String signature) {
+        var webhookRequest = new WebhookRequest(payload, signature);
+        paymentGatewayService.handleWebhookEvent(webhookRequest);
+        return ResponseEntity.noContent().build();
+    }
+//    @PostMapping("/webhook")
+//    public ResponseEntity<String> handleStripeWebhook(HttpServletRequest request, @RequestHeader("Stripe-Signature") String sigHeader) throws IOException
+//    {
+//        // đọc payload gốc từ request
+//        String payload = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+//
+//        // Tạo WebhookRequest từ payload và signature
+//        var webhookRequest = new WebhookRequest(payload, sigHeader);
+//    }
+
+
 }

@@ -10,7 +10,6 @@ import java.util.UUID;
 
 public interface SubscriptionService {
     String startSubscription(SubscriptionRequestDTO requestDTO);
-    ResponseEntity<String> handleWebhook(String payload, String signature);
     void cancelAutoRenew(Object request);
     void notifyExpiringSubscriptions();
     List<SubscriptionResponseDTO> getUserSubscriptions(UUID userId);
