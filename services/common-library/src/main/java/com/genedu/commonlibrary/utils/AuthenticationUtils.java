@@ -47,4 +47,5 @@ public final class AuthenticationUtils {
         }
         return null;
     }
+
 }

@@ -5,7 +5,6 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 
-@Getter
 public record UserTransactionRequestDTO(String accountId,
                                         BigDecimal amount,
                                         String status) {

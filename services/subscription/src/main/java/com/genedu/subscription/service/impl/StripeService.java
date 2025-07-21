@@ -1,5 +1,7 @@
 package com.genedu.subscription.service.impl;
 
+import com.genedu.commonlibrary.enumeration.PaymentStatus;
+import com.genedu.commonlibrary.enumeration.SubscriptionStatus;
 import com.genedu.commonlibrary.enumeration.TransactionStatus;
 import com.genedu.commonlibrary.exception.BadRequestException;
 import com.genedu.subscription.configuration.StripeConfig;
@@ -8,10 +10,12 @@ import com.genedu.subscription.dto.subscription.SubscriptionRequestDTO;
 import com.genedu.subscription.dto.subscriptionplane.SubscriptionPlanResponseDTO;
 import com.genedu.subscription.dto.userbillingaccount.UserBillingAccountResponseDTO;
 import com.genedu.subscription.dto.usertransaction.UserTransactionRequestDTO;
-import com.genedu.subscription.model.SubscriptionPlan;
-import com.genedu.subscription.model.UserBillingAccount;
 import com.genedu.subscription.service.PaymentGatewayService;
 import com.genedu.subscription.service.UserTransactionService;
+//import com.nimbusds.jose.shaded.gson.JsonElement;
+//import com.nimbusds.jose.shaded.gson.JsonObject;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
@@ -23,6 +27,7 @@ import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -36,6 +41,9 @@ public class StripeService implements PaymentGatewayService {
     private final StripeConfig stripeConfig;
     private final UserTransactionService userTransactionService;
     private final UserBillingAccountServiceImpl userBillingAccountServiceImpl;
+    private final SubscriptionServiceImpl subscriptionServiceImpl;
+    private final ApplicationEventPublisher eventPublisher; // Replace SubscriptionServiceImpl with this
+
 
     @Override
     public Map<String, Object> createCheckoutSession(UserBillingAccountResponseDTO billing, SubscriptionPlanResponseDTO subscriptionPlan) throws StripeException {
@@ -105,9 +113,39 @@ public class StripeService implements PaymentGatewayService {
 
         String customerId = session.getCustomer();
         String subscriptionId = session.getSubscription();
-        log.info("✅ Checkout session completed. Customer: {}, Subscription: {}", customerId, subscriptionId);
 
-        // TODO: Update DB: mark account active, save Stripe IDs
+        try {
+            // Retrieve the full session to get the latest payment status
+            session = Session.retrieve(session.getId());
+
+            // Check payment status
+            if (!"paid".equals(session.getPaymentStatus())) {
+                log.warn("⚠️ Payment not confirmed yet for session: {}, status: {}",
+                        session.getId(), session.getPaymentStatus());
+                return; // Exit without creating subscription until payment is confirmed
+            }
+
+            // Payment confirmed, retrieve subscription details
+            Subscription subscription = Subscription.retrieve(subscriptionId);
+            String planId = subscription.getItems().getData().get(0).getPlan().getId();
+
+            log.info("✅ Payment successful. Creating subscription with plan: {}", planId);
+
+            // Create subscription in our system
+            subscriptionServiceImpl.startSubscription(
+                    new SubscriptionRequestDTO(
+                            customerId,
+                            planId,
+                            true,
+                            PaymentStatus.COMPLETED.getValue()
+                    )
+            );
+
+            log.info("✅ Subscription created. Customer: {}, Subscription: {}", customerId, subscriptionId);
+        } catch (StripeException e) {
+            log.error("❌ Failed to process subscription after payment for ID: {}", subscriptionId, e);
+            throw new RuntimeException("Error processing paid subscription", e);
+        }
     }
 
     private void handleInvoicePaid(Event event) {
@@ -115,7 +153,7 @@ public class StripeService implements PaymentGatewayService {
                 .getObject()
                 .orElseThrow(() -> new RuntimeException("Invoice data missing"));
 
-        String subscriptionId = getSubscriptionIdFromInvoice(invoice);
+//        String subscriptionId = getSubscriptionIdFromInvoice(invoice);
         String customerId = invoice.getCustomer();
         BigDecimal amount = BigDecimal.valueOf(invoice.getAmountPaid());
 
@@ -126,12 +164,8 @@ public class StripeService implements PaymentGatewayService {
                         TransactionStatus.SUCCESS.name()
                 )
         );
-
-//        SubscriptionServiceImpl
-
-
-        log.info("✅ Invoice paid. Transaction recorded for subscription: {}", subscriptionId);
-
+//        log.info("✅ Invoice paid. Transaction recorded for subscription: {}", subscriptionId);
+        log.info("✅ Invoice paid. Transaction recorded for customer: {}, amount: {}", customerId, amount);
         // TODO: Mark billing as paid, ensure access is active
     }
 
@@ -140,8 +174,19 @@ public class StripeService implements PaymentGatewayService {
                 .getObject()
                 .orElseThrow(() -> new RuntimeException("Invoice data missing"));
 
-        String subscriptionId = getSubscriptionIdFromInvoice(invoice);
-        log.warn("⚠️ Invoice payment failed for subscription: {}", subscriptionId);
+//        String subscriptionId = getSubscriptionIdFromInvoice(invoice);
+        String customerId = invoice.getCustomer();
+        BigDecimal amount = BigDecimal.valueOf(invoice.getAmountPaid());
+
+        userTransactionService.createTransaction(
+                new UserTransactionRequestDTO(
+                        customerId,
+                        amount,
+                        TransactionStatus.FAILED.name()
+                )
+        );
+//        log.warn("⚠️ Invoice payment failed for subscription: {}", subscriptionId);
+        log.warn("⚠️ Invoice payment failed for customer: {}, amount: {}", customerId, amount);
 
         // TODO: Notify user, mark account for retry or downgrade
     }
@@ -187,21 +232,73 @@ public class StripeService implements PaymentGatewayService {
         // TODO: Save new subscription in DB, activate user benefits
     }
 
-    /**
-     * Helper để lấy Subscription ID từ Invoice trong trường hợp Stripe SDK không expose trực tiếp.
-     */
-    private String getSubscriptionIdFromInvoice(Invoice invoice) {
+    // Get subscriptionId directly from Invoice
+//    private String getSubscriptionIdFromInvoice(Invoice invoice) {
 //        try {
-//            return invoice.getSubscription(); // nếu IDE nhận được thì dùng
-//        } catch (Exception e) {
-//            // fallback nếu SDK không hỗ trợ getter
-//            try {
-//                return invoice.getRawJsonObject().get("subscription").getAsString();
-//            } catch (Exception ex) {
-//                log.error("❌ Failed to extract subscription ID from invoice", ex);
-//                return null;
+//            // Try to get the field using getField (if available in your SDK version)
+//            Object subscriptionId = invoice.get("subscription");
+//            if (subscriptionId instanceof String) {
+//                return (String) subscriptionId;
 //            }
+//
+//            // Fallback: parse raw JSON if needed
+//            if (invoice.getRawJsonObject() != null) {
+//                JsonObject raw = invoice.getRawJsonObject();
+//                JsonElement subElem = raw.get("subscription");
+//                if (subElem != null && subElem.isJsonPrimitive()) {
+//                    return subElem.getAsString();
+//                }
+//            }
+//
+//            log.warn("\\u26A0\\uFE0F 'subscription' field is missing in Invoice.");
+//        } catch (Exception e) {
+//            log.error("\\u274C Failed to extract subscription ID from Invoice", e);
 //        }
-        return "";
+//        return null;
+//    }
+
+    private String getSubscriptionIdFromInvoice(Invoice invoice) {
+        try {
+            // Cách 2: Nếu không có, parse từ raw JSON
+            JsonObject raw = invoice.getRawJsonObject();
+            if (raw != null) {
+                // Ưu tiên: lấy từ parent.subscription_details.subscription
+                if (raw.has("parent")) {
+                    JsonObject parent = raw.getAsJsonObject("parent");
+                    if (parent.has("subscription_details")) {
+                        JsonObject details = parent.getAsJsonObject("subscription_details");
+                        if (details.has("subscription")) {
+                            return details.get("subscription").getAsString();
+                        }
+                    }
+                }
+
+                // Fallback: lấy từ lines.data[0].parent.subscription_item_details.subscription
+                if (raw.has("lines")) {
+                    JsonObject lines = raw.getAsJsonObject("lines");
+                    if (lines.has("data") && lines.get("data").isJsonArray()) {
+                        JsonElement firstLine = lines.getAsJsonArray("data").get(0);
+                        if (firstLine.isJsonObject()) {
+                            JsonObject line = firstLine.getAsJsonObject();
+                            if (line.has("parent")) {
+                                JsonObject parent = line.getAsJsonObject("parent");
+                                if (parent.has("subscription_item_details")) {
+                                    JsonObject subDetails = parent.getAsJsonObject("subscription_item_details");
+                                    if (subDetails.has("subscription")) {
+                                        return subDetails.get("subscription").getAsString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            log.warn("⚠️ Không tìm thấy subscriptionId trong Invoice (fallback thất bại).");
+        } catch (Exception e) {
+            log.error("❌ Lỗi khi lấy subscriptionId từ invoice", e);
+        }
+        return null;
     }
+
 }
