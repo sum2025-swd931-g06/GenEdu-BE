@@ -36,6 +36,9 @@
         <module name="subscription" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="genedu" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

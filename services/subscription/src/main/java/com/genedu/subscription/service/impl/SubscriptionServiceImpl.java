@@ -20,6 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,20 +47,25 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         var billingAccount = billingRepo.findByPaymentGatewayCustomerId(requestDTO.accountId())
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.CUSTOMER_NOT_FOUND, requestDTO.accountId()));
 
-        var subscriptionPlan = subscriptionPlanRepository.findById(UUID.fromString(requestDTO.planId()))
+        var subscriptionPlan = subscriptionPlanRepository.findByStripeProductIdAndDeletedIsFalse(requestDTO.planId())
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.SUBSCRIPTION_PLAN_NOT_FOUND, requestDTO.planId()));
 
 
         try {
+            ZoneId saigonZone = ZoneId.of("Asia/Saigon");
+            ZonedDateTime nowInSaigon = ZonedDateTime.now(saigonZone);
+
+
             // Create subscription entity in our database
             Subscription subscription = new Subscription();
+            subscription.setId(UUID.randomUUID());
             subscription.setAccount(billingAccount);
             subscription.setPlan(subscriptionPlan);
-            subscription.setStartedAt(Instant.now());
-            subscription.setEndedAt(Instant.now().plus(java.time.Duration.ofDays(subscriptionPlan.getDuration())));
+            subscription.setStartedAt(ZonedDateTime.now(saigonZone).toLocalDateTime());
+            subscription.setEndedAt(ZonedDateTime.now(saigonZone).toLocalDateTime().plus(java.time.Duration.ofDays(subscriptionPlan.getDuration())));
             subscription.setAutoRenew(requestDTO.autoRenew());
             subscription.setStatus(requestDTO.status());
-            subscription.setCreatedAt(Instant.now());
+            subscription.setCreatedAt(ZonedDateTime.now(saigonZone).toLocalDateTime());
 
             // Save to database
             subscription = subscriptionRepo.save(subscription);

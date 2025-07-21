@@ -1,7 +1,6 @@
 package com.genedu.subscription.service.impl;
 
 import com.genedu.commonlibrary.enumeration.PaymentStatus;
-import com.genedu.commonlibrary.enumeration.SubscriptionStatus;
 import com.genedu.commonlibrary.enumeration.TransactionStatus;
 import com.genedu.commonlibrary.exception.BadRequestException;
 import com.genedu.subscription.configuration.StripeConfig;
@@ -11,6 +10,8 @@ import com.genedu.subscription.dto.subscriptionplane.SubscriptionPlanResponseDTO
 import com.genedu.subscription.dto.userbillingaccount.UserBillingAccountResponseDTO;
 import com.genedu.subscription.dto.usertransaction.UserTransactionRequestDTO;
 import com.genedu.subscription.service.PaymentGatewayService;
+import com.genedu.subscription.service.SubscriptionService;
+import com.genedu.subscription.service.UserBillingAccountService;
 import com.genedu.subscription.service.UserTransactionService;
 //import com.nimbusds.jose.shaded.gson.JsonElement;
 //import com.nimbusds.jose.shaded.gson.JsonObject;
@@ -18,10 +19,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
-import com.stripe.model.Customer;
-import com.stripe.model.Event;
-import com.stripe.model.Invoice;
-import com.stripe.model.Subscription;
+import com.stripe.model.*;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
@@ -40,9 +38,8 @@ import java.util.Map;
 public class StripeService implements PaymentGatewayService {
     private final StripeConfig stripeConfig;
     private final UserTransactionService userTransactionService;
-    private final UserBillingAccountServiceImpl userBillingAccountServiceImpl;
-    private final SubscriptionServiceImpl subscriptionServiceImpl;
-    private final ApplicationEventPublisher eventPublisher; // Replace SubscriptionServiceImpl with this
+    private final UserBillingAccountService userBillingAccountServiceImpl;
+    private final SubscriptionService subscriptionService;
 
 
     @Override
@@ -127,12 +124,14 @@ public class StripeService implements PaymentGatewayService {
 
             // Payment confirmed, retrieve subscription details
             Subscription subscription = Subscription.retrieve(subscriptionId);
-            String planId = subscription.getItems().getData().get(0).getPlan().getId();
+
+            String priceId = subscription.getItems().getData().get(0).getPrice().getId(); // hoặc getPlan().getId()
+            String planId = Price.retrieve(priceId).getProduct();
 
             log.info("✅ Payment successful. Creating subscription with plan: {}", planId);
 
             // Create subscription in our system
-            subscriptionServiceImpl.startSubscription(
+            subscriptionService.startSubscription(
                     new SubscriptionRequestDTO(
                             customerId,
                             planId,

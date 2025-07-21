@@ -58,15 +58,6 @@ public class PaymentController {
         paymentGatewayService.handleWebhookEvent(webhookRequest);
         return ResponseEntity.noContent().build();
     }
-//    @PostMapping("/webhook")
-//    public ResponseEntity<String> handleStripeWebhook(HttpServletRequest request, @RequestHeader("Stripe-Signature") String sigHeader) throws IOException
-//    {
-//        // đọc payload gốc từ request
-//        String payload = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-//
-//        // Tạo WebhookRequest từ payload và signature
-//        var webhookRequest = new WebhookRequest(payload, sigHeader);
-//    }
 
 
 }

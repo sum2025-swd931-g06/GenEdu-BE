@@ -3,6 +3,7 @@ package com.genedu.subscription.configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,6 +33,19 @@ public class SecurityConfig {
     };
 
     @Bean
+    @Order(1)
+    public SecurityFilterChain webhookFilterChain(HttpSecurity http) throws Exception {
+        log.info("Configuring security for webhook endpoint");
+        http
+                .securityMatcher("/api/v1/subscriptions/payment/webhook") // Chỉ áp dụng cho webhook
+                .csrf(AbstractHttpConfigurer::disable)
+                .oauth2ResourceServer(AbstractHttpConfigurer::disable) // ⛔ Tắt xác thực JWT cho webhook
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable); // Disable CSRF protection for stateless APIs
         http.cors(Customizer.withDefaults()); // Enable CORS with default settings
