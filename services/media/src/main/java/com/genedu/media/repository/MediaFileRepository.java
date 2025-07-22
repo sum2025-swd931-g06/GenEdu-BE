@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface MediaFileRepository extends JpaRepository<MediaFile, Long> {
     Optional<MediaFile> findFirstByFileUrlAndDeletedIsFalseOrderByUploadedOnDesc(String fileUrl);
     Optional<MediaFile> findFirstByFileNameAndFileTypeAndDeletedIsFalseOrderByUploadedOnDesc(String fileName, FileType fileType);
-
+    Optional<MediaFile> findByIdAndDeletedIsFalse(Long id);
     /**
      * Finds the most recent, non-deleted file for a given project ID and file type.
      * This is the cleanest and safest way to get a single, latest result.

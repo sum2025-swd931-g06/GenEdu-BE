@@ -1,20 +1,12 @@
 package com.genedu.project.service;
 
-import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.commonlibrary.webclient.dto.SlideFileDownloadDTO;
 import com.genedu.commonlibrary.webclient.dto.SlideFileUploadDTO;
-import com.genedu.project.dto.FinalizedLectureCreateRequestDTO;
 import com.genedu.project.dto.LectureContentRequestDTO;
 import com.genedu.project.dto.LectureContentResponseDTO;
-import com.genedu.project.model.FinalizedLecture;
 import com.genedu.project.model.LectureContent;
-import com.genedu.project.model.SlideContent;
-import com.genedu.project.model.enumeration.LectureStatus;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface LectureContentService {
@@ -30,7 +22,13 @@ public interface LectureContentService {
 
     public SlideFileDownloadDTO uploadSlideFile(SlideFileUploadDTO fileUploadDTO) ;
 
-    void generateNarrationForLectureContent(UUID lectureContentId);
+    void generateNarrationForLectureContentAsyn(UUID lectureContentId);
 
     void updateNarrationAudioForLectureContent(UUID lectureContentId, Long audioFileId);
+
+    public LectureContentResponseDTO generateNarrationForLectureContent(
+            UUID lectureContentId
+    );
+
+    void generateLectureVideoForLectureContentAsyn(UUID finalizedLectureId);
 }

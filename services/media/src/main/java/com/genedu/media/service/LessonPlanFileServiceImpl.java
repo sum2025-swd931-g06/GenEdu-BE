@@ -28,7 +28,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class LectureFileServiceImpl implements MediaFileService<LessonPlanFileUploadDTO, LessonPlanFileDownloadDTO> {
+public class LessonPlanFileServiceImpl implements MediaFileService<LessonPlanFileUploadDTO, LessonPlanFileDownloadDTO> {
     private final S3StorageService s3StorageService;
     private final MediaFileRepository mediaFileRepository;
     private final BucketName bucketName;

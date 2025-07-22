@@ -6,12 +6,14 @@ import com.genedu.project.dto.FinalizedLectureResponseDTO;
 import com.genedu.project.mapper.FinalizedLectureMapper;
 import com.genedu.project.model.FinalizedLecture;
 import com.genedu.project.model.LectureContent;
+import com.genedu.project.model.enumeration.LectureStatus;
 import com.genedu.project.model.enumeration.PublishedStatus;
 import com.genedu.project.repository.FinalizedLectureRepository;
 import com.genedu.project.service.FinalizedLectureService;
 import com.genedu.project.service.LectureContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +47,7 @@ public class FinalizedLectureServiceImpl implements FinalizedLectureService {
                 .orElseThrow(() -> new NotFoundException("Finalized lecture not found for ID: " + finalizedLectureId));
     }
 
+    @Transactional
     public FinalizedLectureResponseDTO createFinalizedLecture(
             FinalizedLectureCreateRequestDTO finalizedLectureCreateRequestDTO
     ) {
@@ -54,6 +57,8 @@ public class FinalizedLectureServiceImpl implements FinalizedLectureService {
         LectureContent lectureContent = lectureContentServiceImpl.getLectureContentEntityById(finalizedLectureCreateRequestDTO.lectureContentId());
         FinalizedLecture finalizedLecture = finalizedLectureMapper.toEntity(finalizedLectureCreateRequestDTO, lectureContent);
         FinalizedLecture savedFinalizedLecture = finalizedLectureRepository.save(finalizedLecture);
+        lectureContent.setFinalizedLecture(savedFinalizedLecture);
+        lectureContent.setStatus(LectureStatus.FINALIZED);
         return finalizedLectureMapper.toDTO(savedFinalizedLecture);
     }
 
@@ -61,6 +66,15 @@ public class FinalizedLectureServiceImpl implements FinalizedLectureService {
             UUID lectureContentId
     ) {
         return !finalizedLectureRepository.findByLectureContentIdAndDeletedIsFalse(lectureContentId).isEmpty();
+    }
+
+    @Override
+    public void updateNarrationAudioForLectureContent(UUID finalizedLectureId, Long lectureVideoId) {
+        FinalizedLecture finalizedLecture = finalizedLectureRepository.findById(finalizedLectureId)
+                .orElseThrow(() -> new NotFoundException("Finalized lecture not found for ID: " + finalizedLectureId));
+
+        finalizedLecture.setVideoFileId(lectureVideoId);
+        finalizedLectureRepository.save(finalizedLecture);
     }
 
     public FinalizedLecture createFinalizedLectureEntity(
@@ -71,7 +85,8 @@ public class FinalizedLectureServiceImpl implements FinalizedLectureService {
         return finalizedLectureRepository.save(finalizedLecture);
     }
 
-    public FinalizedLecture updateFinalizedLectureMedia(
+    @Transactional
+    public FinalizedLectureResponseDTO updateFinalizedLectureMedia(
             UUID finalizedLectureId,
             FinalizedLectureCreateRequestDTO finalizedLectureCreateRequestDTO
     ) {
@@ -90,6 +105,9 @@ public class FinalizedLectureServiceImpl implements FinalizedLectureService {
         if (finalizedLectureCreateRequestDTO.thumbnailFileId() != null) {
             existingFinalizedLecture.setThumbnailFileId(finalizedLectureCreateRequestDTO.thumbnailFileId());
         }
-        return finalizedLectureRepository.save(existingFinalizedLecture);
+
+        FinalizedLecture savedFinalizeLecture = finalizedLectureRepository.save(existingFinalizedLecture);
+
+        return finalizedLectureMapper.toDTO(savedFinalizeLecture);
     }
 }

@@ -1,5 +1,7 @@
 package com.genedu.media.controller;
 
+import com.genedu.commonlibrary.webclient.dto.LectureVideoDownloadDTO;
+import com.genedu.commonlibrary.webclient.dto.LectureVideoUploadDTO;
 import com.genedu.commonlibrary.webclient.dto.SlideNarrationAudioDownloadDTO;
 import com.genedu.commonlibrary.webclient.dto.SlideNarrationAudioUploadDTO;
 import com.genedu.media.service.MediaFileService;
@@ -14,21 +16,20 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/medias")
-public class SlideNarrationAudioController {
-
-    private final MediaFileService<SlideNarrationAudioUploadDTO, SlideNarrationAudioDownloadDTO> mediaFileService;
+public class LectureVideoController {
+    private final MediaFileService<LectureVideoUploadDTO, LectureVideoDownloadDTO> mediaFileService;
 
     @PostMapping(
-            path = "/projects/slides/narration-audios/upload"
+            path = "/projects/lecture-video/upload"
     )
-    public ResponseEntity<SlideNarrationAudioDownloadDTO> uploadSlideNarrationAudioFile(
-            @RequestBody @Validated SlideNarrationAudioUploadDTO file
+    public ResponseEntity<LectureVideoDownloadDTO> uploadLectureVideoFile(
+            @RequestBody @Validated LectureVideoUploadDTO file
     ) throws IOException {
-        SlideNarrationAudioDownloadDTO uploadedFile = mediaFileService.saveMediaFile(file);
+        LectureVideoDownloadDTO uploadedFile = mediaFileService.saveMediaFile(file);
         return ResponseEntity.ok(uploadedFile);
     }
 
-    @GetMapping("/projects/slides/narration-audios/{fileId}/url")
+    @GetMapping("/projects/lecture-video/{fileId}/url")
     public ResponseEntity<String> getNarrationFileUrlBySlideId(
             @PathVariable Long fileId
     ) {

@@ -2,9 +2,11 @@ package com.genedu.media.service;
 
 import com.genedu.commonlibrary.enumeration.FileType;
 import com.genedu.commonlibrary.exception.BadRequestException;
-import com.genedu.commonlibrary.exception.FileStorageException;
 import com.genedu.commonlibrary.utils.AuthenticationUtils;
-import com.genedu.commonlibrary.webclient.dto.*;
+import com.genedu.commonlibrary.webclient.dto.LectureVideoDownloadDTO;
+import com.genedu.commonlibrary.webclient.dto.LectureVideoUploadDTO;
+import com.genedu.commonlibrary.webclient.dto.SlideNarrationAudioDownloadDTO;
+import com.genedu.commonlibrary.webclient.dto.SlideNarrationAudioUploadDTO;
 import com.genedu.media.buckets.BucketName;
 import com.genedu.media.model.MediaFile;
 import com.genedu.media.repository.MediaFileRepository;
@@ -13,18 +15,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Slf4j
 @Service
+@Slf4j
 @RequiredArgsConstructor
-public class NarrationAudioServiceImpl implements MediaFileService<SlideNarrationAudioUploadDTO, SlideNarrationAudioDownloadDTO>{
-
+public class LectureVideoServiceImpl implements MediaFileService<LectureVideoUploadDTO, LectureVideoDownloadDTO>{
     @Value("${aws.s3.endpoint}")
     private String S3Host;
 
@@ -32,46 +33,40 @@ public class NarrationAudioServiceImpl implements MediaFileService<SlideNarratio
     private final MediaFileRepository mediaFileRepository;
     private final BucketName bucketName;
     private static final String PROJECT_FOLDER = "projects";
+    private final UUID SYSTEM_USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     @Override
-    public void checkValidFormat(SlideNarrationAudioUploadDTO mediaFile) {
+    public void checkValidFormat(LectureVideoUploadDTO mediaFile) {
         if (mediaFile == null) {
             throw new BadRequestException("Media file cannot be null");
         }
-        if (mediaFile.getAudioFile() == null || mediaFile.getAudioFile().length == 0) {
-            throw new BadRequestException("Audio file cannot be null or empty");
+        if (mediaFile.getVideoFile() == null || mediaFile.getVideoFile().length == 0) {
+            throw new BadRequestException("Video file cannot be null or empty");
         }
     }
 
     @Override
-    public SlideNarrationAudioDownloadDTO getMediaFileByFileNameAndFileType(String fileName, FileType fileType) {
-        return mediaFileRepository.findFirstByFileNameAndFileTypeAndDeletedIsFalseOrderByUploadedOnDesc(fileName, fileType)
-                .map(this::mapToDto)
-                .orElseThrow(() -> new BadRequestException("Media file not found with name: " + fileName + " and type: " + fileType));
-    }
-
-    @Override
-    public SlideNarrationAudioDownloadDTO saveMediaFile(SlideNarrationAudioUploadDTO mediaFile) throws IOException {
+    public LectureVideoDownloadDTO saveMediaFile(LectureVideoUploadDTO mediaFile) throws IOException {
         UUID userId = Optional.ofNullable(AuthenticationUtils.getUserId())
                 .orElseThrow(() -> new BadRequestException("User ID could not be determined from security context."));
-        return saveFileInternal(mediaFile, FileType.AUDIO, userId);
+        return saveFileInternal(mediaFile, FileType.VIDEO, userId);
+    }
+    
+    public LectureVideoDownloadDTO saveMediaFile(LectureVideoUploadDTO uploadDTO, UUID userId) throws IOException {
+        return saveFileInternal(uploadDTO, FileType.VIDEO, userId);
     }
 
-    @Override
-    public SlideNarrationAudioDownloadDTO systematicSaveMediaFile(SlideNarrationAudioUploadDTO mediaFile) throws IOException {
-        return null;
-    }
-
-    private SlideNarrationAudioDownloadDTO saveFileInternal(SlideNarrationAudioUploadDTO uploadDTO, FileType fileType, UUID uploadedBy) throws IOException {
+    private LectureVideoDownloadDTO saveFileInternal(LectureVideoUploadDTO uploadDTO, FileType fileType, UUID uploadedBy) throws IOException {
         checkValidFormat(uploadDTO);
 
-        byte[] file = uploadDTO.getAudioFile();
+        byte[] file = uploadDTO.getVideoFile();
 
         String projectId = uploadDTO.getProjectId().toString();
-        String fileName = uploadDTO.getSlideId() + "_narration" + ".mp3"; // Use a consistent naming convention for the file
+        String fileName = uploadDTO.getFinalizeLectureId() + "_lecture_video" + ".mp4"; // Use a consistent naming convention for the file
         //define content type for mp3
-        String contentType = "audio/mpeg"; // Default content type for MP3 files
-        String filePath = String.join("/", PROJECT_FOLDER, projectId, "narrations", uploadDTO.getLectureContentId().toString(), uploadDTO.getSlideId().toString());
+        String contentType = "video/mp4"; // Default content type for MP3 files
+
+        String filePath = String.join("/", PROJECT_FOLDER, projectId, "videos", uploadDTO.getLectureContentId().toString(), uploadDTO.getFinalizeLectureId().toString());
         String fullS3Key = String.join("/", filePath, fileName);
 
         // Find an existing file at the same path and mark it as deleted.
@@ -100,9 +95,9 @@ public class NarrationAudioServiceImpl implements MediaFileService<SlideNarratio
         return mapToDto(savedMediaFile);
     }
 
-    private SlideNarrationAudioDownloadDTO mapToDto(MediaFile mediaFile) {
+    private LectureVideoDownloadDTO mapToDto(MediaFile mediaFile) {
         String fileUrl = String.join("/",S3Host, bucketName.getGeneduBucket(), mediaFile.getFileUrl());
-        return SlideNarrationAudioDownloadDTO.builder()
+        return LectureVideoDownloadDTO.builder()
                 .id(mediaFile.getId())
                 .fileName(mediaFile.getFileName())
                 .fileType(mediaFile.getFileType())
@@ -113,26 +108,20 @@ public class NarrationAudioServiceImpl implements MediaFileService<SlideNarratio
     }
 
     @Override
+    public LectureVideoDownloadDTO systematicSaveMediaFile(LectureVideoUploadDTO mediaFile) throws IOException {
+        return saveFileInternal(mediaFile, FileType.LESSON_PLAN_TEMPLATE, SYSTEM_USER_ID);
+    }
+
+    @Override
+    public LectureVideoDownloadDTO getMediaFileByFileNameAndFileType(String fileName, FileType fileType) {
+        return null;
+    }
+
+    @Override
     public String getMediaFileUrlById(Long id) {
         MediaFile mediaFile = mediaFileRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Media file not found with id: " + id));
         return String.format("%s/%s/%s",S3Host, bucketName.getGeneduBucket(), mediaFile.getFileUrl());
-    }
-
-    public Path downloadAudioToDirectory(Long fileId, Path targetDirectory) {
-        MediaFile mediaFile = mediaFileRepository.findByIdAndDeletedIsFalse(fileId)
-                .orElseThrow(() -> new IllegalArgumentException("Media file not found with id: " + fileId));
-
-        // Use the original file name for the downloaded file.
-        Path destinationPath = targetDirectory.resolve(mediaFile.getFileName());
-
-        try {
-            s3StorageService.downloadToFile(mediaFile.getFileUrl(), destinationPath);
-            log.debug("Downloaded file {} to {}", mediaFile.getFileUrl(), destinationPath);
-            return destinationPath;
-        } catch (IOException e) {
-            throw new FileStorageException("Failed to download narration audio file with id: " + fileId, e);
-        }
     }
 
     @Override
@@ -141,32 +130,32 @@ public class NarrationAudioServiceImpl implements MediaFileService<SlideNarratio
     }
 
     @Override
-    public SlideNarrationAudioDownloadDTO updateMediaFile(Long id, SlideNarrationAudioUploadDTO mediaFile) {
+    public LectureVideoDownloadDTO updateMediaFile(Long id, LectureVideoUploadDTO mediaFile) {
         return null;
     }
 
     @Override
-    public List<SlideNarrationAudioDownloadDTO> getAllMediaFilesByOwnerId(UUID ownerId) {
+    public List<LectureVideoDownloadDTO> getAllMediaFilesByOwnerId(UUID ownerId) {
         return List.of();
     }
 
     @Override
-    public List<SlideNarrationAudioDownloadDTO> getMediaFilesByType(FileType type) {
+    public List<LectureVideoDownloadDTO> getMediaFilesByType(FileType type) {
         return List.of();
     }
 
     @Override
-    public List<SlideNarrationAudioDownloadDTO> getMediaFilesByOwnerIdAndType(UUID ownerId, FileType type) {
+    public List<LectureVideoDownloadDTO> getMediaFilesByOwnerIdAndType(UUID ownerId, FileType type) {
         return List.of();
     }
 
     @Override
-    public SlideNarrationAudioDownloadDTO readFileContent(Long id) {
+    public LectureVideoDownloadDTO readFileContent(Long id) {
         return null;
     }
 
     @Override
-    public SlideNarrationAudioDownloadDTO getMediaFileByProjectId(String projectId) {
+    public LectureVideoDownloadDTO getMediaFileByProjectId(String projectId) {
         return null;
     }
 }

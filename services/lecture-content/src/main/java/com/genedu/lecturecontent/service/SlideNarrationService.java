@@ -45,8 +45,6 @@ public class SlideNarrationService {
                 if (audioBytes != null && audioBytes.length > 0) {
                     log.info("Successfully generated {} bytes of audio for slideId: {}", audioBytes.length, slideNarration.getSlideId());
 
-
-
                     // Upload the generated audio directly to the media service.
                     SlideNarrationAudioUploadDTO narrationAudioUploadDTO = new SlideNarrationAudioUploadDTO(
                             slideNarrationEvent.getProjectId().toString(),
@@ -73,5 +71,4 @@ public class SlideNarrationService {
             }
         }
     }
-
 }

@@ -12,13 +12,13 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @AllArgsConstructor
 @NoArgsConstructor
-public class SlideNarrationAudioUploadDTO {
+public class LectureVideoUploadDTO {
     @NotNull(message = "Project ID cannot be null")
     private String projectId;
     @NotNull(message = "LectureContent ID cannot be null")
     private String lectureContentId;
-    @NotNull(message = "Slide ID cannot be null")
-    private String slideId;
-    @NotNull(message = "Audio file cannot be null")
-    private byte[] audioFile;
+    @NotNull(message = "FinalizedLecture ID cannot be null")
+    private String finalizeLectureId;
+    @NotNull(message = "Video file cannot be null")
+    private byte[] videoFile;
 }

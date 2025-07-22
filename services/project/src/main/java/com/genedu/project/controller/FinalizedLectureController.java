@@ -1,6 +1,7 @@
 package com.genedu.project.controller;
 
 import com.genedu.project.dto.FinalizedLectureResponseDTO;
+import com.genedu.project.dto.LectureContentResponseDTO;
 import com.genedu.project.service.impl.FinalizedLectureServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -49,5 +50,23 @@ public class FinalizedLectureController {
     ) {
         FinalizedLectureResponseDTO finalizedLecture = finalizedLectureServiceImpl.getFinalizedLectureById(finalizedLectureId);
         return ResponseEntity.ok(finalizedLecture);
+    }
+
+    @Operation(
+            summary = "Update a finalized lecture video",
+            description = "Updates the narration audio for a finalized lecture video."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated the finalized lecture video"),
+            @ApiResponse(responseCode = "404", description = "Finalized lecture or lecture video not found")
+    })
+    @PutMapping("/finalized-lectures/{finalizedLectureId}/lecture-videos")
+    @Deprecated // This endpoint is deprecated and should not be used by external clients.
+    public ResponseEntity<LectureContentResponseDTO> updateLectureVideo(
+            @PathVariable("finalizedLectureId") UUID finalizedLectureId,
+            @RequestParam("lectureVideoId") Long lectureVideoId
+    ) {
+        finalizedLectureServiceImpl.updateNarrationAudioForLectureContent(finalizedLectureId, lectureVideoId);
+        return ResponseEntity.ok().build();
     }
 }

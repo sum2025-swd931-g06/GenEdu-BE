@@ -8,13 +8,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,6 +78,25 @@ public class S3StorageService {
         } catch (NoSuchKeyException e) {
             log.warn("Could not find object: {}", key);
             return new byte[0]; // Return empty byte array when object is not found
+        } catch (SdkException e) {
+            log.error("Failed to download file from S3: {}", e.getMessage());
+            throw new IOException("Failed to download file from S3", e);
+        }
+    }
+
+    public Path downloadToFile(String key, Path targetPath) throws IOException {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName.getGeneduBucket())
+                .key(key)
+                .build();
+
+        try (ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest)) {
+            Files.createDirectories(targetPath.getParent());
+            Files.copy(s3Object, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            return targetPath;
+        } catch (NoSuchKeyException e) {
+            log.warn("Could not find object: {}", key);
+            throw new FileNotFoundException("S3 object not found: " + key);
         } catch (SdkException e) {
             log.error("Failed to download file from S3: {}", e.getMessage());
             throw new IOException("Failed to download file from S3", e);
