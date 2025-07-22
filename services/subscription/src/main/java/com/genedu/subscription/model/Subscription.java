@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Getter
@@ -28,25 +30,33 @@ public class Subscription {
     private SubscriptionPlan plan;
 
     @NotNull
+    @Column(name = "stripe_subscription_id")
+    private String stripeSubscriptionId;
+
+    @NotNull
     @Column(name = "started_at", nullable = false)
-    private Instant startedAt;
+    private LocalDateTime startedAt;
 
     @NotNull
     @Column(name = "ended_at", nullable = false)
-    private Instant endedAt;
+    private LocalDateTime endedAt;
 
     @NotNull
     @Column(name = "auto_renew", nullable = false)
     private Boolean autoRenew = false;
 
     @NotNull
+    @Column(name = "stripe_subscription_id", nullable = false)
+    private Boolean renewalReminderSent = false;
+
+    @NotNull
     @Column(name = "status", nullable = false, length = Integer.MAX_VALUE)
     private String status;
 
     @Column(name = "created_at")
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 
 }

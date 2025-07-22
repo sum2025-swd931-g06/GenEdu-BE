@@ -34,7 +34,10 @@ public final class AuthenticationUtils {
     }
 
     public static Authentication getAuthentication() {
-        return SecurityContextHolder.getContext().getAuthentication();
+//        return SecurityContextHolder.getContext().getAuthentication();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Current authentication: " + auth);
+        return auth;
     }
 
     public static boolean isAuthenticated() {
@@ -50,6 +53,24 @@ public final class AuthenticationUtils {
         return null;
     }
 
+
+    public static String getUserEmail() {
+        return getClaim("email");
+    }
+
+    public static String getUserName() {
+        var result = getClaim("name");
+        return result;
+    }
+
+    private static String getClaim(String claimName) {
+        Authentication authentication = getAuthentication();
+        if (authentication instanceof JwtAuthenticationToken jwtAuth) {
+            Object claimValue = jwtAuth.getToken().getClaim(claimName);
+            return claimValue != null ? claimValue.toString() : null;
+        }
+        return null;
+
     public static UUID extracUserIdFromJwt(String jwt) {
         if (jwt == null || jwt.isEmpty()) {
             return null;
@@ -58,5 +79,6 @@ public final class AuthenticationUtils {
         String userId = jwtToken.getClaimAsString("sub");
         log.info("Extracted user ID from JWT: {}", userId);
         return UUID.fromString(userId);
+
     }
 }

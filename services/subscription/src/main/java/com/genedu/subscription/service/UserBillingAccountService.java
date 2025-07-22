@@ -2,13 +2,15 @@ package com.genedu.subscription.service;
 
 import com.genedu.subscription.dto.userbillingaccount.UserBillingAccountResponseDTO;
 import com.genedu.subscription.model.UserBillingAccount;
+import com.stripe.exception.StripeException;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public interface UserBillingAccountService {
-    UserBillingAccountResponseDTO getOrCreateUserBillingAccount(UUID userId);
-    Optional<UserBillingAccountResponseDTO> findByUserId(UUID userId);
-    Optional<UserBillingAccountResponseDTO> findByPaymentGatewayCustomerId(UUID userId);
-    void updatePaymentGatewayCustomerId(UUID userId, String customerId);
+    UserBillingAccountResponseDTO getOrCreateUserBillingAccount(String userId);
+    void updatePaymentGatewayCustomerId(String userId, String customerId);
+    void updateSubscriptionStatus(String customerId, Boolean status);
+    UserBillingAccountResponseDTO ensureStripeCustomer(String userId, String country) throws StripeException;
+    UserBillingAccount findByStripeCustomerId(String customerId);
 }
