@@ -46,7 +46,7 @@ public class Subscription {
     private Boolean autoRenew = false;
 
     @NotNull
-    @Column(name = "stripe_subscription_id", nullable = false)
+    @Column(name = "renewal_reminder_sent", nullable = false)
     private Boolean renewalReminderSent = false;
 
     @NotNull

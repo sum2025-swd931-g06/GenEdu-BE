@@ -70,7 +70,8 @@ public final class AuthenticationUtils {
             return claimValue != null ? claimValue.toString() : null;
         }
         return null;
-
+    }
+    
     public static UUID extracUserIdFromJwt(String jwt) {
         if (jwt == null || jwt.isEmpty()) {
             return null;

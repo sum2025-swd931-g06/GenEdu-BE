@@ -35,7 +35,6 @@ public class SecurityConfig {
             "/api/v1/subscriptions/payment/webhook"
     };
 
-
     @Bean
     public SecurityWebFilterChain securityFilterChain (ServerHttpSecurity httpSecurity) {
         return httpSecurity
