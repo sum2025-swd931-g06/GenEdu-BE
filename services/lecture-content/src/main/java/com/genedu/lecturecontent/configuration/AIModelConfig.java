@@ -10,14 +10,15 @@ import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
 public class AIModelConfig {
-
-    private final String OPENAI_API_KEY = "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";
+    @Value("${spring.ai.openai.api-key}")
+    private String OPENAI_API_KEY;
     private final String OPENAI_BASE_URL = "https://api.openai.com";
     private final String OPENAI_COMPLETIONS_PATH = "/v1/chat/completions";
     private final String OPENAI_EMBEDDING_PATH = "/v1/embeddings";

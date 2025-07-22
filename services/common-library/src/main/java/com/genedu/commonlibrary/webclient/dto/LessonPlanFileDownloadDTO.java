@@ -1,5 +1,6 @@
 package com.genedu.commonlibrary.webclient.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.genedu.commonlibrary.enumeration.FileType;
 import lombok.*;
 
@@ -18,5 +19,6 @@ public class LessonPlanFileDownloadDTO {
     private String fileUrl;
     private UUID uploadedBy;
     private LocalDateTime uploadedOn;
+    @JsonIgnore
     private String content;
 }

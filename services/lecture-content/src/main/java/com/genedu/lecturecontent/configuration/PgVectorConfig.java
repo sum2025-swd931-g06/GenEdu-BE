@@ -4,6 +4,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,10 +17,11 @@ import static org.springframework.ai.vectorstore.pgvector.PgVectorStore.PgIndexT
 
 @Configuration
 public class PgVectorConfig {
+    @Value("${spring.datasource.url}")
+    private String dataSourceUrl;
 
     @Bean("pgVectorStore")
     public VectorStore vectorStore(
-
             JdbcTemplate jdbcTemplate,
             @Qualifier("openAiEmbeddingModel")
             EmbeddingModel embeddingModel
@@ -48,7 +50,7 @@ public class PgVectorConfig {
     @Bean("pgVectorDataSource")
     public javax.sql.DataSource pgVectorDataSource() {
         return DataSourceBuilder.create()
-                .url("jdbc:postgresql://localhost:5434/postgres")
+                .url(dataSourceUrl)
                 .username("admin")
                 .password("admin")
                 .driverClassName("org.postgresql.Driver")

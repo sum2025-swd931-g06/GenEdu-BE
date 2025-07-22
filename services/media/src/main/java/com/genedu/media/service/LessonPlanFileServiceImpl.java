@@ -28,11 +28,11 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class LectureFileServiceImpl implements MediaFileService<LessonPlanFileUploadDTO, LessonPlanFileDownloadDTO> {
+public class LessonPlanFileServiceImpl implements MediaFileService<LessonPlanFileUploadDTO, LessonPlanFileDownloadDTO> {
     private final S3StorageService s3StorageService;
     private final MediaFileRepository mediaFileRepository;
     private final BucketName bucketName;
-    private static final String LECTURE_FOLDER = "projects";
+    private static final String PROJECT_FOLDER = "projects";
 
     @Value("${aws.s3.endpoint}")
     private String S3Host;
@@ -71,7 +71,7 @@ public class LectureFileServiceImpl implements MediaFileService<LessonPlanFileUp
             throw new BadRequestException("File name cannot be null or empty");
         }
 
-        String filePath = String.join("/", LECTURE_FOLDER, projectId, "lesson_plans");
+        String filePath = String.join("/", PROJECT_FOLDER, projectId, "lesson_plans");
         String fullS3Key = String.join("/", filePath, fileName);
 
         // Find an existing file at the same path and mark it as deleted.
@@ -101,7 +101,7 @@ public class LectureFileServiceImpl implements MediaFileService<LessonPlanFileUp
     }
 
     private LessonPlanFileDownloadDTO mapToDto(MediaFile mediaFile) {
-        String fileUrl = String.format("%s/%s/%s",S3Host, bucketName.getLectureBucket(), mediaFile.getFileUrl());
+        String fileUrl = String.format("%s/%s/%s",S3Host, bucketName.getGeneduBucket(), mediaFile.getFileUrl());
         return LessonPlanFileDownloadDTO.builder()
                 .id(mediaFile.getId())
                 .fileName(mediaFile.getFileName())
@@ -136,7 +136,7 @@ public class LectureFileServiceImpl implements MediaFileService<LessonPlanFileUp
     public String getMediaFileUrlById(Long id) {
         MediaFile mediaFile = mediaFileRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Media file not found with id: " + id));
-        return String.format("%s/%s/%s",S3Host, bucketName.getLectureBucket(), mediaFile.getFileUrl());
+        return String.format("%s/%s/%s",S3Host, bucketName.getGeneduBucket(), mediaFile.getFileUrl());
     }
 
     @Override
@@ -200,7 +200,7 @@ public class LectureFileServiceImpl implements MediaFileService<LessonPlanFileUp
 
     @Override
     public LessonPlanFileDownloadDTO getMediaFileByProjectId(String projectId) {
-        String fileUrlPrefix = String.format("%s/%s/%s/", LECTURE_FOLDER, projectId, "lesson_plans");
+        String fileUrlPrefix = String.format("%s/%s/%s/", PROJECT_FOLDER, projectId, "lesson_plans");
         Optional<MediaFile> mediaFile = mediaFileRepository.findFirstByFileUrlStartingWithAndFileTypeAndDeletedIsFalseOrderByUploadedOnDesc(fileUrlPrefix, FileType.LESSON_PLAN);
         if (mediaFile.isEmpty()) {
             throw new IllegalArgumentException("Media file not found for project ID: " + projectId);

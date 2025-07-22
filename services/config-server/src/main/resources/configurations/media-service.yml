@@ -7,7 +7,9 @@ spring:
     url: ${POSTGRES_MEDIA_DB_URL}
     username: ${POSTGRES_USER:admin}
     password: ${POSTGRES_PASSWORD:admin}
-
+  cloud:
+    compatibility-verifier:
+      enabled: false
   # JPA and Hibernate configuration
   jpa:
     hibernate:

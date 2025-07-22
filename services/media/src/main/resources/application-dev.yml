@@ -1,6 +1,22 @@
 spring:
   application:
     name: media-service
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9094
+      group-id: lecture-content-service-group
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: com.genedu.*
+        max.poll.interval.ms: 600000 # 10 minutes
+        # Also increase the session timeout to be safe.
+        # The broker will wait this long before considering the consumer dead if no heartbeats are sent.
+        session.timeout.ms: 60000 # 1 minute
+        # Heartbeats should be sent more frequently than the session timeout.
+        heartbeat.interval.ms: 10000 # 10 seconds
   config:
     import: optional:configserver:http://localhost:8888
     activate:

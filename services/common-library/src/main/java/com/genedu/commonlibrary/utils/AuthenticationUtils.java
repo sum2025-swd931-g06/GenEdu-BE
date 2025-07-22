@@ -2,6 +2,7 @@ package com.genedu.commonlibrary.utils;
 
 import com.genedu.commonlibrary.constants.ApiConstant;
 import com.genedu.commonlibrary.exception.AccessDeniedException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,6 +11,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 
 import java.util.UUID;
 
+@Slf4j
 public final class AuthenticationUtils {
 
     private AuthenticationUtils() {
@@ -51,6 +53,7 @@ public final class AuthenticationUtils {
         return null;
     }
 
+
     public static String getUserEmail() {
         return getClaim("email");
     }
@@ -67,5 +70,15 @@ public final class AuthenticationUtils {
             return claimValue != null ? claimValue.toString() : null;
         }
         return null;
+
+    public static UUID extracUserIdFromJwt(String jwt) {
+        if (jwt == null || jwt.isEmpty()) {
+            return null;
+        }
+        Jwt jwtToken = Jwt.withTokenValue(jwt).build();
+        String userId = jwtToken.getClaimAsString("sub");
+        log.info("Extracted user ID from JWT: {}", userId);
+        return UUID.fromString(userId);
+
     }
 }

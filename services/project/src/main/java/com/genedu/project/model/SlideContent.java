@@ -44,11 +44,11 @@ public class SlideContent extends AbstractTimeAuditEntity {
     private String slideTitle;
 
     @Column(
-            name = "main_idea",
-            columnDefinition = "TEXT",
+            name = "slide_type",
+            columnDefinition = "VARCHAR(100)",
             nullable = false
     )
-    private String mainIdea;
+    private String slideType;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(
@@ -63,4 +63,10 @@ public class SlideContent extends AbstractTimeAuditEntity {
             columnDefinition = "TEXT"
     )
     private String narrationScript;
+
+    @Column(
+            name = "narration_file_id",
+            columnDefinition = "bigint"
+    )
+    private Long narrationFileId;
 }

@@ -5,7 +5,7 @@ import java.util.Map;
 public record SlideContentRequestDTO(
         String lectureContentId,
         String title,
-        String mainIdea,
+        String slideType,
         Integer orderNumber,
         Map<String, Object> subpoints,
         String narrationScript

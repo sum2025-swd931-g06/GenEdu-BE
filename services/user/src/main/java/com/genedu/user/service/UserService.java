@@ -14,5 +14,7 @@ public interface UserService {
 
     UserListResponseDTO getAllUsers(int pageNo);
 
+    boolean isUserExists(String userId);
+
     void clearUserSession(String name);
 }

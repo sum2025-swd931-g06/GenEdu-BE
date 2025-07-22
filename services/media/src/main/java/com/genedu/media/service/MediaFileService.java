@@ -18,6 +18,5 @@ public interface MediaFileService<Request, Response> {
     List<Response> getMediaFilesByType(FileType type);
     List<Response> getMediaFilesByOwnerIdAndType(UUID ownerId, FileType type);
     Response readFileContent(Long id);
-
     Response getMediaFileByProjectId(String projectId);
 }

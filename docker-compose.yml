@@ -39,6 +39,7 @@ services:
     volumes:
         - pgdata_vector:/data/postgres-vector
         - ./postgres_vector_init.sql:/docker-entrypoint-initdb.d/postgres_vector_init.sql
+    hostname: pgvector
     ports:
       - 5434:5432
     networks:
@@ -63,9 +64,9 @@ services:
   zipkin:
     container_name: zipkin
     image: openzipkin/zipkin
-    hostname: zipkin
+    hostname: "${ZIPKIN_SERVICE_HOST-zipkin}"
     ports:
-      - "9411:9411"
+      - "${ZIPKIN_SERVICE_PORT-9411}:9411"
     networks:
       - microservices-net
 
@@ -73,9 +74,9 @@ services:
     container_name: keycloak-ms
     image: quay.io/keycloak/keycloak:24.0.3
     command: 'start-dev --import-realm'
-    hostname: keycloak
+    hostname: "${KEYCLOAK_HOST-keycloak}"
     ports:
-      - 9099:8080
+      - "${KEYCLOAK_PORT-9099}:8080"
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -84,84 +85,40 @@ services:
     volumes:
       - ./identity/realm-export.json:/opt/keycloak/data/import/realm-export.json
 
+  kafka:
+    container_name: kafka
+    image: bitnami/kafka:latest
+    hostname: "${KAFKA_HOST-kafka}"
+    ports:
+      - "${KAFKA_PORT-9092}:9092"
+      - "${KAFKA_PORT_OUTSIDE-9094}:9094"
+    environment:
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+    networks:
+        - microservices-net
+
   config-server:
     build: ./services/config-server
-    container_name: config-server
-    image: config-server:latest
+    container_name: config-service
+    image: config-service:latest
+    hostname: "${CONFIG_SERVER_HOST-config-server}"
     ports:
-      - 8888:8888
+      - "${CONFIG_SERVER_PORT-8888}:8888"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://config-server:8888/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://config-service:8888/actuator/health"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 3
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      # This file is used to set environment variables for the application.
-      # Development and production environments may have different configurations.
-      # Main Configuration
-      - PUBLIC_HOST
-      - INTERNAL_HOST
-      - APPLICATION_NAME
-      # PgAdmin Configuration
-      - PGADMIN_DEFAULT_EMAIL
-      - PGADMIN_DEFAULT_PASSWORD
-      - PGADMIN_PORT
-      # Database Configuration
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_HOST
-      - POSTGRES_PORT
-      - POSTGRES_CONTENT_DB
-      - POSTGRES_USER_DB
-      - POSTGRES_CONTENT_DB_URL
-      - POSTGRES_USER_DB_URL
-      # Keycloak Configuration
-      - KEYCLOAK_HOST
-      - KEYCLOAK_PORT
-      - KEYCLOAK_URL
-      - KEYCLOAK_ADMIN_USER
-      - KEYCLOAK_ADMIN_PASSWORD
-      #Keycloak Volume Configuration
-      - KEYCLOAK_VOLUME_URL
-      # Keycloak Realm Configuration
-      - KEYCLOAK_REALM_NAME=GenEdu
-      # KC GenEdu Backend Configuration
-      - KC_GENEDU_GENEDU_BE_CLIENT_ID
-      - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
-      # KC GenEdu Admin CLI Configuration
-      - KC_GENEDU_ADMIN_CLI_CLIENT_ID
-      - KC_GENEDU_ADMIN_CLI_ADMIN_USERNAME
-      - KC_GENEDU_ADMIN_CLI_ADMIN_PASSWORD
-      - KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY
-      # Discovery Server Configuration
-      - DISCOVERY_SERVER_HOST
-      - DISCOVERY_SERVICE_PORT
-      - DISCOVERY_SERVICE_URL
-      - DISCOVERY_SERVICE_SELF_URL
-      # Zipkin Configuration
-      - ZIPKIN_SERVICE_HOST
-      - ZIPKIN_SERVICE_PORT
-      - ZIPKIN_URL
-      #Oauth2 Configuration
-      - JWT_ISSUER_URI
-      - JWT_SET_JWKS_URI
-      # Gateway Configuration
-      - GATEWAY_SERVICE_HOST
-      - GATEWAY_SERVICE_PORT
-      - GATEWAY_SERVICE_URL
-      - GATEWAY_SERVICE_ACTUATOR_URL
-      # Config Server Configuration
-      - CONFIG_SERVER_HOST
-      - CONFIG_SERVER_PORT
-      - CONFIG_SERVER_URL
-      - CONFIG_SERVER_ACTUATOR_URL
-      # User Service Configuration
-      - USER_SERVICE_HOST
-      - USER_SERVICE_PORT
-      # Content Service Configuration
-      - CONTENT_SERVICE_HOST
-      - CONTENT_SERVICE_PORT
+    env_file:
+      - docker.env
     networks:
       - microservices-net
 
@@ -169,83 +126,23 @@ services:
     build:
       context: ./services/discovery
       dockerfile: Dockerfile
-    container_name: discovery
-    hostname: discovery
+    container_name: discovery-service
+    hostname: "${DISCOVERY_SERVER_HOST-discovery-service}"
     image: discovery:latest
     depends_on:
       config-server:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://discovery:8761/eureka/apps"]
+      test: ["CMD", "curl", "-f", "http://discovery-service:8761/actuator/health"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 3
     ports:
-      - "8761:8761"
+      - "${DISCOVERY_SERVICE_PORT-8761}:8761"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - PUBLIC_HOST
-      - INTERNAL_HOST
-      - APPLICATION_NAME
-      # PgAdmin Configuration
-      - PGADMIN_DEFAULT_EMAIL
-      - PGADMIN_DEFAULT_PASSWORD
-      - PGADMIN_PORT
-      # Database Configuration
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_HOST
-      - POSTGRES_PORT
-      - POSTGRES_CONTENT_DB
-      - POSTGRES_USER_DB
-      - POSTGRES_CONTENT_DB_URL
-      - POSTGRES_USER_DB_URL
-      # Keycloak Configuration
-      - KEYCLOAK_HOST
-      - KEYCLOAK_PORT
-      - KEYCLOAK_URL
-      - KEYCLOAK_ADMIN_USER
-      - KEYCLOAK_ADMIN_PASSWORD
-      # Keycloak Volume Configuration
-      - KEYCLOAK_VOLUME_URL
-      # Keycloak Realm Configuration
-      - KEYCLOAK_REALM_NAME=GenEdu
-      # KC GenEdu Backend Configuration
-      - KC_GENEDU_GENEDU_BE_CLIENT_ID
-      - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
-      # KC GenEdu Admin CLI Configuration
-      - KC_GENEDU_ADMIN_CLI_CLIENT_ID
-      - KC_GENEDU_ADMIN_CLI_ADMIN_USERNAME
-      - KC_GENEDU_ADMIN_CLI_ADMIN_PASSWORD
-      - KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY
-      # Discovery Server Configuration
-      - DISCOVERY_SERVER_HOST
-      - DISCOVERY_SERVICE_PORT
-      - DISCOVERY_SERVICE_URL
-      - DISCOVERY_SERVICE_SELF_URL
-      # Zipkin Configuration
-      - ZIPKIN_SERVICE_HOST
-      - ZIPKIN_SERVICE_PORT
-      - ZIPKIN_URL
-      #Oauth2 Configuration
-      - JWT_ISSUER_URI
-      - JWT_SET_JWKS_URI
-      # Gateway Configuration
-      - GATEWAY_SERVICE_HOST
-      - GATEWAY_SERVICE_PORT
-      - GATEWAY_SERVICE_URL
-      - GATEWAY_SERVICE_ACTUATOR_URL
-      # Config Server Configuration
-      - CONFIG_SERVER_HOST
-      - CONFIG_SERVER_PORT
-      - CONFIG_SERVER_URL
-      - CONFIG_SERVER_ACTUATOR_URL
-      # User Service Configuration
-      - USER_SERVICE_HOST
-      - USER_SERVICE_PORT
-      # Content Service Configuration
-      - CONTENT_SERVICE_HOST
-      - CONTENT_SERVICE_PORT
+    env_file:
+      - docker.env
     networks:
       - microservices-net
 
@@ -253,84 +150,20 @@ services:
     build:
       context: ./services/gateway
       dockerfile: Dockerfile
-    container_name: gateway
-    hostname: gateway
+    container_name: gateway-service
+    hostname: "${GATEWAY_SERVICE_HOST-gateway-service}"
     image: gateway:latest
     ports:
-      - "8222:8222"
+      - "${GATEWAY_SERVICE_PORT-8222}:8222"
     healthcheck:
-        test: ["CMD", "curl", "-f", "http://gateway:8222/actuator/health"]
+        test: ["CMD", "curl", "-f", "http://gateway-service:8222/actuator/health"]
         interval: 30s
         timeout: 10s
-        retries: 5
+        retries: 3
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_PROFILES_ACTIVE=docker
-      # This file is used to set environment variables for the application.
-      # Development and production environments may have different configurations.
-      # Main Configuration
-      - PUBLIC_HOST
-      - INTERNAL_HOST
-      - APPLICATION_NAME
-      # PgAdmin Configuration
-      - PGADMIN_DEFAULT_EMAIL
-      - PGADMIN_DEFAULT_PASSWORD
-      - PGADMIN_PORT
-      # Database Configuration
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_HOST
-      - POSTGRES_PORT
-      - POSTGRES_CONTENT_DB
-      - POSTGRES_USER_DB
-      - POSTGRES_CONTENT_DB_URL
-      - POSTGRES_USER_DB_URL
-      # Keycloak Configuration
-      - KEYCLOAK_HOST
-      - KEYCLOAK_PORT
-      - KEYCLOAK_URL
-      - KEYCLOAK_ADMIN_USER
-      - KEYCLOAK_ADMIN_PASSWORD
-      #Keycloak Volume Configuration
-      - KEYCLOAK_VOLUME_URL
-      # Keycloak Realm Configuration
-      - KEYCLOAK_REALM_NAME=GenEdu
-      # KC GenEdu Backend Configuration
-      - KC_GENEDU_GENEDU_BE_CLIENT_ID
-      - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
-      # KC GenEdu Admin CLI Configuration
-      - KC_GENEDU_ADMIN_CLI_CLIENT_ID
-      - KC_GENEDU_ADMIN_CLI_ADMIN_USERNAME
-      - KC_GENEDU_ADMIN_CLI_ADMIN_PASSWORD
-      - KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY
-      # Discovery Server Configuration
-      - DISCOVERY_SERVER_HOST
-      - DISCOVERY_SERVICE_PORT
-      - DISCOVERY_SERVICE_URL
-      - DISCOVERY_SERVICE_SELF_URL
-      # Zipkin Configuration
-      - ZIPKIN_SERVICE_HOST
-      - ZIPKIN_SERVICE_PORT
-      - ZIPKIN_URL
-      #Oauth2 Configuration
-      - JWT_ISSUER_URI
-      - JWT_SET_JWKS_URI
-      # Gateway Configuration
-      - GATEWAY_SERVICE_HOST
-      - GATEWAY_SERVICE_PORT
-      - GATEWAY_SERVICE_URL
-      - GATEWAY_SERVICE_ACTUATOR_URL
-      # Config Server Configuration
-      - CONFIG_SERVER_HOST
-      - CONFIG_SERVER_PORT
-      - CONFIG_SERVER_URL
-      - CONFIG_SERVER_ACTUATOR_URL
-      # User Service Configuration
-      - USER_SERVICE_HOST
-      - USER_SERVICE_PORT
-      # Content Service Configuration
-      - CONTENT_SERVICE_HOST
-      - CONTENT_SERVICE_PORT
+    env_file:
+      - docker.env
     depends_on:
       config-server:
         condition: service_healthy
@@ -341,82 +174,24 @@ services:
     networks:
       - microservices-net
 
-  content-service:
+  media-service:
     build:
-      context: ./services/content
+      context: ./services/media
       dockerfile: Dockerfile
-    container_name: content
-    image: content:latest
-    hostname: content
+    container_name: media-service
+    image: media:latest
+    hostname: "${MEDIA_SERVICE_HOST-media-service}"
+    ports:
+      - "${MEDIA_SERVICE_PORT-8093}:8093"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://media-service:8093/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      # This file is used to set environment variables for the application.
-      # Development and production environments may have different configurations.
-      # Main Configuration
-      - PUBLIC_HOST
-      - INTERNAL_HOST
-      - APPLICATION_NAME
-      # PgAdmin Configuration
-      - PGADMIN_DEFAULT_EMAIL
-      - PGADMIN_DEFAULT_PASSWORD
-      - PGADMIN_PORT
-      # Database Configuration
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_HOST
-      - POSTGRES_PORT
-      - POSTGRES_CONTENT_DB
-      - POSTGRES_USER_DB
-      - POSTGRES_CONTENT_DB_URL
-      - POSTGRES_USER_DB_URL
-      # Keycloak Configuration
-      - KEYCLOAK_HOST
-      - KEYCLOAK_PORT
-      - KEYCLOAK_URL
-      - KEYCLOAK_ADMIN_USER
-      - KEYCLOAK_ADMIN_PASSWORD
-      #Keycloak Volume Configuration
-      - KEYCLOAK_VOLUME_URL
-      # Keycloak Realm Configuration
-      - KEYCLOAK_REALM_NAME=GenEdu
-      # KC GenEdu Backend Configuration
-      - KC_GENEDU_GENEDU_BE_CLIENT_ID
-      - KC_GENEDU_GENEDU_BE_GENEDU_SCRET_KEY
-      # KC GenEdu Admin CLI Configuration
-      - KC_GENEDU_ADMIN_CLI_CLIENT_ID
-      - KC_GENEDU_ADMIN_CLI_ADMIN_USERNAME
-      - KC_GENEDU_ADMIN_CLI_ADMIN_PASSWORD
-      - KC_GENEDU_ADMIN_CLI_GENEDU_SCRET_KEY
-      # Discovery Server Configuration
-      - DISCOVERY_SERVER_HOST
-      - DISCOVERY_SERVICE_PORT
-      - DISCOVERY_SERVICE_URL
-      - DISCOVERY_SERVICE_SELF_URL
-      # Zipkin Configuration
-      - ZIPKIN_SERVICE_HOST
-      - ZIPKIN_SERVICE_PORT
-      - ZIPKIN_URL
-      #Oauth2 Configuration
-      - JWT_ISSUER_URI
-      - JWT_SET_JWKS_URI
-      # Gateway Configuration
-      - GATEWAY_SERVICE_HOST
-      - GATEWAY_SERVICE_PORT
-      - GATEWAY_SERVICE_URL
-      - GATEWAY_SERVICE_ACTUATOR_URL
-      # Config Server Configuration
-      - CONFIG_SERVER_HOST
-      - CONFIG_SERVER_PORT
-      - CONFIG_SERVER_URL
-      - CONFIG_SERVER_ACTUATOR_URL
-      # User Service Configuration
-      - USER_SERVICE_HOST
-      - USER_SERVICE_PORT
-      # Content Service Configuration
-      - CONTENT_SERVICE_HOST
-      - CONTENT_SERVICE_PORT
-    ports:
-      - "8091:8091"
+    env_file:
+      - docker.env
     depends_on:
       config-server:
         condition: service_healthy
@@ -430,4 +205,112 @@ services:
         condition: service_started
     networks:
       - microservices-net
+
+  content-service:
+    build:
+      context: ./services/content
+      dockerfile: Dockerfile
+    container_name: content-service
+    image: content:latest
+    hostname: "${CONTENT_SERVICE_HOST-content-service}"
+    ports:
+      - "${CONTENT_SERVICE_PORT-8091}:8091"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://content-service:8091/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - docker.env
+    depends_on:
+      keycloak:
+        condition: service_started
+      postgresql:
+        condition: service_started
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+      media-service:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  project-service:
+    build:
+      context: ./services/project
+      dockerfile: Dockerfile
+    container_name: project-service
+    image: project:latest
+    hostname: "${PROJECT_SERVICE_HOST-project-service}"
+    ports:
+      - "${PROJECT_SERVICE_PORT-8092}:8092"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://project-service:8092/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - docker.env
+    depends_on:
+      keycloak:
+        condition: service_started
+      postgresql:
+        condition: service_started
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+      media-service:
+        condition: service_healthy
+      content-service:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  lecture-content-service:
+    build:
+      context: ./services/lecture-content
+      dockerfile: Dockerfile
+    container_name: lecture-content-service
+    image: lecture-content:latest
+    hostname: "${LECTURE_CONTENT_SERVICE_HOST-lecture-content-service}"
+    ports:
+      - "${LECTURE_CONTENT_SERVICE_PORT-8096}:8096"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://lecture-content-service:8096/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - docker.env
+    depends_on:
+      keycloak:
+        condition: service_started
+      postgresql:
+        condition: service_started
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+      media-service:
+        condition: service_healthy
+      content-service:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+
 

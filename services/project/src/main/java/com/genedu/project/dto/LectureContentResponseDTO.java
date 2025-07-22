@@ -1,11 +1,13 @@
 package com.genedu.project.dto;
 
 import java.util.List;
+import java.util.UUID;
 
 public record LectureContentResponseDTO(
-        String id,
-        String projectId,
+        UUID id,
+        UUID projectId,
         String title,
-        List<SlideContentRequestDTO> slideContents
+        String status,
+        List<SlideContentResponseDTO> slideContents
 ) {
 }
