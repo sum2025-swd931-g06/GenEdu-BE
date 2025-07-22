@@ -127,6 +127,9 @@ public class StripeService implements PaymentGatewayService {
             String priceId = subscription.getItems().getData().get(0).getPrice().getId(); // hoặc getPlan().getId()
             String planId = Price.retrieve(priceId).getProduct();
 
+            Customer customer = Customer.retrieve(customerId);
+            String email = customer.getEmail();
+            String userName = customer.getName();
             log.info("Payment successful. Creating subscription with plan: {}", planId);
 
             // Create subscription in our system
@@ -135,7 +138,9 @@ public class StripeService implements PaymentGatewayService {
                             customerId,
                             planId,
                             true,
-                            PaymentStatus.COMPLETED.getValue()
+                            PaymentStatus.COMPLETED.getValue(),
+                            email,
+                            userName
                     )
             );
 

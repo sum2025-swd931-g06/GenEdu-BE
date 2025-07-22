@@ -71,8 +71,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             // Send confirmation email if needed
             if (billingAccount.getUserId() != null) {
                 emailService.sendConfirmationEmail(
-                        "shinkiriloveforever@gmail.com",
-                        "NganNganChimte",
+                        requestDTO.toEmail(),
+                        requestDTO.userName(),
                         subscriptionPlan.getPlanName(),
                         subscription.getEndedAt().toString(),
                         subscriptionPlan.getPrice().toString()

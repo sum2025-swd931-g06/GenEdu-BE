@@ -2,6 +2,7 @@ package com.genedu.subscription.service.impl;
 
 import com.genedu.commonlibrary.exception.InternalServerErrorException;
 import com.genedu.commonlibrary.exception.NotFoundException;
+import com.genedu.commonlibrary.utils.AuthenticationUtils;
 import com.genedu.subscription.dto.userbillingaccount.UserBillingAccountResponseDTO;
 import com.genedu.subscription.mapper.UserBillingAccountMapper;
 import com.genedu.subscription.model.UserBillingAccount;
@@ -102,6 +103,8 @@ public class UserBillingAccountServiceImpl implements UserBillingAccountService 
         if (billingAccount.paymentGatewayCustomerId() == null || billingAccount.paymentGatewayCustomerId().isBlank()) {
             var stripeCustomer = Customer.create(CustomerCreateParams.builder()
                     .setAddress(CustomerCreateParams.Address.builder().setCountry(country).build())
+                    .setEmail(AuthenticationUtils.getUserEmail())
+                    .setName(AuthenticationUtils.getUserName())
                     .setMetadata(Map.of("userId", userId))
                     .build());
             updatePaymentGatewayCustomerId(billingAccount.id().toString(), stripeCustomer.getId());

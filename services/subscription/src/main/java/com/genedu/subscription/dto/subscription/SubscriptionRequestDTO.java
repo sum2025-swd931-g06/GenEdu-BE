@@ -4,7 +4,9 @@ public record SubscriptionRequestDTO(
         String accountId,
         String planId,
         Boolean autoRenew,
-        String status
+        String status,
+        String toEmail,
+        String userName
 ) {
     public SubscriptionRequestDTO{
         autoRenew = true;
