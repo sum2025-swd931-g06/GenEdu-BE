@@ -5,6 +5,7 @@ import com.genedu.subscription.dto.subscription.SubscriptionResponseDTO;
 import com.genedu.subscription.model.Subscription;
 import com.genedu.subscription.repository.SubscriptionRepository;
 import com.genedu.subscription.service.SubscriptionService;
+import com.stripe.exception.StripeException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +27,10 @@ import java.util.UUID;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    @Operation(summary = "Create a session url to start a subscription")
-    @PostMapping("/start")
-    public ResponseEntity<Map<String, String>> startSubscription(@RequestBody SubscriptionRequestDTO request) {
-        String sessionUrl = subscriptionService.startSubscription(request);
-        return ResponseEntity.ok(Map.of("url", sessionUrl));
-    }
-
     @Operation(summary = "Cancel auto-renewal for a subscription")
-    @PostMapping("/cancel-auto-renew")
-    public ResponseEntity<String> cancelAutoRenew(@RequestParam Object request) {
-        subscriptionService.cancelAutoRenew(request);
+    @PostMapping("/{subscriptionId}/cancel-auto-renew")
+    public ResponseEntity<String> cancelAutoRenew(@PathVariable String subscriptionId) throws StripeException {
+        subscriptionService.cancelAutoRenew(subscriptionId);
         return ResponseEntity.ok("Auto-renew canceled");
     }
 

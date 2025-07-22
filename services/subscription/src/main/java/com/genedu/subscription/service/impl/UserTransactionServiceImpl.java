@@ -11,6 +11,7 @@ import com.genedu.subscription.utils.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.bcel.Const;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -23,6 +24,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserTransactionServiceImpl implements UserTransactionService {
+    @Value("${zone.id}")
+    private String zoneId;
 
     private final UserTransactionRepository transactionRepository;
     private final UserBillingAccountService billingAccountService;
@@ -32,7 +35,7 @@ public class UserTransactionServiceImpl implements UserTransactionService {
         var account = billingAccountService.findByStripeCustomerId(requestDTO.accountId());
 
         try {
-            ZoneId saigonZone = ZoneId.of("Asia/Saigon");
+            ZoneId saigonZone = ZoneId.of(zoneId);
             var transaction = UserTransaction.builder()
                     .id(UUID.randomUUID())
                     .account(account)
@@ -45,11 +48,6 @@ public class UserTransactionServiceImpl implements UserTransactionService {
             log.error("Error creating transaction for account {}: {}", requestDTO.accountId(), e.getMessage(), e);
             throw new InternalServerErrorException(Constants.ErrorCode.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    @Override
-    public void updateTransactionStatus(UUID txId, String status) {
-
     }
 
     @Override

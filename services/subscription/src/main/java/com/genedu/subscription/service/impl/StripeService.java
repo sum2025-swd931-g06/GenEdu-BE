@@ -1,22 +1,19 @@
 package com.genedu.subscription.service.impl;
 
 import com.genedu.commonlibrary.enumeration.PaymentStatus;
-import com.genedu.commonlibrary.enumeration.SubscriptionStatus;
 import com.genedu.commonlibrary.enumeration.TransactionStatus;
 import com.genedu.commonlibrary.exception.BadRequestException;
-import com.genedu.commonlibrary.utils.AuthenticationUtils;
 import com.genedu.subscription.configuration.StripeConfig;
 import com.genedu.subscription.dto.WebhookRequest;
 import com.genedu.subscription.dto.subscription.SubscriptionRequestDTO;
 import com.genedu.subscription.dto.subscriptionplane.SubscriptionPlanResponseDTO;
 import com.genedu.subscription.dto.userbillingaccount.UserBillingAccountResponseDTO;
 import com.genedu.subscription.dto.usertransaction.UserTransactionRequestDTO;
+import com.genedu.subscription.repository.SubscriptionRepository;
 import com.genedu.subscription.service.PaymentGatewayService;
 import com.genedu.subscription.service.SubscriptionService;
 import com.genedu.subscription.service.UserBillingAccountService;
 import com.genedu.subscription.service.UserTransactionService;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.*;
@@ -39,7 +36,6 @@ public class StripeService implements PaymentGatewayService {
     private final UserTransactionService userTransactionService;
     private final UserBillingAccountService userBillingAccountService;
     private final SubscriptionService subscriptionService;
-
 
     @Override
     public Map<String, Object> createCheckoutSession(UserBillingAccountResponseDTO billing, SubscriptionPlanResponseDTO subscriptionPlan) throws StripeException {
@@ -65,16 +61,11 @@ public class StripeService implements PaymentGatewayService {
     }
 
     @Override
-    public void cancelSubscription(String gatewaySubscriptionId) {
-
-    }
-
-    @Override
     public boolean isWebhookSignatureValid(WebhookRequest webhookRequest) {
         return false;
     }
 
-    public void handleWebhookEvent(WebhookRequest webhookRequest) {
+    public void handleWebhookEvent(WebhookRequest webhookRequest) throws StripeException {
         String payload = webhookRequest.payload();
         String sigHeader = webhookRequest.signature();
 
@@ -137,8 +128,9 @@ public class StripeService implements PaymentGatewayService {
                     new SubscriptionRequestDTO(
                             customerId,
                             planId,
+                            subscriptionId,
                             true,
-                            PaymentStatus.COMPLETED.getValue(),
+                            subscription.getStatus(),
                             email,
                             userName
                     )
@@ -166,7 +158,7 @@ public class StripeService implements PaymentGatewayService {
                         TransactionStatus.SUCCESS.name()
                 )
         );
-        userBillingAccountService.updateSubscriptionStatus(customerId, Boolean.TRUE);
+        updateSubscriptionStatus(customerId, true);
 
         log.info("✅ Invoice paid. Transaction recorded for customer: {}, amount: {}", customerId, amount);
         // TODO: Mark billing as paid, ensure access is active
@@ -188,21 +180,27 @@ public class StripeService implements PaymentGatewayService {
                 )
         );
 
-        userBillingAccountService.updateSubscriptionStatus(customerId, Boolean.FALSE);
+        updateSubscriptionStatus(customerId, false);
 
         log.warn("⚠️ Invoice payment failed for customer: {}, amount: {}", customerId, amount);
 
         // TODO: Notify user, mark account for retry or downgrade
     }
 
-    private void handleSubscriptionCancelled(Event event) {
+    private void handleSubscriptionCancelled(Event event) throws StripeException {
         Subscription subscription = (Subscription) event.getDataObjectDeserializer()
                 .getObject()
                 .orElseThrow(() -> new RuntimeException("Subscription data missing"));
 
         String stripeCustomerId = subscription.getCustomer();
-        log.info("❌ Subscription canceled for customer: {}", stripeCustomerId);
 
+        updateSubscriptionStatus(stripeCustomerId, false);
+
+        String subscriptionStatus = subscription.getStatus();
+        subscriptionService.turnOffAutoRenew(subscription.getId(), subscriptionStatus);
+
+        log.info("❌ Subscription canceled for customer: {}", stripeCustomerId);
+        // Update local subscription status
         // TODO: Revoke access, update subscription status in DB
     }
 
@@ -236,73 +234,18 @@ public class StripeService implements PaymentGatewayService {
         // TODO: Save new subscription in DB, activate user benefits
     }
 
-    // Get subscriptionId directly from Invoice
-//    private String getSubscriptionIdFromInvoice(Invoice invoice) {
-//        try {
-//            // Try to get the field using getField (if available in your SDK version)
-//            Object subscriptionId = invoice.get("subscription");
-//            if (subscriptionId instanceof String) {
-//                return (String) subscriptionId;
-//            }
-//
-//            // Fallback: parse raw JSON if needed
-//            if (invoice.getRawJsonObject() != null) {
-//                JsonObject raw = invoice.getRawJsonObject();
-//                JsonElement subElem = raw.get("subscription");
-//                if (subElem != null && subElem.isJsonPrimitive()) {
-//                    return subElem.getAsString();
-//                }
-//            }
-//
-//            log.warn("\\u26A0\\uFE0F 'subscription' field is missing in Invoice.");
-//        } catch (Exception e) {
-//            log.error("\\u274C Failed to extract subscription ID from Invoice", e);
-//        }
-//        return null;
-//    }
-
-    private String getSubscriptionIdFromInvoice(Invoice invoice) {
+    private void updateSubscriptionStatus(String stripeCustomerId, boolean isSubscriptionActive) {
         try {
-            // Cách 2: Nếu không có, parse từ raw JSON
-            JsonObject raw = invoice.getRawJsonObject();
-            if (raw != null) {
-                // Ưu tiên: lấy từ parent.subscription_details.subscription
-                if (raw.has("parent")) {
-                    JsonObject parent = raw.getAsJsonObject("parent");
-                    if (parent.has("subscription_details")) {
-                        JsonObject details = parent.getAsJsonObject("subscription_details");
-                        if (details.has("subscription")) {
-                            return details.get("subscription").getAsString();
-                        }
-                    }
-                }
-
-                // Fallback: lấy từ lines.data[0].parent.subscription_item_details.subscription
-                if (raw.has("lines")) {
-                    JsonObject lines = raw.getAsJsonObject("lines");
-                    if (lines.has("data") && lines.get("data").isJsonArray()) {
-                        JsonElement firstLine = lines.getAsJsonArray("data").get(0);
-                        if (firstLine.isJsonObject()) {
-                            JsonObject line = firstLine.getAsJsonObject();
-                            if (line.has("parent")) {
-                                JsonObject parent = line.getAsJsonObject("parent");
-                                if (parent.has("subscription_item_details")) {
-                                    JsonObject subDetails = parent.getAsJsonObject("subscription_item_details");
-                                    if (subDetails.has("subscription")) {
-                                        return subDetails.get("subscription").getAsString();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            log.warn("⚠️ Không tìm thấy subscriptionId trong Invoice (fallback thất bại).");
+            // Update the subscription status in your database
+            userBillingAccountService.updateSubscriptionStatus(
+                    stripeCustomerId,
+                    isSubscriptionActive
+            );
+            log.info("Subscription status updated for customer: {}", stripeCustomerId);
         } catch (Exception e) {
-            log.error("❌ Lỗi khi lấy subscriptionId từ invoice", e);
+            log.error("Failed to update subscription status for customer: {}", stripeCustomerId, e);
+            throw new RuntimeException("Error updating subscription status", e);
         }
-        return null;
     }
 
 }

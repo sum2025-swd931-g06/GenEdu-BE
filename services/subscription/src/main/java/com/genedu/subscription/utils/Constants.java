@@ -11,10 +11,17 @@ public final class Constants {
         public static final String SUBSCRIPTION_PLAN_NOT_FOUND = "SUBSCRIPTION_PLAN_NOT_FOUND";
         public static final String STRIPE_API_FAILED = "STRIPE_API_FAILED";
 
+        // Subscription
+        public static final String SUBSCRIPTION_NOT_FOUND = "SUBSCRIPTION_NOT_FOUND";
+
+
         // User Billing Account
         public static final String USER_BILLING_ACCOUNT_NOT_FOUND = "USER_BILLING_ACCOUNT_NOT_FOUND";
         public static final String USER_BILLING_ACCOUNT_CREATION_FAILED = "USER_BILLING_ACCOUNT_CREATION_FAILED";
         public static final String CUSTOMER_NOT_FOUND = "CUSTOMER_NOT_FOUND";
+
+        // Stripe
+        public static final String STRIPE_ERROR = "STRIPE_ERROR";
 
         public static final String CREATE_FAILED = "CREATE_FAILED";
         public static final String UPDATE_FAILED = "UPDATE_FAILED";

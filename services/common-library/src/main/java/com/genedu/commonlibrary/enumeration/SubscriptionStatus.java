@@ -16,7 +16,8 @@ public enum SubscriptionStatus {
 
     ACTIVE("ACTIVE"),
     CANCELED("CANCELED"),
-    EXPIRED("EXPIRED");
+    EXPIRED("EXPIRED"),
+    CANCEL_AT_PERIOD_END("CANCEL_AT_PERIOD_END");
 
     private final String status;
 

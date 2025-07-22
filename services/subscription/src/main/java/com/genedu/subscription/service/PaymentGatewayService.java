@@ -12,7 +12,6 @@ import java.util.Map;
 
 public interface PaymentGatewayService {
     Map<String, Object> createCheckoutSession(UserBillingAccountResponseDTO billing, SubscriptionPlanResponseDTO subscriptionPlan) throws StripeException;
-    void cancelSubscription(String gatewaySubscriptionId);
-    void handleWebhookEvent(WebhookRequest webhookRequest);
+    void handleWebhookEvent(WebhookRequest webhookRequest) throws StripeException;
     boolean isWebhookSignatureValid(WebhookRequest webhookRequest);
 }

@@ -8,7 +8,6 @@ import java.util.UUID;
 
 public interface UserTransactionService {
     void createTransaction(UserTransactionRequestDTO requestDTO);
-    void updateTransactionStatus(UUID txId, String status);
     List<UserTransactionResponseDTO> getTransactionsByUserId(UUID userId);
     UserTransactionResponseDTO getTransactionById(UUID txId);
 }

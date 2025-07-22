@@ -2,6 +2,7 @@ package com.genedu.subscription.controller;
 
 import com.genedu.commonlibrary.exception.AccessDeniedException;
 import com.genedu.commonlibrary.exception.BadRequestException;
+import com.genedu.commonlibrary.exception.InternalServerErrorException;
 import com.genedu.commonlibrary.utils.AuthenticationUtils;
 import com.genedu.subscription.dto.WebhookRequest;
 import com.genedu.subscription.dto.userbillingaccount.UserBillingAccountResponseDTO;
@@ -55,7 +56,11 @@ public class PaymentController {
     @PostMapping("/webhook")
     public ResponseEntity<Void> handleWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String signature) {
         var webhookRequest = new WebhookRequest(payload, signature);
-        paymentGatewayService.handleWebhookEvent(webhookRequest);
+        try {
+            paymentGatewayService.handleWebhookEvent(webhookRequest);
+        } catch (StripeException e) {
+            throw new InternalServerErrorException(Constants.ErrorCode.STRIPE_ERROR, e.getMessage());
+        }
         return ResponseEntity.noContent().build();
     }
 

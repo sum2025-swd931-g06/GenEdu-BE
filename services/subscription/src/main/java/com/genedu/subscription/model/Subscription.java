@@ -30,6 +30,10 @@ public class Subscription {
     private SubscriptionPlan plan;
 
     @NotNull
+    @Column(name = "stripe_subscription_id")
+    private String stripeSubscriptionId;
+
+    @NotNull
     @Column(name = "started_at", nullable = false)
     private LocalDateTime startedAt;
 

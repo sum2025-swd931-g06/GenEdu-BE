@@ -20,12 +20,6 @@ import java.util.Optional;
 public class UserBillingAccountController {
     private final UserBillingAccountService userBillingAccountService;
 
-    @Operation(summary = "Create or get User Billing Account by userId")
-    @PostMapping
-    public ResponseEntity<UserBillingAccountResponseDTO> create(@RequestParam String userId) {
-        return ResponseEntity.ok(userBillingAccountService.getOrCreateUserBillingAccount(userId));
-    }
-
     @GetMapping
     public ResponseEntity<String> getUserId() {
         String userId = AuthenticationUtils.getUserId().toString();

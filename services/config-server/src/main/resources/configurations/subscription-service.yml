@@ -66,3 +66,6 @@ stripe:
   webhookSecret: ${WEBHOOK_SECRET:whsec_6814338c5b7b02eaafcbd429340ab40010fc0dbddab436eea962ceca45674f03}
   successUrl: ${STRIPE_SUCCESS_URL:http://localhost:8094/stripe/success}
   cancelUrl: ${STRIPE_CANCEL_URL:http://localhost:8094/stripe/cancel}
+
+zone:
+  id: ${ZONE_ID:Asia/Saigon}

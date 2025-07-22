@@ -48,29 +48,6 @@ public class UserBillingAccountServiceImpl implements UserBillingAccountService 
     }
 
     @Override
-    public Optional<UserBillingAccountResponseDTO> findByUserId(String userId) {
-        try {
-            UUID userUUID = UUID.fromString(userId);
-            return userBillingAccountRepository.findByUserId(userUUID)
-                    .map(UserBillingAccountMapper::toDTO);
-        } catch (Exception e) {
-            log.error("Error when findByUserId for userId {}", userId, e);
-            throw new InternalServerErrorException("error.internal.server");
-        }
-    }
-
-//    @Override
-//    public Optional<UserBillingAccountResponseDTO> findByPaymentGatewayCustomerId(String customerId) {
-//        try {
-//            return userBillingAccountRepository.findByPaymentGatewayCustomerId(customerId)
-//                    .map(UserBillingAccountMapper::toDTO);
-//        } catch (Exception e) {
-//            log.error("Error when findByPaymentGatewayCustomerId for customerId {}", customerId, e);
-//            throw new InternalServerErrorException("error.internal.server");
-//        }
-//    }
-
-    @Override
     public void updatePaymentGatewayCustomerId(String userId, String customerId) {
         UUID userUUID = UUID.fromString(userId);
         UserBillingAccount account = userBillingAccountRepository.findById(userUUID)
