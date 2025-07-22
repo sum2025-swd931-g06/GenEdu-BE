@@ -1,19 +1,16 @@
 package com.genedu.subscription.service.impl;
 
-import com.genedu.commonlibrary.enumeration.PaymentStatus;
 import com.genedu.commonlibrary.enumeration.TransactionStatus;
 import com.genedu.commonlibrary.exception.BadRequestException;
+import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.subscription.configuration.StripeConfig;
 import com.genedu.subscription.dto.WebhookRequest;
 import com.genedu.subscription.dto.subscription.SubscriptionRequestDTO;
 import com.genedu.subscription.dto.subscriptionplane.SubscriptionPlanResponseDTO;
 import com.genedu.subscription.dto.userbillingaccount.UserBillingAccountResponseDTO;
 import com.genedu.subscription.dto.usertransaction.UserTransactionRequestDTO;
-import com.genedu.subscription.repository.SubscriptionRepository;
-import com.genedu.subscription.service.PaymentGatewayService;
-import com.genedu.subscription.service.SubscriptionService;
-import com.genedu.subscription.service.UserBillingAccountService;
-import com.genedu.subscription.service.UserTransactionService;
+import com.genedu.subscription.service.*;
+import com.genedu.subscription.utils.Constants;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.*;
@@ -36,6 +33,7 @@ public class StripeService implements PaymentGatewayService {
     private final UserTransactionService userTransactionService;
     private final UserBillingAccountService userBillingAccountService;
     private final SubscriptionService subscriptionService;
+    private final EmailService emailService;
 
     @Override
     public Map<String, Object> createCheckoutSession(UserBillingAccountResponseDTO billing, SubscriptionPlanResponseDTO subscriptionPlan) throws StripeException {
@@ -198,6 +196,18 @@ public class StripeService implements PaymentGatewayService {
 
         String subscriptionStatus = subscription.getStatus();
         subscriptionService.turnOffAutoRenew(subscription.getId(), subscriptionStatus);
+
+        Customer customer = Customer.retrieve(stripeCustomerId);
+        var subscriptionResponseDTO = subscriptionService.getSubscriptionByStripeSubscriptionId(subscription.getId())
+                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.SUBSCRIPTION_NOT_FOUND, subscription.getId()));
+
+        // Send cancellation email
+        emailService.sendExpiredEmail(
+                customer.getEmail(),
+                customer.getName(),
+                subscriptionResponseDTO.planName(),
+                subscriptionResponseDTO.endedAt().toLocalDate().toString()
+        );
 
         log.info("❌ Subscription canceled for customer: {}", stripeCustomerId);
         // Update local subscription status

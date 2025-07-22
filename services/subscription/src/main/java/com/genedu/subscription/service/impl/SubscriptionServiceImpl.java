@@ -3,6 +3,7 @@ package com.genedu.subscription.service.impl;
 import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.subscription.dto.subscription.SubscriptionRequestDTO;
 import com.genedu.subscription.dto.subscription.SubscriptionResponseDTO;
+import com.genedu.subscription.mapper.SubscriptionMapper;
 import com.genedu.subscription.model.Subscription;
 import com.genedu.subscription.repository.SubscriptionPlanRepository;
 import com.genedu.subscription.repository.SubscriptionRepository;
@@ -11,6 +12,7 @@ import com.genedu.subscription.service.EmailService;
 import com.genedu.subscription.service.SubscriptionService;
 import com.genedu.subscription.utils.Constants;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
 import com.stripe.param.SubscriptionUpdateParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -74,7 +77,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                         requestDTO.toEmail(),
                         requestDTO.userName(),
                         subscriptionPlan.getPlanName(),
-                        subscription.getEndedAt().toString(),
+                        subscription.getEndedAt().toLocalDate().toString(),
                         subscriptionPlan.getPrice().toString()
                 );
             }
@@ -97,10 +100,23 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         stripeSubscription.update(params);
 
         subscription.setAutoRenew(false);
+        System.out.println("Stripe Subscription Status: " + stripeSubscription.getStatus());
+        System.out.println("Subscription status: " + stripeSubscription.getStatus());
         subscription.setStatus(stripeSubscription.getStatus());
         subscription.setUpdatedAt(ZonedDateTime.now(ZoneId.of(zoneId)).toLocalDateTime());
 
         subscriptionRepo.save(subscription);
+
+        // Send cancellation email
+        Customer stripeCustomer = Customer.retrieve(subscription.getAccount().getPaymentGatewayCustomerId());
+        String email = stripeCustomer.getEmail();
+        String userName = stripeCustomer.getName();
+        emailService.sendCancellationEmail(
+                email,
+                userName,
+                subscription.getPlan().getPlanName(),
+                subscription.getEndedAt().toLocalDate().toString()
+        );
     }
 
     @Override
@@ -120,6 +136,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public void notifyExpiringSubscriptions() {
 
+    }
+
+    @Override
+    public Optional<SubscriptionResponseDTO> getSubscriptionByStripeSubscriptionId(String stripeSubscriptionId) {
+        return subscriptionRepo.findByStripeSubscriptionId(stripeSubscriptionId)
+                .map(SubscriptionMapper::toDTO);
     }
 
     @Override

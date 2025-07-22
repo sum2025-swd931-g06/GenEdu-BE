@@ -1,9 +1,6 @@
 package com.genedu.subscription.controller;
 
-import com.genedu.subscription.dto.subscription.SubscriptionRequestDTO;
 import com.genedu.subscription.dto.subscription.SubscriptionResponseDTO;
-import com.genedu.subscription.model.Subscription;
-import com.genedu.subscription.repository.SubscriptionRepository;
 import com.genedu.subscription.service.SubscriptionService;
 import com.stripe.exception.StripeException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,12 +8,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
