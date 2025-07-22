@@ -44,13 +44,13 @@ public class SubscriptionController {
 
     @Scheduled(cron = "0 0 9 * * ?") // chạy mỗi 9h sáng hàng ngày
     public void notifyExpiringSubscriptions() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime threshold = now.plusDays(3); // hoặc cấu hình số ngày từ config
-
-        List<Subscription> expiring = subscriptionRepository.findAllByAutoRenewTrueAndEndedAtBetween(now, threshold);
-        for (Subscription sub : expiring) {
-            emailService.sendReminder(sub.getUserId(), "Your subscription will expire on " + sub.getEndedAt());
-        }
+//        LocalDateTime now = LocalDateTime.now();
+//        LocalDateTime threshold = now.plusDays(3); // hoặc cấu hình số ngày từ config
+//
+//        List<Subscription> expiring = subscriptionRepository.findAllByAutoRenewTrueAndEndedAtBetween(now, threshold);
+//        for (Subscription sub : expiring) {
+//            emailService.sendReminder(sub.getUserId(), "Your subscription will expire on " + sub.getEndedAt());
+//        }
     }
 
 
