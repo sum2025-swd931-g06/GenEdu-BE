@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -135,7 +137,23 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public void notifyExpiringSubscriptions() {
+//        LocalDateTime threshold = LocalDateTime.now().plusDays(3); // hoặc cấu hình số ngày từ config
+//
+//        List<Subscription> expiring = subscriptionRepo.findAllByAutoRenewTrueAndEndedAtBetween(now, threshold);
+//        for (Subscription sub : expiring) {
+//            emailService.sendReminder(sub.getUserId(), "Your subscription will expire on " + sub.getEndedAt());
+//        }
+    }
 
+    @Override
+    public void updateReminderStatusToSent(String subscriptionId) {
+        Subscription subscription = subscriptionRepo.findByStripeSubscriptionId(subscriptionId)
+                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.SUBSCRIPTION_NOT_FOUND, subscriptionId));
+
+        subscription.setRenewalReminderSent(true);
+        subscription.setUpdatedAt(ZonedDateTime.now(ZoneId.of(zoneId)).toLocalDateTime());
+
+        subscriptionRepo.save(subscription);
     }
 
     @Override

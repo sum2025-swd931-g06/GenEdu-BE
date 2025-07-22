@@ -67,6 +67,7 @@ public class UserBillingAccountServiceImpl implements UserBillingAccountService 
             UserBillingAccount account = userBillingAccountRepository.findByPaymentGatewayCustomerId(customerId)
                     .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.USER_BILLING_ACCOUNT_NOT_FOUND, customerId));
             account.setSubscriptionStatus(status);
+
             userBillingAccountRepository.save(account);
         } catch (Exception e) {
             log.error("Error when updateSubscriptionStatus for customerId {}", customerId, e);

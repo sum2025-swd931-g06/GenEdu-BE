@@ -8,8 +8,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,16 +42,16 @@ public class SubscriptionController {
         return ResponseEntity.ok(result);
     }
 
-//    @Scheduled(cron = "0 0 9 * * ?") // chạy mỗi 9h sáng hàng ngày
-//    public void notifyExpiringSubscriptions() {
-//        LocalDateTime now = LocalDateTime.now();
-//        LocalDateTime threshold = now.plusDays(3); // hoặc cấu hình số ngày từ config
-//
-//        List<Subscription> expiring = subscriptionRepository.findAllByAutoRenewTrueAndEndedAtBetween(now, threshold);
-//        for (Subscription sub : expiring) {
-//            emailService.sendReminder(sub.getUserId(), "Your subscription will expire on " + sub.getEndedAt());
-//        }
-//    }
+    @Scheduled(cron = "0 0 9 * * ?") // chạy mỗi 9h sáng hàng ngày
+    public void notifyExpiringSubscriptions() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime threshold = now.plusDays(3); // hoặc cấu hình số ngày từ config
+
+        List<Subscription> expiring = subscriptionRepository.findAllByAutoRenewTrueAndEndedAtBetween(now, threshold);
+        for (Subscription sub : expiring) {
+            emailService.sendReminder(sub.getUserId(), "Your subscription will expire on " + sub.getEndedAt());
+        }
+    }
 
 
 }

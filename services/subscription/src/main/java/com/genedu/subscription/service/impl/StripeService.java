@@ -11,6 +11,8 @@ import com.genedu.subscription.dto.userbillingaccount.UserBillingAccountResponse
 import com.genedu.subscription.dto.usertransaction.UserTransactionRequestDTO;
 import com.genedu.subscription.service.*;
 import com.genedu.subscription.utils.Constants;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.*;
@@ -146,6 +148,8 @@ public class StripeService implements PaymentGatewayService {
                 .getObject()
                 .orElseThrow(() -> new RuntimeException("Invoice data missing"));
 
+
+
         String customerId = invoice.getCustomer();
         BigDecimal amount = BigDecimal.valueOf(invoice.getAmountPaid());
 
@@ -157,6 +161,8 @@ public class StripeService implements PaymentGatewayService {
                 )
         );
         updateSubscriptionStatus(customerId, true);
+
+        subscriptionService.updateReminderStatusToSent(getSubscriptionIdFromInvoice(invoice));
 
         log.info("✅ Invoice paid. Transaction recorded for customer: {}, amount: {}", customerId, amount);
         // TODO: Mark billing as paid, ensure access is active
@@ -256,6 +262,50 @@ public class StripeService implements PaymentGatewayService {
             log.error("Failed to update subscription status for customer: {}", stripeCustomerId, e);
             throw new RuntimeException("Error updating subscription status", e);
         }
+    }
+
+    private String getSubscriptionIdFromInvoice(Invoice invoice) {
+        try {
+            // Cách 2: Nếu không có, parse từ raw JSON
+            JsonObject raw = invoice.getRawJsonObject();
+            if (raw != null) {
+                // Ưu tiên: lấy từ parent.subscription_details.subscription
+                if (raw.has("parent")) {
+                    JsonObject parent = raw.getAsJsonObject("parent");
+                    if (parent.has("subscription_details")) {
+                        JsonObject details = parent.getAsJsonObject("subscription_details");
+                        if (details.has("subscription")) {
+                            return details.get("subscription").getAsString();
+                        }
+                    }
+                }
+
+                // Fallback: lấy từ lines.data[0].parent.subscription_item_details.subscription
+                if (raw.has("lines")) {
+                    JsonObject lines = raw.getAsJsonObject("lines");
+                    if (lines.has("data") && lines.get("data").isJsonArray()) {
+                        JsonElement firstLine = lines.getAsJsonArray("data").get(0);
+                        if (firstLine.isJsonObject()) {
+                            JsonObject line = firstLine.getAsJsonObject();
+                            if (line.has("parent")) {
+                                JsonObject parent = line.getAsJsonObject("parent");
+                                if (parent.has("subscription_item_details")) {
+                                    JsonObject subDetails = parent.getAsJsonObject("subscription_item_details");
+                                    if (subDetails.has("subscription")) {
+                                        return subDetails.get("subscription").getAsString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            log.warn("⚠️ Không tìm thấy subscriptionId trong Invoice (fallback thất bại).");
+        } catch (Exception e) {
+            log.error("❌ Lỗi khi lấy subscriptionId từ invoice", e);
+        }
+        return null;
     }
 
 }
