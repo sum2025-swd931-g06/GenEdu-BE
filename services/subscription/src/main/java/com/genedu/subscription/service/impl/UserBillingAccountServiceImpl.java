@@ -84,16 +84,15 @@ public class UserBillingAccountServiceImpl implements UserBillingAccountService 
     }
 
     @Override
-    public void updateSubscriptionStatus(String userId, Boolean status) {
+    public void updateSubscriptionStatus(String customerId, Boolean status) {
         try {
-            UUID userUUID = UUID.fromString(userId);
-            UserBillingAccount account = userBillingAccountRepository.findByUserId(userUUID)
-                    .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.USER_BILLING_ACCOUNT_NOT_FOUND, userId));
+            UserBillingAccount account = userBillingAccountRepository.findByPaymentGatewayCustomerId(customerId)
+                    .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.USER_BILLING_ACCOUNT_NOT_FOUND, customerId));
             account.setSubscriptionStatus(status);
             userBillingAccountRepository.save(account);
         } catch (Exception e) {
-            log.error("Error when updateSubscriptionStatus for userId {}", userId, e);
-            throw new InternalServerErrorException(Constants.ErrorCode.UPDATE_FAILED, "UserBillingAccount", userId);
+            log.error("Error when updateSubscriptionStatus for customerId {}", customerId, e);
+            throw new InternalServerErrorException(Constants.ErrorCode.UPDATE_FAILED, "UserBillingAccount", customerId);
         }
     }
 

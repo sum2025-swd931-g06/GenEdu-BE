@@ -31,6 +31,20 @@ spring:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:http://localhost:9099/realms/GenEdu}
           jwk-set-uri: ${JWT_SET_JWKS_URI:http://localhost:9099/realms/GenEdu/protocol/openid-connect/certs}
+  # Gmail configuration
+  mail:
+    enabled: true
+    host: ${EMAIL_HOST:smtp.gmail.com}
+    port: ${EMAIL_PORT:587}
+    username: ${EMAIL_USERNAME:shinkirilovforever@gmail.com}
+    password: ${EMAIL_PASSWORD:syrrljluormikseh}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 # Spring Doc configuration
 springdoc:

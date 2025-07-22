@@ -1,8 +1,10 @@
 package com.genedu.subscription.service.impl;
 
 import com.genedu.commonlibrary.enumeration.PaymentStatus;
+import com.genedu.commonlibrary.enumeration.SubscriptionStatus;
 import com.genedu.commonlibrary.enumeration.TransactionStatus;
 import com.genedu.commonlibrary.exception.BadRequestException;
+import com.genedu.commonlibrary.utils.AuthenticationUtils;
 import com.genedu.subscription.configuration.StripeConfig;
 import com.genedu.subscription.dto.WebhookRequest;
 import com.genedu.subscription.dto.subscription.SubscriptionRequestDTO;
@@ -13,8 +15,6 @@ import com.genedu.subscription.service.PaymentGatewayService;
 import com.genedu.subscription.service.SubscriptionService;
 import com.genedu.subscription.service.UserBillingAccountService;
 import com.genedu.subscription.service.UserTransactionService;
-//import com.nimbusds.jose.shaded.gson.JsonElement;
-//import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.stripe.exception.SignatureVerificationException;
@@ -25,7 +25,6 @@ import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -38,7 +37,7 @@ import java.util.Map;
 public class StripeService implements PaymentGatewayService {
     private final StripeConfig stripeConfig;
     private final UserTransactionService userTransactionService;
-    private final UserBillingAccountService userBillingAccountServiceImpl;
+    private final UserBillingAccountService userBillingAccountService;
     private final SubscriptionService subscriptionService;
 
 
@@ -128,7 +127,7 @@ public class StripeService implements PaymentGatewayService {
             String priceId = subscription.getItems().getData().get(0).getPrice().getId(); // hoặc getPlan().getId()
             String planId = Price.retrieve(priceId).getProduct();
 
-            log.info("✅ Payment successful. Creating subscription with plan: {}", planId);
+            log.info("Payment successful. Creating subscription with plan: {}", planId);
 
             // Create subscription in our system
             subscriptionService.startSubscription(
@@ -140,9 +139,9 @@ public class StripeService implements PaymentGatewayService {
                     )
             );
 
-            log.info("✅ Subscription created. Customer: {}, Subscription: {}", customerId, subscriptionId);
+            log.info("Subscription created. Customer: {}, Subscription: {}", customerId, subscriptionId);
         } catch (StripeException e) {
-            log.error("❌ Failed to process subscription after payment for ID: {}", subscriptionId, e);
+            log.error("Failed to process subscription after payment for ID: {}", subscriptionId, e);
             throw new RuntimeException("Error processing paid subscription", e);
         }
     }
@@ -152,7 +151,6 @@ public class StripeService implements PaymentGatewayService {
                 .getObject()
                 .orElseThrow(() -> new RuntimeException("Invoice data missing"));
 
-//        String subscriptionId = getSubscriptionIdFromInvoice(invoice);
         String customerId = invoice.getCustomer();
         BigDecimal amount = BigDecimal.valueOf(invoice.getAmountPaid());
 
@@ -163,7 +161,8 @@ public class StripeService implements PaymentGatewayService {
                         TransactionStatus.SUCCESS.name()
                 )
         );
-//        log.info("✅ Invoice paid. Transaction recorded for subscription: {}", subscriptionId);
+        userBillingAccountService.updateSubscriptionStatus(customerId, Boolean.TRUE);
+
         log.info("✅ Invoice paid. Transaction recorded for customer: {}, amount: {}", customerId, amount);
         // TODO: Mark billing as paid, ensure access is active
     }
@@ -173,7 +172,6 @@ public class StripeService implements PaymentGatewayService {
                 .getObject()
                 .orElseThrow(() -> new RuntimeException("Invoice data missing"));
 
-//        String subscriptionId = getSubscriptionIdFromInvoice(invoice);
         String customerId = invoice.getCustomer();
         BigDecimal amount = BigDecimal.valueOf(invoice.getAmountPaid());
 
@@ -184,7 +182,9 @@ public class StripeService implements PaymentGatewayService {
                         TransactionStatus.FAILED.name()
                 )
         );
-//        log.warn("⚠️ Invoice payment failed for subscription: {}", subscriptionId);
+
+        userBillingAccountService.updateSubscriptionStatus(customerId, Boolean.FALSE);
+
         log.warn("⚠️ Invoice payment failed for customer: {}, amount: {}", customerId, amount);
 
         // TODO: Notify user, mark account for retry or downgrade

@@ -14,6 +14,8 @@ import org.apache.tomcat.util.bcel.Const;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,12 +32,13 @@ public class UserTransactionServiceImpl implements UserTransactionService {
         var account = billingAccountService.findByStripeCustomerId(requestDTO.accountId());
 
         try {
+            ZoneId saigonZone = ZoneId.of("Asia/Saigon");
             var transaction = UserTransaction.builder()
                     .id(UUID.randomUUID())
                     .account(account)
                     .amount(requestDTO.amount())
                     .status(requestDTO.status())
-                    .createdAt(Instant.now())
+                    .createdAt(ZonedDateTime.now(saigonZone).toLocalDateTime())
                     .build();
             transactionRepository.save(transaction);
         } catch (Exception e) {

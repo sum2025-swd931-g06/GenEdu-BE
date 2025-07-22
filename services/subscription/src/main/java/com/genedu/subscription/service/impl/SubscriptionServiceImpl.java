@@ -53,8 +53,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         try {
             ZoneId saigonZone = ZoneId.of("Asia/Saigon");
-            ZonedDateTime nowInSaigon = ZonedDateTime.now(saigonZone);
-
 
             // Create subscription entity in our database
             Subscription subscription = new Subscription();

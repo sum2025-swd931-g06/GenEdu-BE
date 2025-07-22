@@ -12,7 +12,7 @@ public interface UserBillingAccountService {
     Optional<UserBillingAccountResponseDTO> findByUserId(String userId);
 //    Optional<UserBillingAccountResponseDTO> findByPaymentGatewayCustomerId(String userId);
     void updatePaymentGatewayCustomerId(String userId, String customerId);
-    void updateSubscriptionStatus(String userId, Boolean status);
+    void updateSubscriptionStatus(String customerId, Boolean status);
     UserBillingAccountResponseDTO ensureStripeCustomer(String userId, String country) throws StripeException;
     UserBillingAccount findByStripeCustomerId(String customerId);
 }
