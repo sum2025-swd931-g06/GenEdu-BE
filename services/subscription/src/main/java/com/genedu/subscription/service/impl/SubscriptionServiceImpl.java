@@ -30,7 +30,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SubscriptionServiceImpl implements SubscriptionService {
+public class
+SubscriptionServiceImpl implements SubscriptionService {
 
     @Value("${zone.id}")
     private String zoneId;
@@ -73,6 +74,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             // Save to database
             subscription = subscriptionRepo.save(subscription);
 
+            log.info("Created subscription: {}", subscriptionRepo.findByStripeSubscriptionId(requestDTO.stripeSubscriptionId()).get().getAccount().getPaymentGatewayCustomerId());
+
             // Send confirmation email if needed
             if (billingAccount.getUserId() != null) {
                 emailService.sendConfirmationEmail(
@@ -103,8 +106,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         subscription.setAutoRenew(false);
         System.out.println("Stripe Subscription Status: " + stripeSubscription.getStatus());
-        System.out.println("Subscription status: " + stripeSubscription.getStatus());
         subscription.setStatus(stripeSubscription.getStatus());
+        System.out.println("Subscription status: " + stripeSubscription.getStatus());
         subscription.setUpdatedAt(ZonedDateTime.now(ZoneId.of(zoneId)).toLocalDateTime());
 
         subscriptionRepo.save(subscription);
@@ -136,21 +139,24 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public void notifyExpiringSubscriptions() {
-//        LocalDateTime threshold = LocalDateTime.now().plusDays(3); // hoặc cấu hình số ngày từ config
-//
-//        List<Subscription> expiring = subscriptionRepo.findAllByAutoRenewTrueAndEndedAtBetween(now, threshold);
-//        for (Subscription sub : expiring) {
-//            emailService.sendReminder(sub.getUserId(), "Your subscription will expire on " + sub.getEndedAt());
-//        }
+    public void notifyExpiringSubscriptions() throws StripeException {
+        LocalDateTime threshold = LocalDateTime.now().plusDays(3); // hoặc cấu hình số ngày từ config
+
+        List<Subscription> expiring = subscriptionRepo.findAllByAutoRenewTrueAndEndedAtBetweenWithAccounts(LocalDateTime.now(), threshold);
+        for (Subscription sub : expiring) {
+            Customer stripeCustomer = Customer.retrieve(sub.getAccount().getPaymentGatewayCustomerId());
+            emailService.sendReminderEmail(stripeCustomer.getEmail(), stripeCustomer.getName(), sub.getPlan().getPlanName(), "Your subscription will expire on " + sub.getEndedAt());
+            sub.setRenewalReminderSent(true);
+        }
+        subscriptionRepo.saveAll(expiring);
     }
 
     @Override
-    public void updateReminderStatusToSent(String subscriptionId) {
+    public void updateReminderStatus(String subscriptionId, boolean isSent) {
         Subscription subscription = subscriptionRepo.findByStripeSubscriptionId(subscriptionId)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.SUBSCRIPTION_NOT_FOUND, subscriptionId));
 
-        subscription.setRenewalReminderSent(true);
+        subscription.setRenewalReminderSent(isSent);
         subscription.setUpdatedAt(ZonedDateTime.now(ZoneId.of(zoneId)).toLocalDateTime());
 
         subscriptionRepo.save(subscription);

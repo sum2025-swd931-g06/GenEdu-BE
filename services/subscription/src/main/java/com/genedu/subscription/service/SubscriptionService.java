@@ -12,8 +12,8 @@ public interface SubscriptionService {
     void startSubscription(SubscriptionRequestDTO requestDTO);
     void cancelAutoRenew(String subscriptionId) throws StripeException;
     void turnOffAutoRenew(String subscriptionId, String status) throws StripeException;
-    void notifyExpiringSubscriptions();
-    void updateReminderStatusToSent(String subscriptionId);
+    void notifyExpiringSubscriptions() throws StripeException;
+    void updateReminderStatus(String subscriptionId, boolean isSent);
     Optional<SubscriptionResponseDTO> getSubscriptionByStripeSubscriptionId(String stripeSubscriptionId);
     List<SubscriptionResponseDTO> getUserSubscriptions(UUID userId);
     SubscriptionResponseDTO getActiveSubscription(UUID userId);
