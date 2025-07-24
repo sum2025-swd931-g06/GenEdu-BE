@@ -38,7 +38,7 @@ public class LectureContentController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved lecture content"),
             @ApiResponse(responseCode = "404", description = "Project or lecture content not found")
     })
-    @GetMapping("/{projectId}/lecture-content")
+    @GetMapping("/{projectId}/lecture-contents")
     public ResponseEntity<List<LectureContentResponseDTO>> getLectureContentByProjectId(
             @PathVariable("projectId") UUID projectId
     ) {
@@ -53,7 +53,7 @@ public class LectureContentController {
             @ApiResponse(responseCode = "400", description = "Invalid request data provided"),
             @ApiResponse(responseCode = "404", description = "Associated project not found")
     })
-    @PostMapping("/lecture-content")
+    @PostMapping("/lecture-contents")
     public ResponseEntity<LectureContentResponseDTO> createLectureContent(
             @RequestBody LectureContentRequestDTO lectureContentRequestDTO
     ) {
@@ -88,7 +88,6 @@ public class LectureContentController {
             @ApiResponse(responseCode = "404", description = "Lecture content with the given ID not found.")
     })
     @PostMapping("/lecture-content/{lectureContentId}/narration-generation-async")
-    // @Deprecated // This endpoint is deprecated and should not be used by external clients.
     public ResponseEntity<Void> generateNarrationForLectureContentAsync(
             @PathVariable("lectureContentId") UUID lectureContentId
     ) {

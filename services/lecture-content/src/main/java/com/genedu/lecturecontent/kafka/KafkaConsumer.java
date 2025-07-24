@@ -25,6 +25,5 @@ public class KafkaConsumer {
             log.info("Received SlideNarrationEvent with {} narrations", message.getSlideNarrations().size());
             slideNarrationService.slideNarration(message);
         }
-        // Here you can add logic to handle the message, such as saving it to a database or triggering other actions
     }
 }

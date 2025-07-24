@@ -20,14 +20,6 @@ public class FinalizedLectureController {
 
     private final FinalizedLectureServiceImpl finalizedLectureServiceImpl;
 
-    @Operation(
-            summary = "Get all finalized lectures for a specific project",
-            description = "Retrieves a list of finalized lectures associated with a given lectureContent ID."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of finalized lectures"),
-            @ApiResponse(responseCode = "404", description = "Project with the given ID not found")
-    })
     @GetMapping("/{lectureContentId}/finalized-lectures")
     public ResponseEntity<List<FinalizedLectureResponseDTO>> getFinalizedLecture(
             @PathVariable("lectureContentId") UUID lectureContentId

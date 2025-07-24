@@ -15,15 +15,13 @@ import com.genedu.project.service.ProjectService;
 import com.genedu.project.utils.Constants;
 import com.genedu.project.webclient.LectureMediaWebClientService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -32,31 +30,16 @@ public class ProjectServiceImpl implements ProjectService {
     private final LectureMediaWebClientService lectureMediaWebClientService;
     private final ProjectMapper projectMapper;
 
-    public List<ProjectResponseDTO> getAllProjects() {
-        List<Project> projects = projectRepository.findByDeletedIsFalse();
-        List<ProjectResponseDTO> projectResponseDTOs = projects.stream()
-                .map(projectMapper::toDTO)
-                .toList();
-        if (projectResponseDTOs.isEmpty()) {
-            throw new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND);
-        }
-        return projectResponseDTOs;
-    }
 
     public Project getProjectEntityById(UUID id) {
         return projectRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND, id));
     }
 
-    public List<ProjectResponseDTO> getProjectsByUserId(UUID userId) {
-        List<Project> projects = projectRepository.findByUserIdAndDeletedIsFalse(userId);
-        if (projects.isEmpty()) {
-            throw new NotFoundException(Constants.ErrorCode.PROJECT_WITH_USERID_NOT_FOUND, userId);
-        }
-
-        return projects.stream()
-                .map(projectMapper::toDTO)
-                .toList();
+    @Override
+    public Page<ProjectResponseDTO> getProjectsByUserId(UUID userId, Pageable pageable) {
+        Page<Project> projects = projectRepository.findByUserIdAndDeletedIsFalse(userId, pageable);
+        return projects.map(projectMapper::toDTO);
     }
 
     public ProjectResponseDTO getProjectById(UUID id) {
@@ -129,18 +112,6 @@ public ProjectResponseDTO updateProject(UUID id, ProjectRequestDTO projectDetail
         Project updatedProject = projectRepository.save(project);
 
         return projectMapper.toDTO(updatedProject);
-    }
-
-    public List<ProjectResponseDTO> getCurrentUserProjects() {
-        UUID currentUserId = AuthenticationUtils.getUserId();
-        List<Project> projects = projectRepository.findByUserIdAndDeletedIsFalse(currentUserId);
-        if (projects.isEmpty()) {
-            throw new NotFoundException(Constants.ErrorCode.PROJECT_NOT_FOUND);
-        }
-
-        return projects.stream()
-                .map(projectMapper::toDTO)
-                .collect(toList());
     }
 
     public LessonPlanFileDownloadDTO getLessonPlanTemplate() {
