@@ -24,10 +24,13 @@ public class SubscriptionPlanMapper {
                 .description(subscriptionPlan.getDescription())
                 .price(subscriptionPlan.getPrice())
                 .durationInDays(subscriptionPlan.getDuration())
+                .isDeleted(subscriptionPlan.isDeleted())
                 .createdOn(subscriptionPlan.getCreatedOn())
                 .createdBy(subscriptionPlan.getCreatedBy())
                 .lastModifiedOn(subscriptionPlan.getLastModifiedOn())
                 .lastModifiedBy(subscriptionPlan.getLastModifiedBy())
+                .stripeProductId(subscriptionPlan.getStripeProductId())
+                .stripePriceId(subscriptionPlan.getStripePriceId())
                 .build();
     }
 }

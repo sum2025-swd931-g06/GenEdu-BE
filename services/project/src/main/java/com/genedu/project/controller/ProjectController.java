@@ -1,5 +1,6 @@
 package com.genedu.project.controller;
 
+import com.genedu.commonlibrary.utils.AuthenticationUtils;
 import com.genedu.commonlibrary.webclient.dto.LessonPlanFileDownloadDTO;
 import com.genedu.commonlibrary.webclient.dto.LessonPlanFileUploadDTO;
 import com.genedu.project.dto.ProjectResponseDTO;
@@ -11,6 +12,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,30 +46,12 @@ public class ProjectController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of projects")
     })
-    @GetMapping
-    public ResponseEntity<List<ProjectResponseDTO>> getAllProjects() {
-        List<ProjectResponseDTO> projects = projectServiceImpl.getAllProjects();
-        return new ResponseEntity<>(projects, HttpStatus.OK);
-    }
-
-    @Operation(summary = "Get projects by user ID", description = "Retrieves all projects associated with a specific user ID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved the user's projects")
-    })
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ProjectResponseDTO>> getProjectsByUserId(@PathVariable UUID userId) {
-        List<ProjectResponseDTO> projects = projectServiceImpl.getProjectsByUserId(userId);
-        return new ResponseEntity<>(projects, HttpStatus.OK);
-    }
-
-    @Operation(summary = "Get my projects", description = "Retrieves all projects for the currently authenticated user.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved the current user's projects"),
-            @ApiResponse(responseCode = "401", description = "User is not authenticated")
-    })
-    @GetMapping("/my-projects")
-    public ResponseEntity<List<ProjectResponseDTO>> getCurrentUserProjects() {
-        List<ProjectResponseDTO> projects = projectServiceImpl.getCurrentUserProjects();
+    @GetMapping()
+    public ResponseEntity<Page<ProjectResponseDTO>> getAllProjects(
+            @PageableDefault(size = 10, sort = "lastModifiedOn", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        UUID userId = AuthenticationUtils.getUserId();
+        Page<ProjectResponseDTO> projects = projectServiceImpl.getProjectsByUserId(userId, pageable);
         return new ResponseEntity<>(projects, HttpStatus.OK);
     }
 
@@ -98,14 +85,14 @@ public class ProjectController {
             @ApiResponse(responseCode = "400", description = "Invalid file or project ID provided"),
             @ApiResponse(responseCode = "404", description = "Project not found")
     })
-    @PutMapping(
-            value = "/lesson-plan",
+    @PostMapping(
+            value = "/lesson-plans",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<ProjectResponseDTO> uploadLectureFile(
-            @ModelAttribute LessonPlanFileUploadDTO lectureFileUploadDTO
+    public ResponseEntity<ProjectResponseDTO> uploadLessonPlanFile(
+            @ModelAttribute LessonPlanFileUploadDTO lessonPlanFileUploadDTO
     ) {
-        ProjectResponseDTO updatedProject = projectServiceImpl.updateLessonPlanFile(lectureFileUploadDTO);
+        ProjectResponseDTO updatedProject = projectServiceImpl.updateLessonPlanFile(lessonPlanFileUploadDTO);
         return new ResponseEntity<>(updatedProject, HttpStatus.OK);
     }
 

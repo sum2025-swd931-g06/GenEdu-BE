@@ -27,7 +27,6 @@ public class KafkaProducer {
     }
 
     public void sendLectureVideoGenerateEvent(LectureVideoGenerateEvent event) {
-        // Send the event to the Kafka topic
         try {
             lectureVideoGenerateTemplate.send("lecture-video-generate-events", event.getLectureContentId().toString(), event);
             System.out.println("Sent LectureVideoGenerateEvent to Kafka: " + event);

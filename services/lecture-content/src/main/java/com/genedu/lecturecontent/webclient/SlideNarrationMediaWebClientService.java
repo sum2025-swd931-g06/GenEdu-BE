@@ -19,7 +19,6 @@ import java.util.Objects;
 @Service
 public class SlideNarrationMediaWebClientService {
     private final WebClient webClient;
-
     private static final String UPLOAD_SLIDE_NARRATION_AUDIO_URL = "/medias/projects/slides/narration-audios/upload";
 
     public SlideNarrationMediaWebClientService(

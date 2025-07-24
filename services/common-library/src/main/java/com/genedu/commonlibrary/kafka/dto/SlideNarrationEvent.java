@@ -16,6 +16,8 @@ import java.util.UUID;
 public class SlideNarrationEvent implements Serializable {
     private UUID projectId;
     private UUID lectureContentId;
+    private UUID finalizeLectureId;
+    private Long slideFileId;
     private List<SlideNarration> slideNarrations;
     private String jwtToken;
 
@@ -25,6 +27,7 @@ public class SlideNarrationEvent implements Serializable {
     @AllArgsConstructor
     public static class SlideNarration implements Serializable {
         private UUID slideId;
+        private Integer orderNumber;
         private String narrationScript;
     }
 }

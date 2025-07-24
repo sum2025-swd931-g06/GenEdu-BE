@@ -132,6 +132,7 @@ public class LectureContentServiceImpl implements LectureContentService {
                 .map(slide -> SlideNarrationEvent.SlideNarration.builder()
                         .slideId(slide.getId())
                         .narrationScript(slide.getNarrationScript())
+                        .orderNumber(slide.getOrderNumber())
                         .build())
                 .toList();
 
@@ -141,7 +142,9 @@ public class LectureContentServiceImpl implements LectureContentService {
                 .slideNarrations(slideNarrations)
                 .jwtToken(AuthenticationUtils.extractJwt())
                 .build();
+
         log.info("Generating narration for lecture content ID: {}", lectureContentId);
+
         kafkaProducer.sendSlideNarrationEvent(event);
     }
 
@@ -157,7 +160,6 @@ public class LectureContentServiceImpl implements LectureContentService {
 
     @Override
     public LectureContentResponseDTO generateNarrationForLectureContent(UUID lectureContentId) {
-        // Todo : Implement the logic to generate narration for the lecture content
         LectureContent lectureContent = lectureContentRepository.findById(lectureContentId)
                 .orElseThrow(() -> new NotFoundException("Lecture content not found for ID: " + lectureContentId));
         if (lectureContent.getStatus() != LectureStatus.FINALIZED) {
@@ -190,6 +192,7 @@ public class LectureContentServiceImpl implements LectureContentService {
 
         // Prepare the lecture video generate event
         List<SlideContent> slideContents = slideContentRepository.findByLectureContentId(lectureContentId);
+
         Map<Integer, Long> slideNarrationAudios = slideContents.stream()
                 .filter(slide -> slide.getNarrationFileId() != null && slide.getOrderNumber() != null && slide.getOrderNumber() > 0)
                 .collect(Collectors.toMap(

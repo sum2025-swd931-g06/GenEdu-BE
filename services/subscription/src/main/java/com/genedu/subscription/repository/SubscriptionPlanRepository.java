@@ -13,4 +13,5 @@ public interface SubscriptionPlanRepository extends JpaRepository<SubscriptionPl
     boolean existsByPlanNameAndDeletedIsFalseAndIdNot(String planeName, UUID planeId);
     List<SubscriptionPlan> findAllByDeletedIsFalse();
     Optional<SubscriptionPlan> findByIdAndDeletedIsFalse(UUID id);
+    Optional<SubscriptionPlan> findByStripeProductIdAndDeletedIsFalse(String stripeProductId);
 }
