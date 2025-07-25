@@ -8,6 +8,7 @@ public record SlideContentResponseDTO(
         String slideType,
         Integer orderNumber,
         Map<String, Object> subpoints,
-        String narrationScript
+        String narrationScript,
+        String slideNarrationFileUrl
 ) {
 }

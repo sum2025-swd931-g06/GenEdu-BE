@@ -36,7 +36,6 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable); // Disable CSRF protection for stateless APIs
         http.cors(Customizer.withDefaults()); // Enable CORS with default settings
-//        http.addFilterAfter(createPolicyEnforcerFilter(), BearerTokenAuthenticationFilter.class); // Keycloak Policy Enforcer Filter
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(freeResources).permitAll() // Allow free resources
                 .anyRequest().authenticated() // All other requests require authentication

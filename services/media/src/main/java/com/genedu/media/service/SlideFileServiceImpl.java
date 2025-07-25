@@ -3,6 +3,7 @@ package com.genedu.media.service;
 import com.genedu.commonlibrary.enumeration.FileType;
 import com.genedu.commonlibrary.enumeration.SlideFileFormat;
 import com.genedu.commonlibrary.exception.BadRequestException;
+import com.genedu.commonlibrary.exception.FileStorageException;
 import com.genedu.commonlibrary.utils.AuthenticationUtils;
 import com.genedu.commonlibrary.webclient.dto.LessonPlanFileDownloadDTO;
 import com.genedu.commonlibrary.webclient.dto.SlideFileDownloadDTO;
@@ -12,18 +13,23 @@ import com.genedu.media.model.MediaFile;
 import com.genedu.media.repository.MediaFileRepository;
 import com.genedu.media.repository.S3StorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SlideFileServiceImpl implements MediaFileService<SlideFileUploadDTO, SlideFileDownloadDTO> {
     @Value("${aws.s3.endpoint}")
     private String S3Host;
@@ -129,7 +135,15 @@ public class SlideFileServiceImpl implements MediaFileService<SlideFileUploadDTO
 
     @Override
     public void deleteMediaFile(Long id) {
+        MediaFile mediaFile = mediaFileRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Media file not found with id: " + id));
 
+        // Delete the file from S3
+        s3StorageService.delete(mediaFile.getFileUrl());
+
+        // Mark the file as deleted in the database
+        mediaFile.setDeleted(true);
+        mediaFileRepository.save(mediaFile);
     }
 
     @Override
@@ -154,11 +168,37 @@ public class SlideFileServiceImpl implements MediaFileService<SlideFileUploadDTO
 
     @Override
     public SlideFileDownloadDTO readFileContent(Long id) {
-        return null;
+        MediaFile mediaFile = mediaFileRepository.findByIdAndDeletedIsFalse(id)
+                .orElseThrow(() -> new IllegalArgumentException("Media file not found with id: " + id));
+        String fileUrl = String.format("%s/%s/%s", S3Host, bucketName.getGeneduBucket(), mediaFile.getFileUrl());
+        return SlideFileDownloadDTO.builder()
+                .id(mediaFile.getId())
+                .fileName(mediaFile.getFileName())
+                .fileType(mediaFile.getFileType())
+                .fileUrl(fileUrl)
+                .uploadedBy(mediaFile.getUploadedBy())
+                .uploadedOn(mediaFile.getUploadedOn())
+                .build();
     }
 
     @Override
     public SlideFileDownloadDTO getMediaFileByProjectId(String projectId) {
         return null;
+    }
+
+    public Path downloadPptxToDirectory(Long fileId, Path targetDirectory) {
+        MediaFile mediaFile = mediaFileRepository.findByIdAndDeletedIsFalse(fileId)
+                .orElseThrow(() -> new IllegalArgumentException("No slide PPTX found for fileId: " + fileId));
+
+        // Use the original file name for the downloaded file.
+        Path destinationPath = targetDirectory.resolve(mediaFile.getFileName());
+
+        try {
+            s3StorageService.downloadToFile(mediaFile.getFileUrl(), destinationPath);
+            log.debug("Downloaded file {} to {}", mediaFile.getFileUrl(), destinationPath);
+            return destinationPath;
+        } catch (IOException e) {
+            throw new FileStorageException("Failed to download slide presentation file with id: " + fileId, e);
+        }
     }
 }

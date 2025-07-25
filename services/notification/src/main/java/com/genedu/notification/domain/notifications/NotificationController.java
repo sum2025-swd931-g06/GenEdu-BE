@@ -79,7 +79,7 @@ public class NotificationController {
     @PostMapping("/send")
     @Deprecated
     public ResponseEntity<?> send() throws Exception {
-        String token = "fHbU6NCiTkWw-JqPNWI5Y7:APA91bH4zrWYQrm0xXzputlOCx-2OI8DoA8EntQ9haXGu8aIpBKDpfyoMPRRR7hmjuzU8lFHhDoz_P68KwqgChvD3Hwwyn3A2lde18MnUBgn28SBqTVrGVU"; // 👈 Replace this with your real device token
+        String token = "fHbU6NCiTkWw-JqPNWI5Y7:APA91bH4zrWYQrm0xXzputlOCx-2OI8DoA8EntQ9haXGu8aIpBKDpfyoMPRRR7hmjuzU8lFHhDoz_P68KwqgChvD3Hwwyn3A2lde18MnUBgn28SBqTVrGVU"; // Replace this with your real device token
         service.sendNotification(token);
         return ResponseEntity.ok("Sent!");
     }

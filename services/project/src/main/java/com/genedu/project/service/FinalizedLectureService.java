@@ -18,8 +18,11 @@ public interface FinalizedLectureService {
 
     public FinalizedLecture createFinalizedLectureEntity(FinalizedLectureCreateRequestDTO finalizedLectureCreateRequestDTO);
 
-    public FinalizedLecture updateFinalizedLectureMedia(UUID finalizedLectureId, FinalizedLectureCreateRequestDTO finalizedLectureCreateRequestDTO);
+    public FinalizedLectureResponseDTO updateFinalizedLectureMedia(UUID finalizedLectureId, FinalizedLectureCreateRequestDTO finalizedLectureCreateRequestDTO);
 
     public boolean isFinalizedLectureExists(UUID finalizedLectureId);
 
+    void updateNarrationAudioForLectureContent(UUID finalizedLectureId, Long lectureVideoId);
+
+    void generatedLectureVideo(UUID finalizedLectureId);
 }

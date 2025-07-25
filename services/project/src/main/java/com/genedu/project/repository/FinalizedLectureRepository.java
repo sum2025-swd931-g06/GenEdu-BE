@@ -9,4 +9,6 @@ import java.util.UUID;
 @Repository
 public interface FinalizedLectureRepository extends JpaRepository<FinalizedLecture, UUID> {
     List<FinalizedLecture> findByLectureContentIdAndDeletedIsFalse(UUID lectureContentId);
+
+    FinalizedLecture findByIdAndDeletedIsFalse(UUID id);
 }

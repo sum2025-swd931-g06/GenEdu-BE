@@ -1,8 +1,11 @@
 package com.genedu.lecturecontent.controller;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.genedu.commonlibrary.utils.AuthenticationUtils;
 import com.genedu.lecturecontent.dto.*;
+import com.genedu.lecturecontent.dto.webclient.SlideContentResponseDTO;
 import com.genedu.lecturecontent.service.SlideContentService;
+import com.genedu.lecturecontent.webclient.ProjectWebClientService;
 import org.slf4j.Logger;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
@@ -41,17 +44,20 @@ public class SlideContentController {
     private final VectorStore vectorStore;
     private final ChatClient openAiChatClient;
     private final SlideContentService slideContentService;
+    private final ProjectWebClientService projectWebClientService;
 
     private final Logger log = org.slf4j.LoggerFactory.getLogger(SlideContentController.class);
 
     public SlideContentController(
             @Qualifier("pgVectorStore")  VectorStore vectorStore,
             @Qualifier("openAiChatClient") ChatClient openAiChatClient,
-            SlideContentService slideContentService
+            SlideContentService slideContentService,
+            ProjectWebClientService projectWebClientService
     ) {
         this.vectorStore = vectorStore;
         this.openAiChatClient = openAiChatClient;
         this.slideContentService = slideContentService;
+        this.projectWebClientService = projectWebClientService;
     }
 
     @PostMapping(
@@ -61,6 +67,10 @@ public class SlideContentController {
             @PathVariable String projectId
     ) {
         log.info("Structuring lesson plan from provided content.");
+
+        List<Slide> generatedSlides = new ArrayList<>();
+        String jwtToken = AuthenticationUtils.extractJwt();
+
         BeanOutputConverter<LessonPlan> lessonPlanConverter = new BeanOutputConverter<>(LessonPlan.class);
         String format = lessonPlanConverter.getFormat();
         // 1. Get the uploaded lesson plan content by project ID.
@@ -129,6 +139,7 @@ public class SlideContentController {
                             // A better approach is to use .onErrorResume in the chain.
                             try {
                                 log.info("Generating slide for instruction: {} : {}", instruction.name(), instruction.content());
+
                                 return generateSlideForInstruction(instruction, slideContentRequest);
                             } catch (JsonMappingException e) {
                                 log.warn("Skipping slide due to JSON mapping error for instruction: {}", instruction.name(), e);
@@ -143,9 +154,67 @@ public class SlideContentController {
                         .data(slide)
                         .build()
                 )
+                .doOnNext(slide -> {
+                    generatedSlides.add(slide.data());
+                })
                 .doOnComplete(
-                        () -> log.info("All slides generated successfully.")
+                        () -> projectWebClientService.postLectureContent(
+                                new LectureContentRequestDTO(
+                                        projectId,
+                                        lessonPlan.title(),
+                                        generatedSlides.stream()
+                                                .map(slide -> mapToSlideContentResponseDTO(
+                                                        slide,
+                                                        generatedSlides.indexOf(slide) + 1
+                                                ))
+                                                .toList()
+                                ),
+                                jwtToken
+                        )
                 );
+    }
+
+    private com.genedu.lecturecontent.dto.webclient.SlideContentRequestDTO mapToSlideContentResponseDTO(
+            Slide slide,
+            Integer orderNumber
+    ) {
+        String slideTitle = slide.title();
+        String slideType = slide.type();
+        Map<String, Object> subPoints = new HashMap<>();
+        if (slide.data() != null) {
+            subPoints = convertSlideDataToMap(slide.data());
+        }
+        String narrationScript = slide.narrationScript();
+        com.genedu.lecturecontent.dto.webclient.SlideContentRequestDTO slideContentRequestDTO = new com.genedu.lecturecontent.dto.webclient.SlideContentRequestDTO(
+                "",
+                slideTitle,
+                slideType,
+                orderNumber,
+                subPoints,
+                narrationScript
+        );
+        log.info("Mapped Slide to SlideContentRequestDTO: {}", slideContentRequestDTO);
+        return slideContentRequestDTO;
+    }
+
+    private Map<String, Object> convertSlideDataToMap(Slide.SlideData data) {
+        if (data instanceof Slide.WelcomeSlideData d) {
+            return Map.of("subtitle", d.subtitle());
+        } else if (data instanceof Slide.ContentSlideData d) {
+            return Map.of("body", d.body());
+        } else if (data instanceof Slide.ListSlideData d) {
+            return Map.of("items", d.items());
+        } else if (data instanceof Slide.CompareSlideData d) {
+            return Map.of(
+                    "left_header", d.left_header(),
+                    "left_points", d.left_points(),
+                    "right_header", d.right_header(),
+                    "right_points", d.right_points()
+            );
+        } else if (data instanceof Slide.ThanksSlideData d) {
+            return Map.of("message", d.message());
+        }
+        return Collections.emptyMap(); // Fallback for unknown types
     }
 
     private Mono<Slide> generateSlideForInstruction (

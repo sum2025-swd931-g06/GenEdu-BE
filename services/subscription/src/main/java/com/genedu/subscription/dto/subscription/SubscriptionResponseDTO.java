@@ -1,4 +1,16 @@
 package com.genedu.subscription.dto.subscription;
 
-public class SubscriptionResponseDTO {
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+public record SubscriptionResponseDTO(
+        UUID id,
+        String stripeSubscriptionId,
+        String stripeCustomerId,
+        String planName,
+        LocalDateTime startedAt,
+        LocalDateTime endedAt,
+        boolean isAutoRenew,
+        String status
+) {
 }

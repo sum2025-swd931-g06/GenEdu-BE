@@ -42,6 +42,7 @@ public class MaterialMapper {
                 .subjectId(material.getSubject().getId())
                 .subjectName(material.getSubject().getName())
                 .subjectDescription(material.getSubject().getDescription())
+
                 .materialId(material.getId())
                 .title(material.getTitle())
                 .orderNumber(material.getOrderNumber())
@@ -53,6 +54,7 @@ public class MaterialMapper {
                 .title(materialRequestDTO.title())
                 .orderNumber(materialRequestDTO.orderNumber())
                 .description(materialRequestDTO.description())
+                .subject(subject)
                 .build();
     }
 }

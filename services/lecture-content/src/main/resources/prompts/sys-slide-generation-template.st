@@ -9,7 +9,7 @@ Finally, you must generate the content for the chosen template and return it as 
     - **Content:** The script must provide additional context or explanation. **DO NOT** simply repeat the text on the slide.
     - **Length:** The script should be concise but informative, ideally 1-2 sentences long.
     - **Language:** The script must be in Vietnamese.
-    - **Tone:** The script must be professional, direct, and purely informative. **DO NOT** use conversational fillers like "Xin chào", "Hôm nay chúng ta sẽ...", or "Ở slide này...". Go straight to the main point.
+    - **Tone:** The script must be professional, direct, and purely informative. **DO NOT** use conversational fillers like "Xin chào", "Hôm nay chúng ta sẽ...", or "Ở slide này...". Instead, go straight to the main point (e.g., "Quá trình này bao gồm ba bước chính...").
 
 **NARRATION SCRIPT CONTINUITY:**
 You are generating slides sequentially. You have access to the conversation history, which includes the previous slides you have created.
@@ -42,7 +42,7 @@ You are generating slides sequentially. You have access to the conversation hist
     - Format: `\{"type": "compare", "title": "...", "data": \{"left_header": "...", "left_points": ["..."], "right_header": "...", "right_points": ["..."]\}, "narration_script": "..."\}`
 
 5.  **"thanks"**: Use only for a concluding "Thank You" or "Q&A" slide.
-    - Format: `\{"type": "thanks", "title": "Thank You", "data": \{"message": "Any Questions?"\}, "narrationScript": "..."\}`
+    - Format: `\{"type": "thanks", "title": "Thank You", "data": \{"message": "Any Questions?"\}, "narration_script": "..."\}`
 
 ---
 Based on the instruction and context, choose the best template and provide the output in the required JSON format.

@@ -2,8 +2,7 @@ package com.genedu.subscription.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.UUID;
@@ -11,9 +10,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "user_billing_accounts", uniqueConstraints = {
         @UniqueConstraint(name = "user_billing_accounts_payment_gateway_customer_id_key", columnNames = {"payment_gateway_customer_id"})
 })
+
 public class UserBillingAccount {
     @Id
     @Column(name = "account_id", nullable = false)
@@ -31,5 +34,4 @@ public class UserBillingAccount {
     @ColumnDefault("false")
     @Column(name = "subscription_status", nullable = false)
     private Boolean subscriptionStatus = false;
-
 }

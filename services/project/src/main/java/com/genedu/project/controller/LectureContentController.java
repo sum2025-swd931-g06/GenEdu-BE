@@ -3,13 +3,13 @@ package com.genedu.project.controller;
 import com.genedu.commonlibrary.webclient.dto.SlideFileDownloadDTO;
 import com.genedu.commonlibrary.webclient.dto.SlideFileUploadDTO;
 import com.genedu.project.dto.FinalizedLectureCreateRequestDTO;
+import com.genedu.project.dto.FinalizedLectureResponseDTO;
 import com.genedu.project.dto.LectureContentRequestDTO;
 import com.genedu.project.dto.LectureContentResponseDTO;
 import com.genedu.project.model.FinalizedLecture;
-import com.genedu.project.model.enumeration.PublishedStatus;
+import com.genedu.project.model.LectureContent;
 import com.genedu.project.service.FinalizedLectureService;
 import com.genedu.project.service.LectureContentService;
-import com.genedu.project.service.impl.LectureContentServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,7 +30,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "Lecture Content Management", description = "APIs for creating and managing lecture content within a project")
 public class LectureContentController {
-    private final LectureContentService lectureContentServiceImpl;
+    private final LectureContentService lectureContentService;
     private final FinalizedLectureService finalizedLectureService;
 
     @Operation(summary = "Get lecture contents by Project ID", description = "Retrieves the list of lecture contents associated with a specific project.")
@@ -38,11 +38,11 @@ public class LectureContentController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved lecture content"),
             @ApiResponse(responseCode = "404", description = "Project or lecture content not found")
     })
-    @GetMapping("/{projectId}/lecture-content")
+    @GetMapping("/{projectId}/lecture-contents")
     public ResponseEntity<List<LectureContentResponseDTO>> getLectureContentByProjectId(
             @PathVariable("projectId") UUID projectId
     ) {
-        List<LectureContentResponseDTO> lectureContentResponseDTOS = lectureContentServiceImpl.getLectureContentByProjectId(projectId);
+        List<LectureContentResponseDTO> lectureContentResponseDTOS = lectureContentService.getLectureContentByProjectId(projectId);
         return ResponseEntity.ok(lectureContentResponseDTOS);
     }
 
@@ -53,23 +53,11 @@ public class LectureContentController {
             @ApiResponse(responseCode = "400", description = "Invalid request data provided"),
             @ApiResponse(responseCode = "404", description = "Associated project not found")
     })
-    @PostMapping("/lecture-content")
+    @PostMapping("/lecture-contents")
     public ResponseEntity<LectureContentResponseDTO> createLectureContent(
             @RequestBody LectureContentRequestDTO lectureContentRequestDTO
     ) {
-        LectureContentResponseDTO createdLecture = lectureContentServiceImpl.createLectureContent(lectureContentRequestDTO);
-
-        finalizedLectureService.createFinalizedLecture(
-                new FinalizedLectureCreateRequestDTO(
-                        createdLecture.id(),
-                        null,
-                        null,
-                        null,
-                        null,
-                        PublishedStatus.PRIVATE
-                )
-        );
-
+        LectureContentResponseDTO createdLecture = lectureContentService.createLectureContent(lectureContentRequestDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{lectureContentId}")
@@ -90,35 +78,91 @@ public class LectureContentController {
             @PathVariable("lectureContentId") UUID lectureContentId,
             @RequestBody LectureContentRequestDTO lectureContentRequestDTO
     ) {
-        LectureContentResponseDTO lectureContentResponseDTO = lectureContentServiceImpl.updateLectureContent(lectureContentId, lectureContentRequestDTO);
+        LectureContentResponseDTO lectureContentResponseDTO = lectureContentService.updateLectureContent(lectureContentId, lectureContentRequestDTO);
         return ResponseEntity.ok(lectureContentResponseDTO);
     }
 
-    @PostMapping("/lecture-content/narration-generation")
-    public ResponseEntity<Void> generateNarrationForLectureContent(
-            @RequestBody List<SlideFileDownloadDTO> slideFileDownloadDTOs
+    @Operation(summary = "Trigger narration generation", description = "Starts an asynchronous process to generate narration for all slides within a lecture content.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Narration generation process successfully triggered."),
+            @ApiResponse(responseCode = "404", description = "Lecture content with the given ID not found.")
+    })
+    @PostMapping("/lecture-content/{lectureContentId}/narration-generation-async")
+    public ResponseEntity<Void> generateNarrationForLectureContentAsync(
+            @PathVariable("lectureContentId") UUID lectureContentId
     ) {
-        // TODO: Implement the logic to generate narration for lecture content
+        lectureContentService.generateNarrationForLectureContentAsyn(lectureContentId);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Trigger video generation", description = "Starts an asynchronous process to generate a lecture video for the specified lecture content.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Video generation process successfully triggered."),
+            @ApiResponse(responseCode = "404", description = "Lecture content with the given ID not found.")
+    })
+    @PostMapping("/lecture-content/{finalizedLectureId}/video-generation-async")
+    @Deprecated
+    public ResponseEntity<Void> generateLectureVideoForLectureContentAsync(
+            @PathVariable("finalizedLectureId") UUID finalizedLectureId
+    ) {
+        lectureContentService.generateLectureVideoForLectureContentAsyn(finalizedLectureId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Generate narration for lecture content", description = "Generates narration for all slides within a lecture content and returns the updated lecture content.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Narration successfully generated for the lecture content."),
+            @ApiResponse(responseCode = "404", description = "Lecture content with the given ID not found.")
+    })
+    @PostMapping("/lecture-content/{lectureContentId}/narration-generation")
+    @Deprecated
+    public ResponseEntity<LectureContentResponseDTO> generateNarrationForLectureContent(
+            @PathVariable("lectureContentId") UUID lectureContentId
+    ) {
+        LectureContentResponseDTO lectureContentResponseDTO = lectureContentService.generateNarrationForLectureContent(lectureContentId);
+        return ResponseEntity.ok(lectureContentResponseDTO);
+    }
+
+    @Operation(summary = "Update narration audio for a slide - INTERNAL Service Call Only", description = "Associates a generated narration audio file with a specific slide content record.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Narration audio successfully associated with the slide."),
+            @ApiResponse(responseCode = "400", description = "Invalid request data provided (e.g., missing audioFileId)."),
+            @ApiResponse(responseCode = "404", description = "Slide content with the given ID not found.")
+    })
+    @PutMapping("/lecture-content/slide-content/{slideContentId}/narration-audio")
+    @Deprecated // This endpoint is deprecated and should not be used by external clients.
+    public ResponseEntity<LectureContentResponseDTO> updateNarrationAudioForLectureContent(
+            @PathVariable("slideContentId") UUID slideContentId,
+            @RequestParam("audioFileId") Long audioFileId
+    ) {
+        lectureContentService.updateNarrationAudioForLectureContent(slideContentId, audioFileId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Upload the main presentation file for a lecture",
+            description = "Uploads the primary presentation file (PPTX) for a specific lecture content. This action will create the associated finalized lecture record."
+    )
     @PostMapping(
-            value = "/lecture-content/slides",
+            value = "/lecture-content/presentations",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<Void> uploadLectureContentSlides(
+    public ResponseEntity<FinalizedLectureResponseDTO> uploadLectureContentSlides(
             @ModelAttribute SlideFileUploadDTO slideFileUploadDTO
     ) {
         // Upload the slide file and get the download DTO
-        SlideFileDownloadDTO slideFileDownloadDTO = lectureContentServiceImpl.uploadSlideFile(slideFileUploadDTO);
+        SlideFileDownloadDTO slideFileDownloadDTO = lectureContentService.uploadSlideFile(slideFileUploadDTO);
         // Check if the upload was successful
         if (slideFileDownloadDTO == null) {
             return ResponseEntity.badRequest().build();
         }
         List<FinalizedLecture> existFinalizedLectures = finalizedLectureService.getFinalizedLectureEntitiesByLectureContentId(UUID.fromString(slideFileUploadDTO.getLectureContentId()));
+        FinalizedLectureResponseDTO finalizedLectureResponseDTO;
+
         if (!existFinalizedLectures.isEmpty()) {
+            // If a finalized lecture already exists, update it with the new slide file
             FinalizedLecture finalizedLecture = existFinalizedLectures.get(0);
-            finalizedLectureService.updateFinalizedLectureMedia(finalizedLecture.getId(),
+            finalizedLectureResponseDTO = finalizedLectureService.updateFinalizedLectureMedia(finalizedLecture.getId(),
                     new FinalizedLectureCreateRequestDTO(
                             finalizedLecture.getId(),
                             null,
@@ -128,7 +172,19 @@ public class LectureContentController {
                             finalizedLecture.getPublishedStatus()
                     )
             );
+        } else {
+            // Create a new finalized lecture if none exists
+            LectureContent lectureContent = lectureContentService.getLectureContentEntityById(UUID.fromString(slideFileUploadDTO.getLectureContentId()));
+            FinalizedLectureCreateRequestDTO createRequest = new FinalizedLectureCreateRequestDTO(
+                    lectureContent.getId(),
+                    null,
+                    slideFileDownloadDTO.getId(),
+                    null,
+                    null,
+                    null
+            );
+            finalizedLectureResponseDTO = finalizedLectureService.createFinalizedLecture(createRequest);
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(finalizedLectureResponseDTO);
     }
 }

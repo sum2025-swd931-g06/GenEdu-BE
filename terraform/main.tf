@@ -28,7 +28,7 @@ variable "account_id" {
 resource "aws_s3_bucket" "genedu-bucket" {
     bucket        = "genedu-bucket-project-files"
     tags = {
-        Name = "Lecture Bucket"
+        Name = "Genedu Bucket"
         Environment = "Development"
     }
     force_destroy = true
@@ -40,7 +40,7 @@ resource "aws_s3_bucket" "genedu-bucket" {
 # save generated bucket name to properties file
 resource "local_file" "properties_file" {
   content = <<-EOT
-    lecture_bucket=${aws_s3_bucket.genedu-bucket.bucket}
+    genedu_bucket=${aws_s3_bucket.genedu-bucket.bucket}
   EOT
   depends_on = [aws_s3_bucket.genedu-bucket]
 

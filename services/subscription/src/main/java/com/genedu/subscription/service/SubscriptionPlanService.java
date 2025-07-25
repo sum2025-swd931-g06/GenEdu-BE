@@ -13,5 +13,6 @@ public interface SubscriptionPlanService {
     Optional<SubscriptionPlanResponseDTO> getSubscriptionPlan(String planId);
     SubscriptionPlan getSubscriptionPlanEntity(String planId);
     void deleteSubscriptionPlan(String planId);
+    List<SubscriptionPlanResponseDTO> getAllSubscriptionPlansNotDeleted();
     List<SubscriptionPlanResponseDTO> getAllSubscriptionPlans();
 }

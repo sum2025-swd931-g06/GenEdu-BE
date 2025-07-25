@@ -22,25 +22,13 @@ import java.util.UUID;
 public class ProjectMediaWebClientService {
     @Qualifier("mediaWebClient")
     private final WebClient webClient;
-
     private static final String UPLOAD_LESSON_SLIDE_FILE_URI = "/medias/projects/slides/upload";
     private static final String GET_SLIDE_FILE_URL = "/medias/projects/slides/{fileId}/url";
+    private static final String GET_LECTURE_VIDEO_FILE_URL = "/medias/projects/lecture-video/{fileId}/url";
 
 
     public ProjectMediaWebClientService(WebClient.Builder builder) {
         this.webClient = builder.build();
-    }
-
-    public String getGetSlideFileUrl(Long fileId) {
-        if (fileId == null) {
-            return null;
-        }
-        return webClient.get()
-                .uri(GET_SLIDE_FILE_URL, fileId)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AuthenticationUtils.extractJwt())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
     }
 
     public SlideFileDownloadDTO uploadSlideFile(SlideFileUploadDTO fileUploadDTO) {
@@ -79,17 +67,32 @@ public class ProjectMediaWebClientService {
     public String getPresentationFileUrl(Long presentationFileId) {
         return this.getGetSlideFileUrl(presentationFileId);
     }
-    public String getVideoFileUrl(Long videoFileId) {
-        if (videoFileId == null) {
+
+    public String getGetSlideFileUrl(Long fileId) {
+        if (fileId == null) {
             return null;
         }
         return webClient.get()
-                .uri(GET_SLIDE_FILE_URL, videoFileId)
+                .uri(GET_SLIDE_FILE_URL, fileId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + AuthenticationUtils.extractJwt())
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
     }
+
+    public String getVideoFileUrl(Long fileId) {
+        if (fileId == null) {
+            return null;
+        }
+
+        return webClient.get()
+                .uri(GET_LECTURE_VIDEO_FILE_URL, fileId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + AuthenticationUtils.extractJwt())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
+
     public String getThumbnailFileUrl(Long thumbnailFileId) {
         // Logic to get thumbnail file URL
         return "https://example.com/thumbnail/" + thumbnailFileId;

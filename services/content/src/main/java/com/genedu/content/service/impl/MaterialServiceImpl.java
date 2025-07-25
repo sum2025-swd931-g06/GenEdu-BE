@@ -82,7 +82,7 @@ public class MaterialServiceImpl implements MaterialService {
             Material saveMaterial = materialRepository.save(createdMaterial);
             return MaterialMapper.toFlatDTO(saveMaterial);
         } catch (Exception e){
-            log.error("Error deleting material");
+            log.error("Error creating material");
             throw new InternalServerErrorException(Constants.ErrorCode.CREATE_MATERIAL_FAILED, e.getMessage());
         }
     }
