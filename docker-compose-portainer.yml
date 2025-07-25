@@ -1,0 +1,234 @@
+networks:
+  microservices-net:
+    external: true
+
+services:
+  kafka:
+    container_name: kafka
+    image: bitnami/kafka:latest
+    hostname: kafka
+    ports:
+      - "${KAFKA_PORT-9092}:9092"
+      - "${KAFKA_PORT_OUTSIDE-9094}:9094"
+    environment:
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+    networks:
+      - microservices-net
+
+  config-server:
+    image: chauvinhtien/genedu-config-server
+    container_name: config-service
+    hostname: "${CONFIG_SERVER_HOST-config-server}"
+    ports:
+      - "${CONFIG_SERVER_PORT-8888}:8888"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://config-service:8888/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - stack.env
+    networks:
+      - microservices-net
+
+  discovery-service:
+    image: chauvinhtien/genedu-discovery
+    container_name: discovery-service
+    hostname: "${DISCOVERY_SERVER_HOST-discovery-service}"
+    depends_on:
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://discovery-service:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "${DISCOVERY_SERVICE_PORT-8761}:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - stack.env
+    networks:
+      - microservices-net
+
+  gateway-service:
+    image: chauvinhtien/genedu-gateway
+    container_name: gateway-service
+    hostname: "${GATEWAY_SERVICE_HOST-gateway-service}"
+    ports:
+      - "${GATEWAY_SERVICE_PORT-8222}:8222"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://gateway-service:8222/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - stack.env
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  media-service:
+    image: chauvinhtien/genedu-media
+    container_name: media-service
+    hostname: "${MEDIA_SERVICE_HOST-media-service}"
+    ports:
+      - "${MEDIA_SERVICE_PORT-8093}:8093"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://media-service:8093/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - stack.env
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  content-service:
+    image: chauvinhtien/genedu-content
+    container_name: content-service
+    hostname: "${CONTENT_SERVICE_HOST-content-service}"
+    ports:
+      - "${CONTENT_SERVICE_PORT-8091}:8091"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://content-service:8091/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - stack.env
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      # media-service:
+      #   condition: service_healthy
+    networks:
+      - microservices-net
+
+  project-service:
+    image: chauvinhtien/genedu-project
+    container_name: project-service
+    hostname: "${PROJECT_SERVICE_HOST-project-service}"
+    ports:
+      - "${PROJECT_SERVICE_PORT-8092}:8092"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://project-service:8092/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - stack.env
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      # media-service:
+      #   condition: service_healthy
+      content-service:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  lecture-content-service:
+    image: chauvinhtien/genedu-lecture-content
+    container_name: lecture-content-service
+    hostname: "${LECTURE_CONTENT_SERVICE_HOST-lecture-content-service}"
+    ports:
+      - "${LECTURE_CONTENT_SERVICE_PORT-8096}:8096"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://lecture-content-service:8096/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - stack.env
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      content-service:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  notification-service:
+    image: chauvinhtien/genedu-notification
+    container_name: notification-service
+    hostname: "${NOTIFICATION_SERVICE_HOST-notification-service}"
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT-8095}:8095"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://notification-service:8095/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - stack.env
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      content-service:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  subscription-service:
+    image: chauvinhtien/genedu-subscription
+    container_name: subscription-service
+    hostname: "${SUBSCRIPTION_SERVICE_HOST-subscription-service}"
+    ports:
+      - "${SUBSCRIPTION_SERVICE_PORT-8094}:8094"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://subscription-service:8094/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    env_file:
+      - stack.env
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      content-service:
+        condition: service_healthy
+    networks:
+      - microservices-net
