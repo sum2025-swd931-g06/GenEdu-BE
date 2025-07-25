@@ -1,7 +1,10 @@
 package com.genedu.media.service;
 
+import com.genedu.commonlibrary.kafka.dto.NotificationEvent;
+import com.genedu.commonlibrary.utils.AuthenticationUtils;
 import com.genedu.commonlibrary.webclient.dto.LectureVideoDownloadDTO;
 import com.genedu.commonlibrary.webclient.dto.LectureVideoUploadDTO;
+import com.genedu.media.kafka.KafkaProducer;
 import com.genedu.media.service.webclient.ProjectWebClientService;
 import com.genedu.media.utils.SlideUtil;
 import com.genedu.media.utils.VideoGenerator;
@@ -26,6 +29,7 @@ public class VideoService {
     private final NarrationAudioServiceImpl narrationAudioService;
     private final LectureVideoServiceImpl lectureVideoService;
     private final ProjectWebClientService projectWebClientService;
+    private final KafkaProducer kafkaProducer;
 
     public void generateLectureVideo(
             String projectId, String lectureContentId, String finalizeLectureId,
@@ -90,6 +94,7 @@ public class VideoService {
 
             log.info("Lecture video saved successfully for project ID: {}, lecture content ID: {}, finalize lecture ID: {}",
                     projectId, lectureContentId, finalizeLectureId);
+
         } catch (IOException e) {
             log.error("Video generation failed due to an I/O error.", e);
             throw new RuntimeException("Video generation failed", e);

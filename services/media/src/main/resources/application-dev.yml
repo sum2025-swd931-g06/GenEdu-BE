@@ -17,6 +17,12 @@ spring:
         session.timeout.ms: 60000 # 1 minute
         # Heartbeats should be sent more frequently than the session timeout.
         heartbeat.interval.ms: 10000 # 10 seconds
+    producer:
+      bootstrap-servers: localhost:9094
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: '*'
   config:
     import: optional:configserver:http://localhost:8888
     activate:

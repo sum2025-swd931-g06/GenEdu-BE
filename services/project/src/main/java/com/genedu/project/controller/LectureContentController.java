@@ -101,6 +101,7 @@ public class LectureContentController {
             @ApiResponse(responseCode = "404", description = "Lecture content with the given ID not found.")
     })
     @PostMapping("/lecture-content/{finalizedLectureId}/video-generation-async")
+    @Deprecated
     public ResponseEntity<Void> generateLectureVideoForLectureContentAsync(
             @PathVariable("finalizedLectureId") UUID finalizedLectureId
     ) {
@@ -114,6 +115,7 @@ public class LectureContentController {
             @ApiResponse(responseCode = "404", description = "Lecture content with the given ID not found.")
     })
     @PostMapping("/lecture-content/{lectureContentId}/narration-generation")
+    @Deprecated
     public ResponseEntity<LectureContentResponseDTO> generateNarrationForLectureContent(
             @PathVariable("lectureContentId") UUID lectureContentId
     ) {

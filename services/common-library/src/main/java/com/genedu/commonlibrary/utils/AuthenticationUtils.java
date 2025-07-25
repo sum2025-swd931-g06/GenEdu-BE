@@ -82,4 +82,14 @@ public final class AuthenticationUtils {
         return UUID.fromString(userId);
 
     }
+
+    public static String extracUserEmailFromJwt(String jwt) {
+        if (jwt == null || jwt.isEmpty()) {
+            return null;
+        }
+        Jwt jwtToken = Jwt.withTokenValue(jwt).build();
+        String email = jwtToken.getClaimAsString("email");
+        log.info("Extracted user email from JWT: {}", email);
+        return email;
+    }
 }

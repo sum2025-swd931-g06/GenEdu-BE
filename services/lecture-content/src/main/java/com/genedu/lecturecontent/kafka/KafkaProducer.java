@@ -8,8 +8,7 @@ import org.springframework.stereotype.Service;
 public class KafkaProducer {
     private final KafkaTemplate<String, LectureVideoGenerateEvent> lectureVideoGenerateTemplate;
 
-
-    public KafkaProducer(KafkaTemplate<String, LectureVideoGenerateEvent> lectureVideoGenerateTemplate) {
+    public KafkaProducer(KafkaTemplate<String, LectureVideoGenerateEvent> lectureVideoGenerateTemplate ) {
         this.lectureVideoGenerateTemplate = lectureVideoGenerateTemplate;
     }
 
