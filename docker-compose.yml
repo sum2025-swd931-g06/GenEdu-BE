@@ -88,7 +88,7 @@ services:
   kafka:
     container_name: kafka
     image: bitnami/kafka:latest
-    hostname: "${KAFKA_HOST-kafka}"
+    hostname: kafka
     ports:
       - "${KAFKA_PORT-9092}:9092"
       - "${KAFKA_PORT_OUTSIDE-9094}:9094"
