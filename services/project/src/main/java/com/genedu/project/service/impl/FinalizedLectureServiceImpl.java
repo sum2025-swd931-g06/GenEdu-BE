@@ -9,11 +9,13 @@ import com.genedu.project.kafka.KafkaProducer;
 import com.genedu.project.mapper.FinalizedLectureMapper;
 import com.genedu.project.model.FinalizedLecture;
 import com.genedu.project.model.LectureContent;
+import com.genedu.project.model.Project;
 import com.genedu.project.model.SlideContent;
 import com.genedu.project.model.enumeration.LectureStatus;
 import com.genedu.project.model.enumeration.PublishedStatus;
 import com.genedu.project.repository.FinalizedLectureRepository;
 import com.genedu.project.repository.LectureContentRepository;
+import com.genedu.project.repository.ProjectRepository;
 import com.genedu.project.repository.SlideContentRepository;
 import com.genedu.project.service.FinalizedLectureService;
 import com.genedu.project.service.LectureContentService;
@@ -122,6 +124,15 @@ public class FinalizedLectureServiceImpl implements FinalizedLectureService {
         log.info("Generating narration for lecture content ID: {}", lectureContentId);
 
         kafkaProducer.sendSlideNarrationEvent(event);
+    }
+
+    @Override
+    public List<FinalizedLectureResponseDTO> getFinalizedLectureByProjectId(UUID projectId) {
+        List<LectureContent> lectureContents = lectureContentRepository.findByProjectIdAndDeletedIsFalse(projectId);
+        return lectureContents.stream()
+                .filter(lectureContent -> lectureContent.getFinalizedLecture() != null)
+                .map(lectureContent -> finalizedLectureMapper.toDTO(lectureContent.getFinalizedLecture()))
+                .toList();
     }
 
     public FinalizedLecture createFinalizedLectureEntity(
