@@ -12,8 +12,18 @@ import com.genedu.media.repository.S3StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,7 +69,8 @@ public class NarrationAudioServiceImpl implements MediaFileService<SlideNarratio
 
     @Override
     public SlideNarrationAudioDownloadDTO systematicSaveMediaFile(SlideNarrationAudioUploadDTO mediaFile) throws IOException {
-        return null;
+        UUID userId = new UUID(0, 0); // Use a system user ID for systematic operations
+        return saveFileInternal(mediaFile, FileType.AUDIO, userId);
     }
 
     private SlideNarrationAudioDownloadDTO saveFileInternal(SlideNarrationAudioUploadDTO uploadDTO, FileType fileType, UUID uploadedBy) throws IOException {
@@ -168,5 +179,50 @@ public class NarrationAudioServiceImpl implements MediaFileService<SlideNarratio
     @Override
     public SlideNarrationAudioDownloadDTO getMediaFileByProjectId(String projectId) {
         return null;
+    }
+
+
+    public Path createSilentAudio(double durationInSeconds, Path workingDir) {
+        try {
+            // 1. Define a standard audio format (e.g., 44.1kHz, 16-bit, mono, signed PCM)
+            float sampleRate = 44100;
+            int sampleSizeInBits = 16;
+            int channels = 1; // mono
+            boolean signed = true;
+            boolean bigEndian = false;
+            AudioFormat format = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+
+            // 2. Calculate the number of bytes needed for the specified duration
+            // Formula: (sampleRate * bitsPerSample / 8 * channels * duration)
+            int bytesPerFrame = format.getFrameSize();
+            long numFrames = (long) (durationInSeconds * format.getFrameRate());
+            int totalBytes = (int) (numFrames * bytesPerFrame);
+
+            // 3. Create a byte array of zeros, which represents silence in PCM audio
+            byte[] audioData = new byte[totalBytes]; // Java initializes byte arrays to 0, which is silence
+
+            Path silentAudioPath = workingDir.resolve("silent.wav");
+            File outputFile = silentAudioPath.toFile();
+
+            // 4. Use a try-with-resources block to create an AudioInputStream from the silent byte array
+            try (AudioInputStream audioInputStream = new AudioInputStream(
+                    new ByteArrayInputStream(audioData),
+                    format,
+                    numFrames
+            )) {
+                // 5. Write the audio stream to the output file in WAV format
+                AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, outputFile);
+            }
+
+            log.debug("Created {}s silent audio file at {}", durationInSeconds, silentAudioPath);
+            return silentAudioPath;
+        } catch (IOException e) {
+            throw new FileStorageException("Failed to create silent audio file", e);
+        }
+    }
+
+    public Path getDefaultSilentAudio(Path workingDir) {
+        // Now calls the generator to create a 2-second silent audio file as requested.
+        return createSilentAudio(2.0, workingDir);
     }
 }

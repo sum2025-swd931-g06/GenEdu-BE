@@ -61,4 +61,12 @@ public class FinalizedLectureController {
         finalizedLectureServiceImpl.updateNarrationAudioForLectureContent(finalizedLectureId, lectureVideoId);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/finalized-lectures/{finalizedLectureId}/lecture-videos")
+    public ResponseEntity<Void> generateNarrationForLectureContentAsync(
+            @PathVariable("finalizedLectureId") UUID finalizedLectureId
+    ) {
+        finalizedLectureServiceImpl.generatedLectureVideo(finalizedLectureId);
+        return ResponseEntity.ok().build();
+    }
 }

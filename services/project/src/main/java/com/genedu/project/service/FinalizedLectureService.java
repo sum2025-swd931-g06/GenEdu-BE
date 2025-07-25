@@ -23,4 +23,6 @@ public interface FinalizedLectureService {
     public boolean isFinalizedLectureExists(UUID finalizedLectureId);
 
     void updateNarrationAudioForLectureContent(UUID finalizedLectureId, Long lectureVideoId);
+
+    void generatedLectureVideo(UUID finalizedLectureId);
 }

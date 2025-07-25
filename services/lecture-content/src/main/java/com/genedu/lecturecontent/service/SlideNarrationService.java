@@ -69,14 +69,16 @@ public class SlideNarrationService {
                             slideNarrationEvent.getJwtToken()
                     );
 
-                    slideNarrationAudios.put(slideNarration.getOrderNumber(), slideNarrationAudioDownloadDTO.getId());
+                    slideNarrationAudios.put(slideNarration.getOrderNumber()-1, slideNarrationAudioDownloadDTO.getId());
                     log.info("Successfully uploaded narration for slideId: {}", slideNarration.getSlideId());
                 } else {
-                    log.warn("Failed to generate audio for slideId: {}", slideNarration.getSlideId());
+                    log.warn("Failed to generate audio for slideId: {}. Use the default audio.", slideNarration.getSlideId());
+                    slideNarrationAudios.put(slideNarration.getOrderNumber()-1, 1L);
                 }
             } catch (Exception e) {
                 // This ensures that a failure for one slide doesn't stop the others.
                 log.error("An unexpected error occurred while processing narration for slideId: {}", slideNarration.getSlideId(), e);
+                slideNarrationAudios.put(slideNarration.getOrderNumber()-1, 1L);
             }
         }
 

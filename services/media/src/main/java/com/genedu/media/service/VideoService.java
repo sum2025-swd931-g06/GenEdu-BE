@@ -54,7 +54,15 @@ public class VideoService {
                 if (narrationFileId == null) {
                     throw new IllegalArgumentException("Missing narration audio file ID for slide index: " + i);
                 }
-                // This requires a new helper method in NarrationAudioServiceImpl.
+
+                if (narrationFileId == 1) {
+                    // Using Silent audio file for slide without narration
+                    log.debug("Using silent audio for slide {} as no narration is provided.", i);
+                    Path silentAudioPath = narrationAudioService.getDefaultSilentAudio(workingDir);
+                    narrationAudioPaths.add(silentAudioPath);
+                    continue;
+                }
+
                 Path audioPath = narrationAudioService.downloadAudioToDirectory(narrationFileId, workingDir);
                 narrationAudioPaths.add(audioPath);
                 log.debug("Downloaded narration for slide {} to {}", i, audioPath);

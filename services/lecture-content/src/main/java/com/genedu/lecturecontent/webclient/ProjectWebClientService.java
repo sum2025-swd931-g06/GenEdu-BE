@@ -19,7 +19,7 @@ import java.util.UUID;
 public class ProjectWebClientService {
     private final WebClient contentWebClient;
     private static final String GET_PROJECT_BY_ID_URI = "/projects/{projectId}";
-    private static final String POST_LECTURE_CONTENT_URI = "/projects/lecture-content";
+    private static final String POST_LECTURE_CONTENT_URI = "/projects/lecture-contents";
     private static final String PUT_SLIDE_CONTENT_NARRATION_URI = "/projects/lecture-content/slide-content/{slideContentId}/narration-audio";
 
     public ProjectWebClientService(
