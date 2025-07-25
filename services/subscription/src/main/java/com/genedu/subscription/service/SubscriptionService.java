@@ -15,6 +15,5 @@ public interface SubscriptionService {
     void notifyExpiringSubscriptions() throws StripeException;
     void updateReminderStatus(String subscriptionId, boolean isSent);
     Optional<SubscriptionResponseDTO> getSubscriptionByStripeSubscriptionId(String stripeSubscriptionId);
-    List<SubscriptionResponseDTO> getUserSubscriptions(UUID userId);
     SubscriptionResponseDTO getActiveSubscription(UUID userId);
 }

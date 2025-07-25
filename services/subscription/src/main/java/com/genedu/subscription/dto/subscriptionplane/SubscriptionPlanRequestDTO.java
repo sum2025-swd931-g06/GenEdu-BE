@@ -6,6 +6,7 @@ public record SubscriptionPlanRequestDTO(
         String name,
         String description,
         BigDecimal price,
-        Integer durationInDays
+        Integer durationInDays,
+        boolean isActive
         ) {
 }

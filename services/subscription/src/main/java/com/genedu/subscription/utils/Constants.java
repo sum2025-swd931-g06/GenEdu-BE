@@ -26,6 +26,7 @@ public final class Constants {
         public static final String CREATE_FAILED = "CREATE_FAILED";
         public static final String UPDATE_FAILED = "UPDATE_FAILED";
         public static final String DELETE_FAILED = "DELETE_FAILED";
+        public static final String RETRIEVE_FAILED = "RETRIEVE_FAILED";
         public static final String UNAUTHENTICATED = "UNAUTHENTICATED";
         public static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
     }

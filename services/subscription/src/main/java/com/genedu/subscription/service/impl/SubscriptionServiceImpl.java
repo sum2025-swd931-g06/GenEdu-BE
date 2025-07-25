@@ -94,9 +94,10 @@ SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public void cancelAutoRenew(String subscriptionId) throws StripeException {
-        Subscription subscription = subscriptionRepo.findByStripeSubscriptionId(subscriptionId)
+        UUID subscriptionIdUUID = UUID.fromString(subscriptionId);
+        Subscription subscription = subscriptionRepo.findById(subscriptionIdUUID)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.SUBSCRIPTION_NOT_FOUND, subscriptionId));
-        com.stripe.model.Subscription stripeSubscription = com.stripe.model.Subscription.retrieve(subscriptionId);
+        com.stripe.model.Subscription stripeSubscription = com.stripe.model.Subscription.retrieve(subscription.getStripeSubscriptionId());
 
         SubscriptionUpdateParams params = SubscriptionUpdateParams.builder()
                 .setCancelAtPeriodEnd(true)
@@ -166,11 +167,6 @@ SubscriptionServiceImpl implements SubscriptionService {
     public Optional<SubscriptionResponseDTO> getSubscriptionByStripeSubscriptionId(String stripeSubscriptionId) {
         return subscriptionRepo.findByStripeSubscriptionId(stripeSubscriptionId)
                 .map(SubscriptionMapper::toDTO);
-    }
-
-    @Override
-    public List<SubscriptionResponseDTO> getUserSubscriptions(UUID userId) {
-        return List.of();
     }
 
     @Override

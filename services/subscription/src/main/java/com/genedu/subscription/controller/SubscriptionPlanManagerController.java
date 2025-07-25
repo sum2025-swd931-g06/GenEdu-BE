@@ -7,11 +7,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.net.URI;
-import java.util.List;
 
 /**
  * Controller for managing subscription plans in the administrative context.
@@ -45,7 +48,7 @@ public class SubscriptionPlanManagerController {
     }
 
     @DeleteMapping("/{planId}")
-    @Operation(summary = "Soft delete a subscription plan (mark as inactive)")
+    @Operation(summary = "Delete a subscription plan (soft delete)")
     public ResponseEntity<Void> delete(@PathVariable String planId) {
         subscriptionPlanService.deleteSubscriptionPlan(planId);
         return ResponseEntity.noContent().build();
@@ -58,10 +61,23 @@ public class SubscriptionPlanManagerController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+//
+//    @GetMapping
+//    @Operation(summary = "Get a list of all subscription plans (including soft-deleted ones)")
+//    public ResponseEntity<List<SubscriptionPlanResponseDTO>> getAll() {
+//        return ResponseEntity.ok(subscriptionPlanService.getAllSubscriptionPlansNotDeletedAndActive());
+//    }
 
-    @GetMapping
-    @Operation(summary = "Get a list of all subscription plans (including soft-deleted ones)")
-    public ResponseEntity<List<SubscriptionPlanResponseDTO>> getAll() {
-        return ResponseEntity.ok(subscriptionPlanService.getAllSubscriptionPlans());
+    @GetMapping("/search")
+    @Operation(summary = "Search for subscription plans with optional filters")
+    public ResponseEntity<Page<SubscriptionPlanResponseDTO>> searchPlans(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) Integer durationInDays,
+            @RequestParam(required = false) BigDecimal price,
+            @ParameterObject Pageable pageable
+    ) {
+        Page<SubscriptionPlanResponseDTO> result = subscriptionPlanService.searchPlans(name, isActive, durationInDays, price, pageable);
+        return ResponseEntity.ok(result);
     }
 }

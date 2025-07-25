@@ -22,27 +22,15 @@ import java.util.UUID;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    @Operation(summary = "Cancel auto-renewal for a subscription")
+    @Operation(summary = "Cancel auto-renewal for a subscription by ID")
     @PostMapping("/{subscriptionId}/cancel-auto-renew")
     public ResponseEntity<String> cancelAutoRenew(@PathVariable String subscriptionId) throws StripeException {
         subscriptionService.cancelAutoRenew(subscriptionId);
         return ResponseEntity.ok("Auto-renew canceled");
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<List<SubscriptionResponseDTO>> getUserSubscriptions(@PathVariable String userId) {
-        var result = subscriptionService.getUserSubscriptions(UUID.fromString(userId));
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/users/{userId}/active")
-    public ResponseEntity<SubscriptionResponseDTO> getActiveSubscription(@PathVariable String userId) {
-        var result = subscriptionService.getActiveSubscription(UUID.fromString(userId));
-        return ResponseEntity.ok(result);
-    }
-
-    //    @Scheduled(cron = "0 0 9 * * ?") // chạy mỗi 9h sáng hàng ngày
-    @Scheduled(cron = "*/10 * * * * *")
+        @Scheduled(cron = "0 0 9 * * ?") // chạy mỗi 9h sáng hàng ngày
+//    @Scheduled(cron = "*/10 * * * * *")
     public ResponseEntity<Void> notifyExpiringSubscriptions() throws StripeException {
         subscriptionService.notifyExpiringSubscriptions();
         return ResponseEntity.noContent().build();
