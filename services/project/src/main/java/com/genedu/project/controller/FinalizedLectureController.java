@@ -20,11 +20,19 @@ public class FinalizedLectureController {
 
     private final FinalizedLectureServiceImpl finalizedLectureServiceImpl;
 
-    @GetMapping("/{lectureContentId}/finalized-lectures")
+    @GetMapping("/lecture-contents/{lectureContentId}/finalized-lectures")
     public ResponseEntity<List<FinalizedLectureResponseDTO>> getFinalizedLecture(
             @PathVariable("lectureContentId") UUID lectureContentId
     ) {
         List<FinalizedLectureResponseDTO> finalizedLectures = finalizedLectureServiceImpl.getFinalizedLecturesByLectureContentId(lectureContentId);
+        return ResponseEntity.ok(finalizedLectures);
+    }
+
+    @GetMapping("/{projectId}/finalized-lectures")
+    public ResponseEntity<List<FinalizedLectureResponseDTO>> getAllFinalizedLecturesByProjectId(
+            @PathVariable("projectId") UUID projectId
+    ) {
+        List<FinalizedLectureResponseDTO> finalizedLectures = finalizedLectureServiceImpl.getFinalizedLectureByProjectId(projectId);
         return ResponseEntity.ok(finalizedLectures);
     }
 

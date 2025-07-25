@@ -25,4 +25,6 @@ public interface FinalizedLectureService {
     void updateNarrationAudioForLectureContent(UUID finalizedLectureId, Long lectureVideoId);
 
     void generatedLectureVideo(UUID finalizedLectureId);
+
+    List<FinalizedLectureResponseDTO> getFinalizedLectureByProjectId(UUID projectId);
 }
