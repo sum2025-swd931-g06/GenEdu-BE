@@ -13,7 +13,6 @@ import java.util.Optional;
 
 public interface SubscriptionPlanService {
     //Manager Methods
-    List<SubscriptionPlanResponseDTO> getAllSubscriptionPlansNotDeletedAndActive();
     SubscriptionPlanResponseDTO createSubscriptionPlan(SubscriptionPlanRequestDTO requestDTO);
     SubscriptionPlanResponseDTO updateSubscriptionPlan(String planId, SubscriptionPlanRequestDTO requestDTO);
     void deleteSubscriptionPlan(String planId);

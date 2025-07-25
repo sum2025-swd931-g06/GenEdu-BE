@@ -239,18 +239,6 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.SUBSCRIPTION_PLAN_NOT_FOUND, planId));
     }
 
-    /**
-     * Retrieves all subscription plans that are not soft-deleted.
-     *
-     * @return a list of SubscriptionPlanResponseDTOs.
-     */
-    @Override
-    public List<SubscriptionPlanResponseDTO> getAllSubscriptionPlansNotDeletedAndActive() {
-        return subscriptionPlanRepository.findAllByDeletedIsFalse().stream()
-                .map(SubscriptionPlanMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
     @Override
     public List<SubscriptionPlanUserResponseDTO> getAllSubscriptionPlansForUser() {
         return subscriptionPlanRepository.findAllByDeletedIsFalseAndIsActiveIsTrue().stream()
