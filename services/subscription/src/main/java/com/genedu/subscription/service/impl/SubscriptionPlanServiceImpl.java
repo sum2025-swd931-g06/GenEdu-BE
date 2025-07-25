@@ -280,11 +280,9 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
             // 1. Ẩn Product trên Stripe (ẩn chứ không xóa vì Stripe không hỗ trợ xóa Product)
             Product product = Product.retrieve(plan.getStripeProductId());
             Map<String, Object> stripeParams = new HashMap<>();
-            stripeParams.put("active", false); // Đánh dấu product là không còn hoạt động
-            product.update(stripeParams);
             product.setActive(false);
-
             plan.setDeleted(true);
+//            product.update(stripeParams);
             subscriptionPlanRepository.save(plan);
         } catch (Exception e) {
             log.error("Error deleting subscription plan", e);

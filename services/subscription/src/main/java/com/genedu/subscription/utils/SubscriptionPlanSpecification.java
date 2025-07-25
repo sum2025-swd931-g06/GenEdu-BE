@@ -13,7 +13,7 @@ public class SubscriptionPlanSpecification {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            predicates.add(cb.isFalse(root.get("isDeleted")));
+            predicates.add(cb.isFalse(root.get("deleted")));
 
             if (name != null && !name.isEmpty()) {
                 predicates.add(cb.like(cb.lower(root.get("planName")), "%" + name.toLowerCase() + "%"));

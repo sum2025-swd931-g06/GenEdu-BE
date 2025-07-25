@@ -61,12 +61,6 @@ public class SubscriptionPlanManagerController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-//
-//    @GetMapping
-//    @Operation(summary = "Get a list of all subscription plans (including soft-deleted ones)")
-//    public ResponseEntity<List<SubscriptionPlanResponseDTO>> getAll() {
-//        return ResponseEntity.ok(subscriptionPlanService.getAllSubscriptionPlansNotDeletedAndActive());
-//    }
 
     @GetMapping("/search")
     @Operation(summary = "Search for subscription plans with optional filters")

@@ -29,7 +29,7 @@ public class SubscriptionController {
         return ResponseEntity.ok("Auto-renew canceled");
     }
 
-        @Scheduled(cron = "0 0 9 * * ?") // chạy mỗi 9h sáng hàng ngày
+        @Scheduled(cron = "0 0 9 * * ?")
 //    @Scheduled(cron = "*/10 * * * * *")
     public ResponseEntity<Void> notifyExpiringSubscriptions() throws StripeException {
         subscriptionService.notifyExpiringSubscriptions();

@@ -19,12 +19,8 @@ public record SubscriptionPlanResponseDTO(
         Integer durationInDays,
         @JsonInclude(JsonInclude.Include.NON_NULL)
         String stripeProductId,
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        boolean isDeleted,
         boolean isActive,
         ZonedDateTime createdOn,
-        UUID createdBy,
-        ZonedDateTime lastModifiedOn,
-        UUID lastModifiedBy
+        ZonedDateTime lastModifiedOn
 ) {
 }

@@ -28,12 +28,7 @@ public class SubscriptionPlanMapper {
                 .durationInDays(subscriptionPlan.getDuration())
                 .isActive(subscriptionPlan.getIsActive())
                 .createdOn(subscriptionPlan.getCreatedOn())
-                .createdBy(subscriptionPlan.getCreatedBy())
                 .lastModifiedOn(subscriptionPlan.getLastModifiedOn())
-                .lastModifiedBy(subscriptionPlan.getLastModifiedBy())
-//                .isDeleted(subscriptionPlan.isDeleted())
-//                .stripeProductId(subscriptionPlan.getStripeProductId())
-//                .stripePriceId(subscriptionPlan.getStripePriceId())
                 .build();
     }
 
