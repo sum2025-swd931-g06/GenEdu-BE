@@ -69,6 +69,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
                     .setName(requestDTO.name())
                     .setDescription(requestDTO.description())
                     .setTaxCode("txcd_10000000") // txcd_10000000: General - Electronically Supplied Services
+                    .setActive(requestDTO.isActive())
                     .build();
             Product product = Product.create(productParams);
 
