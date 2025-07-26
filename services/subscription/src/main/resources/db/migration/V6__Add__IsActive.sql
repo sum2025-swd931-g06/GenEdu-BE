@@ -1,0 +1,2 @@
+ALTER TABLE subscription_plans
+    ADD COLUMN is_active BOOLEAN DEFAULT FALSE NOT NULL;

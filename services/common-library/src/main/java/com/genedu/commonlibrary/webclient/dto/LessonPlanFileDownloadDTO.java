@@ -19,6 +19,5 @@ public class LessonPlanFileDownloadDTO {
     private String fileUrl;
     private UUID uploadedBy;
     private LocalDateTime uploadedOn;
-    @JsonIgnore
     private String content;
 }

@@ -3,22 +3,29 @@ package com.genedu.subscription.service.impl;
 import com.genedu.commonlibrary.exception.BadRequestException;
 import com.genedu.commonlibrary.exception.DuplicatedException;
 import com.genedu.commonlibrary.exception.InternalServerErrorException;
+import com.genedu.commonlibrary.exception.NotFoundException;
 import com.genedu.subscription.dto.subscriptionplane.SubscriptionPlanRequestDTO;
 import com.genedu.subscription.dto.subscriptionplane.SubscriptionPlanResponseDTO;
+import com.genedu.subscription.dto.subscriptionplane.SubscriptionPlanUserResponseDTO;
 import com.genedu.subscription.mapper.SubscriptionPlanMapper;
 import com.genedu.subscription.model.SubscriptionPlan;
 import com.genedu.subscription.repository.SubscriptionPlanRepository;
 import com.genedu.subscription.service.SubscriptionPlanService;
 import com.genedu.subscription.utils.Constants;
+import com.genedu.subscription.utils.SubscriptionPlanSpecification;
 import com.stripe.model.Price;
 import com.stripe.model.Product;
 import com.stripe.param.PriceCreateParams;
 import com.stripe.param.ProductCreateParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,6 +69,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
                     .setName(requestDTO.name())
                     .setDescription(requestDTO.description())
                     .setTaxCode("txcd_10000000") // txcd_10000000: General - Electronically Supplied Services
+                    .setActive(requestDTO.isActive())
                     .build();
             Product product = Product.create(productParams);
 
@@ -141,7 +149,8 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
             boolean planInfoChanged =
                     !subscriptionPlan.getPlanName().equals(requestDTO.name()) ||
                             !subscriptionPlan.getDescription().equals(requestDTO.description()) ||
-                            !subscriptionPlan.getDuration().equals(requestDTO.durationInDays());
+                            !subscriptionPlan.getDuration().equals(requestDTO.durationInDays()) ||
+                            !subscriptionPlan.getIsActive().equals(requestDTO.isActive());
 
             if (planInfoChanged) {
                 Product product = Product.retrieve(subscriptionPlan.getStripeProductId());
@@ -149,11 +158,14 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
                 Map<String, Object> updateParams = new HashMap<>();
                 updateParams.put("name", requestDTO.name());
                 updateParams.put("description", requestDTO.description());
+                updateParams.put("active", requestDTO.isActive());
+//                product.setActive(requestDTO.isActive());
                 product.update(updateParams);
 
                 subscriptionPlan.setPlanName(requestDTO.name());
                 subscriptionPlan.setDescription(requestDTO.description());
                 subscriptionPlan.setDuration(requestDTO.durationInDays());
+                subscriptionPlan.setIsActive(requestDTO.isActive());
             }
 
             if (priceChanged) {
@@ -199,12 +211,22 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     public Optional<SubscriptionPlanResponseDTO> getSubscriptionPlan(String planId) {
         try {
             UUID planUUID = UUID.fromString(planId);
-            return subscriptionPlanRepository.findById(planUUID)
-                    .filter(plan -> !plan.isDeleted())
+            return subscriptionPlanRepository.findByIdAndDeletedIsFalse(planUUID)
                     .map(SubscriptionPlanMapper::toDTO);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(Constants.ErrorCode.INVALID_SUBSCRIPTION_PLAN_ID, planId);
+        } catch (Exception e) {
+            log.error("Error retrieving subscription plan", e);
+            throw new InternalServerErrorException(Constants.ErrorCode.RETRIEVE_FAILED, e.getMessage());
         }
+    }
+
+    @Override
+    public Page<SubscriptionPlanResponseDTO> searchPlans(String name, Boolean isActive, Integer durationInDays, BigDecimal price, Pageable pageable) {
+        Specification<SubscriptionPlan> spec = SubscriptionPlanSpecification.build(name, isActive, durationInDays, price);
+
+        return subscriptionPlanRepository.findAll(spec, pageable)
+                .map(SubscriptionPlanMapper::toDTO);
     }
 
     /**
@@ -218,31 +240,19 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     public SubscriptionPlan getSubscriptionPlanEntity(String planId) {
         UUID planUUID = UUID.fromString(planId);
         return subscriptionPlanRepository.findByIdAndDeletedIsFalse(planUUID)
-                .orElseThrow(() -> new BadRequestException(Constants.ErrorCode.SUBSCRIPTION_PLAN_NOT_FOUND, planId));
+                .orElseThrow(() -> new NotFoundException(Constants.ErrorCode.SUBSCRIPTION_PLAN_NOT_FOUND, planId));
     }
 
-    /**
-     * Retrieves all subscription plans that are not soft-deleted.
-     *
-     * @return a list of SubscriptionPlanResponseDTOs.
-     */
     @Override
-    public List<SubscriptionPlanResponseDTO> getAllSubscriptionPlansNotDeleted() {
-        return subscriptionPlanRepository.findAllByDeletedIsFalse().stream()
-                .map(SubscriptionPlanMapper::toDTO)
+    public List<SubscriptionPlanUserResponseDTO> getAllSubscriptionPlansForUser() {
+        return subscriptionPlanRepository.findAllByDeletedIsFalseAndIsActiveIsTrue().stream()
+                .map(SubscriptionPlanMapper::toUserDTO)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Retrieves all subscription plans including those that have been soft-deleted.
-     *
-     * @return a list of all SubscriptionPlanResponseDTOs.
-     */
     @Override
-    public List<SubscriptionPlanResponseDTO> getAllSubscriptionPlans() {
-        return subscriptionPlanRepository.findAll().stream()
-                .map(SubscriptionPlanMapper::toDTO)
-                .collect(Collectors.toList());
+    public Optional<SubscriptionPlanUserResponseDTO> getSubscriptionPlanForUser(String planId) {
+        return Optional.empty();
     }
 
     /**
@@ -262,10 +272,9 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
             // 1. Ẩn Product trên Stripe (ẩn chứ không xóa vì Stripe không hỗ trợ xóa Product)
             Product product = Product.retrieve(plan.getStripeProductId());
             Map<String, Object> stripeParams = new HashMap<>();
-            stripeParams.put("active", false); // Đánh dấu product là không còn hoạt động
-            product.update(stripeParams);
-
+            product.setActive(false);
             plan.setDeleted(true);
+//            product.update(stripeParams);
             subscriptionPlanRepository.save(plan);
         } catch (Exception e) {
             log.error("Error deleting subscription plan", e);

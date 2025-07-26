@@ -1,5 +1,6 @@
 package com.genedu.lecturecontent.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -29,6 +30,14 @@ public record Slide(
     public record WelcomeSlideData(String subtitle) implements SlideData {}
     public record ContentSlideData(String body) implements SlideData {}
     public record ListSlideData(List<String> items) implements SlideData {}
-    public record CompareSlideData(String left_header, List<String> left_points, String right_header, List<String> right_points) implements SlideData {}
+    public record CompareSlideData(
+            // BEST PRACTICE: Use camelCase for Java fields for internal consistency.
+            // The @JsonProperty annotation maps the Java field to the snake_case JSON property,
+            // ensuring the external API contract for the frontend remains unchanged.
+            @JsonProperty("left_header") String leftHeader,
+            @JsonProperty("left_points") List<String> leftPoints,
+            @JsonProperty("right_header") String rightHeader,
+            @JsonProperty("right_points") List<String> rightPoints
+    ) implements SlideData {}
     public record ThanksSlideData(String message) implements SlideData {}
 }

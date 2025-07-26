@@ -42,6 +42,7 @@ public class PaymentController {
 
         // 1. Get or create billing account and ensure Stripe customer exists
         var billingAccount = userBillingAccountService.ensureStripeCustomer(userId.toString(), "VN");
+        System.out.println("Billing Account customerId: " + billingAccount.paymentGatewayCustomerId());
 
         // 2. Get subscription plan
         var subscriptionPlan = subscriptionPlanService.getSubscriptionPlan(subscriptionPlanId)

@@ -46,21 +46,9 @@ public class SubscriptionPlan extends AbstractAuditEntity{
     @Column(name = "stripe_price_id", nullable = false, unique = true, length = 255)
     private String stripePriceId;
 
-//    @Column(name = "created_on")
-//    private Instant createdOn;
-//
-//    @Column(name = "last_modified_on")
-//    private Instant lastModifiedOn;
-//
-//    @Column(name = "created_by")
-//    private UUID createdBy;
-//
-//    @Column(name = "last_modified_by")
-//    private UUID lastModifiedBy;
-//
-//    @NotNull
-//    @ColumnDefault("false")
-//    @Column(name = "is_deleted", nullable = false)
-//    private Boolean isDeleted = false;
+    @NotNull
+    @ColumnDefault("false")
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = false;
 
 }

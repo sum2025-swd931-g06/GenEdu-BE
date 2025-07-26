@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,35 +22,17 @@ import java.util.UUID;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    @Operation(summary = "Cancel auto-renewal for a subscription")
+    @Operation(summary = "Cancel auto-renewal for a subscription by ID")
     @PostMapping("/{subscriptionId}/cancel-auto-renew")
     public ResponseEntity<String> cancelAutoRenew(@PathVariable String subscriptionId) throws StripeException {
         subscriptionService.cancelAutoRenew(subscriptionId);
         return ResponseEntity.ok("Auto-renew canceled");
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<List<SubscriptionResponseDTO>> getUserSubscriptions(@PathVariable String userId) {
-        var result = subscriptionService.getUserSubscriptions(UUID.fromString(userId));
-        return ResponseEntity.ok(result);
+        @Scheduled(cron = "0 0 9 * * ?")
+//    @Scheduled(cron = "*/10 * * * * *")
+    public ResponseEntity<Void> notifyExpiringSubscriptions() throws StripeException {
+        subscriptionService.notifyExpiringSubscriptions();
+        return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/users/{userId}/active")
-    public ResponseEntity<SubscriptionResponseDTO> getActiveSubscription(@PathVariable String userId) {
-        var result = subscriptionService.getActiveSubscription(UUID.fromString(userId));
-        return ResponseEntity.ok(result);
-    }
-
-    @Scheduled(cron = "0 0 9 * * ?") // chạy mỗi 9h sáng hàng ngày
-    public void notifyExpiringSubscriptions() {
-//        LocalDateTime now = LocalDateTime.now();
-//        LocalDateTime threshold = now.plusDays(3); // hoặc cấu hình số ngày từ config
-//
-//        List<Subscription> expiring = subscriptionRepository.findAllByAutoRenewTrueAndEndedAtBetween(now, threshold);
-//        for (Subscription sub : expiring) {
-//            emailService.sendReminder(sub.getUserId(), "Your subscription will expire on " + sub.getEndedAt());
-//        }
-    }
-
-
 }

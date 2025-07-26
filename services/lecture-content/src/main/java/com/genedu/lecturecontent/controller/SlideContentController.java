@@ -75,6 +75,8 @@ public class SlideContentController {
         String format = lessonPlanConverter.getFormat();
         // 1. Get the uploaded lesson plan content by project ID.
         String lessonPlanContent = slideContentService.getLessonPlanContentByProjectId(projectId);
+
+        log.info("Lesson plan content retrieved for project ID {}: {}", projectId, lessonPlanContent);
         PromptTemplate promptTemplate = new PromptTemplate(planGenerationPromptResource);
         promptTemplate.add("unstructured_content", lessonPlanContent);
         promptTemplate.add("format", format);
@@ -92,6 +94,7 @@ public class SlideContentController {
             log.error("Lesson with ID {} not found.", projectResponseDTO.lessonId());
             return Flux.error(new IllegalArgumentException("Lesson not found"));
         }
+
         log.info("Lesson found: {}", lessonEntityResponseDTO);
         SlideContentRequestDTO slideContentRequest = new SlideContentRequestDTO(
                 lessonEntityResponseDTO.lessonId(),
@@ -206,10 +209,10 @@ public class SlideContentController {
             return Map.of("items", d.items());
         } else if (data instanceof Slide.CompareSlideData d) {
             return Map.of(
-                    "left_header", d.left_header(),
-                    "left_points", d.left_points(),
-                    "right_header", d.right_header(),
-                    "right_points", d.right_points()
+                    "leftHeader", d.leftHeader(),
+                    "leftPoints", d.leftPoints(),
+                    "rightHeader", d.rightHeader(),
+                    "rightPoints", d.rightPoints()
             );
         } else if (data instanceof Slide.ThanksSlideData d) {
             return Map.of("message", d.message());
