@@ -27,17 +27,16 @@ public class SubscriptionPlanController {
 
     private final SubscriptionPlanService subscriptionPlanService;
 
-    @GetMapping("/{planId}")
-    @Operation(summary = "Xem chi tiết một gói subscription")
-    public ResponseEntity<SubscriptionPlanResponseDTO> getPlanById(@PathVariable String planId) {
-        return subscriptionPlanService.getSubscriptionPlan(planId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping
+    @Operation(summary = "Lấy danh sách gói subscription hoặc chi tiết nếu có truyền planId")
+    public ResponseEntity<?> getPlans(@RequestParam(required = false) String planId) {
+        if (planId != null) {
+            return subscriptionPlanService.getSubscriptionPlanForUser(planId)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        }
+        return ResponseEntity.ok(subscriptionPlanService.getAllSubscriptionPlansForUser());
     }
 
-    @GetMapping
-    @Operation(summary = "Lấy danh sách gói subscription hiện tại")
-    public ResponseEntity<List<SubscriptionPlanResponseDTO>> getAllPlans() {
-        return ResponseEntity.ok(subscriptionPlanService.getAllSubscriptionPlans());
-    }
+
 }

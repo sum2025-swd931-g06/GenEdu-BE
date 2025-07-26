@@ -34,10 +34,7 @@ public final class AuthenticationUtils {
     }
 
     public static Authentication getAuthentication() {
-//        return SecurityContextHolder.getContext().getAuthentication();
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Current authentication: " + auth);
-        return auth;
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 
     public static boolean isAuthenticated() {

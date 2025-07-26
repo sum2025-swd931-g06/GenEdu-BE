@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -18,11 +19,8 @@ public record SubscriptionPlanResponseDTO(
         Integer durationInDays,
         @JsonInclude(JsonInclude.Include.NON_NULL)
         String stripeProductId,
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        boolean isDeleted,
+        boolean isActive,
         ZonedDateTime createdOn,
-        UUID createdBy,
-        ZonedDateTime lastModifiedOn,
-        UUID lastModifiedBy
+        ZonedDateTime lastModifiedOn
 ) {
 }

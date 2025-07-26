@@ -83,4 +83,26 @@ public class EmailServiceImpl implements EmailService {
         }
 
     }
+
+    @Override
+    public void sendReminderEmail(String to, String userName, String planName, String endDate) {
+        log.info("Sending reminder email to: {}, User: {}, Plan: {}, End Date: {}",
+                to, userName, planName, endDate);
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject("Reminder: Your GenEdu subscription is about to expire.");
+            message.setText(String.format("Dear %s,\n\n" +
+                    "This is a friendly reminder that your subscription plan (%s) will expire on %s.\n" +
+                    "Please consider renewing your subscription to continue enjoying our services.\n\n" +
+                    "Best regards,\n" +
+                    "The GenEdu Team", userName, planName, endDate));
+
+            mailSender.send(message);
+        } catch (Exception e) {
+            log.error("Failed to send reminder email to {}: {}", to, e.getMessage());
+            throw new RuntimeException("Failed to send reminder email", e);
+        }
+    }
 }
