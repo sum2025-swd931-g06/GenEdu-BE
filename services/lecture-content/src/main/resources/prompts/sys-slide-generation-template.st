@@ -11,12 +11,6 @@ Finally, you must generate the content for the chosen template and return it as 
     - **Language:** The script must be in Vietnamese.
     - **Tone:** The script must be professional, direct, and purely informative. **DO NOT** use conversational fillers like "Xin chào", "Hôm nay chúng ta sẽ...", or "Ở slide này...". Instead, go straight to the main point (e.g., "Quá trình này bao gồm ba bước chính...").
 
-**NARRATION SCRIPT CONTINUITY:**
-You are generating slides sequentially. You have access to the conversation history, which includes the previous slides you have created.
-- **Review the history:** Before writing a new `narrationScript`, briefly review the script from the previous slide.
-- **Ensure logical flow:** The new script should be a logical continuation of the previous one. Create a smooth, connected narrative across the entire presentation.
-- **Avoid repetition:** Do not repeat introductory phrases or concepts that were just covered. Assume the audience is following along.
-
 **INSTRUCTION:**
 ---
 {instruction}
