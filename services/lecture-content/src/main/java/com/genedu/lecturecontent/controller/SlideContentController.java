@@ -156,22 +156,22 @@ public class SlideContentController {
                 )
                 .doOnNext(slide -> {
                     generatedSlides.add(slide.data());
-                })
-                .doOnComplete(
-                        () -> projectWebClientService.postLectureContent(
-                                new LectureContentRequestDTO(
-                                        projectId,
-                                        lessonPlan.title(),
-                                        generatedSlides.stream()
-                                                .map(slide -> mapToSlideContentResponseDTO(
-                                                        slide,
-                                                        generatedSlides.indexOf(slide) + 1
-                                                ))
-                                                .toList()
-                                ),
-                                jwtToken
-                        )
-                );
+                });
+//                .doOnComplete(
+//                        () -> projectWebClientService.postLectureContent(
+//                                new LectureContentRequestDTO(
+//                                        projectId,
+//                                        lessonPlan.title(),
+//                                        generatedSlides.stream()
+//                                                .map(slide -> mapToSlideContentResponseDTO(
+//                                                        slide,
+//                                                        generatedSlides.indexOf(slide) + 1
+//                                                ))
+//                                                .toList()
+//                                ),
+//                                jwtToken
+//                        )
+//                );
     }
 
     private com.genedu.lecturecontent.dto.webclient.SlideContentRequestDTO mapToSlideContentResponseDTO(
