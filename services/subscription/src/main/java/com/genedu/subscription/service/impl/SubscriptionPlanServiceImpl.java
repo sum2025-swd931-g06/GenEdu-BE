@@ -148,7 +148,8 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
             boolean planInfoChanged =
                     !subscriptionPlan.getPlanName().equals(requestDTO.name()) ||
                             !subscriptionPlan.getDescription().equals(requestDTO.description()) ||
-                            !subscriptionPlan.getDuration().equals(requestDTO.durationInDays());
+                            !subscriptionPlan.getDuration().equals(requestDTO.durationInDays()) ||
+                            !subscriptionPlan.getIsActive().equals(requestDTO.isActive());
 
             if (planInfoChanged) {
                 Product product = Product.retrieve(subscriptionPlan.getStripeProductId());
@@ -156,6 +157,8 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
                 Map<String, Object> updateParams = new HashMap<>();
                 updateParams.put("name", requestDTO.name());
                 updateParams.put("description", requestDTO.description());
+                updateParams.put("active", requestDTO.isActive());
+//                product.setActive(requestDTO.isActive());
                 product.update(updateParams);
 
                 subscriptionPlan.setPlanName(requestDTO.name());
