@@ -8,6 +8,7 @@ import com.genedu.notification.repositories.NotificationRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,6 +16,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+@Slf4j
 @SpringBootApplication
 @RequiredArgsConstructor
 @ComponentScan(basePackages = {"com.genedu.notification", "com.genedu.commonlibrary"})
@@ -25,6 +27,7 @@ public class NotificationApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
         SpringApplication.run(NotificationApplication.class, args);
+        log.info("Notification Service is running...");
 
 //        JavaBrowserLauncher.openHomePage("http://localhost:8095/swagger-ui.html");
 
